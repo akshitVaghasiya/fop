@@ -12,6 +12,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Item } from 'src/common/models/item.model';
 import { ItemInterest } from 'src/common/models/item-interest.model';
 import { ItemReceiver } from 'src/common/models/item-receiver.model';
+import { Sequelize } from 'sequelize-typescript';
 
 @Module({
   imports: [
@@ -20,7 +21,15 @@ import { ItemReceiver } from 'src/common/models/item-receiver.model';
     CloudinaryModule,
   ],
   controllers: [ItemsController, InterestsController, ReceiversController],
-  providers: [ItemsService, InterestsService, ReceiversService],
+  providers: [
+    ItemsService,
+    InterestsService,
+    ReceiversService,
+    {
+      provide: 'SEQUELIZE',
+      useExisting: Sequelize,
+    }
+  ],
   exports: [ItemsService],
 })
-export class ItemsModule {}
+export class ItemsModule { }

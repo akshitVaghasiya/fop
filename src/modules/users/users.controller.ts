@@ -1,5 +1,20 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Patch, Query, Req, } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Query,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,6 +23,7 @@ import { User } from '../../common/models/users.model';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { UserRole } from '../../common/models/users.model';
 import { UpdateUserStatusDto } from './dto/user-status.dto';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -23,11 +39,8 @@ export class UsersController {
   async me(@Req() req: AuthenticatedRequest) {
     try {
       return await this.userService.me(req.user.id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('User not found');
-      }
-      throw error;
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
     }
   }
 
@@ -38,7 +51,11 @@ export class UsersController {
   async findAll(
     @Query() filters: UserFilterDto,
   ): Promise<{ data: User[]; total: number }> {
-    return this.userService.findAll(filters);
+    try {
+      return await this.userService.findAll(filters);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 
   @Get(':id')
@@ -51,8 +68,12 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'User details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
-  getUser(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userService.findOneById(id);
+  async getUser(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
+    try {
+      return await this.userService.findOneById(id);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 
   @Patch(':id')
@@ -61,11 +82,15 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'UUID of the user' })
   @ApiResponse({ status: 200, description: 'Updated user details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
-  updateUser(
+  async updateUser(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdateUserDto,
   ) {
-    return this.userService.updateUser(id, updateDto);
+    try {
+      return await this.userService.updateUser(id, updateDto);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 
   @Patch(':id/status')
@@ -86,6 +111,10 @@ export class UsersController {
     @Body() dto: UpdateUserStatusDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.userService.updateUserStatus(user_id, dto.is_active, req.user);
+    try {
+      return await this.userService.updateUserStatus(user_id, dto.is_active, req.user);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 }

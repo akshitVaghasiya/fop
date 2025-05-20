@@ -1,29 +1,27 @@
-import fs from 'fs';
-import path from 'path';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
-const migrationName = process.argv[2];
-if (!migrationName) {
-    console.error('Please provide a migration name.');
-    process.exit(1);
-}
+function generateMigrationFile(migrationName?: string) {
+  const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12); // Generate timestamp in YYYYMMDDHHMM format
+  const fileName = migrationName ? `${timestamp}-${migrationName}.ts` : `${timestamp}.ts`;
+  const filePath = join(__dirname, '../database/migrations', fileName);
 
-const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '');
-const fileName = `${timestamp}-${migrationName}.ts`;
-
-// Replace __dirname with process.cwd()
-const filePath = path.join(process.cwd(), 'src/migrations', fileName);
-
-const template = `
+  const boilerplate = `
 import { QueryInterface } from 'sequelize';
 
-export async function up(queryInterface: QueryInterface): Promise<void> {
-  // Write your migration logic here
+async function up(queryInterface: QueryInterface): Promise<void> {
+  // Add your migration logic here
 }
 
-export async function down(queryInterface: QueryInterface): Promise<void> {
-  // Write your rollback logic here
+async function down(queryInterface: QueryInterface): Promise<void> {
+  // Add your rollback logic here
 }
+
+export default { up, down };
 `;
 
-fs.writeFileSync(filePath, template);
-console.log(`Migration created: ${filePath}`);
+  writeFileSync(filePath, boilerplate.trim());
+}
+
+const migrationName = process.argv[2];
+generateMigrationFile(migrationName);

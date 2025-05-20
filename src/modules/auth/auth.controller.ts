@@ -11,12 +11,13 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { Public } from 'src/common/decorators/public/public.decorator';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Public()
   @Get('hello')
@@ -32,9 +33,11 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 409, description: 'Email already registered' })
   async register(@Body() signUpDto: SignUpDto) {
-    const user = await this.authService.register(signUpDto);
-
-    return user;
+    try {
+      return await this.authService.register(signUpDto);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 
   @Public()
@@ -47,7 +50,11 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 403, description: 'Account deactivated' })
-  login(@Body() signInDto: SignInDto) {
-    return this.authService.login(signInDto);
+  async login(@Body() signInDto: SignInDto) {
+    try {
+      return await this.authService.login(signInDto);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 }

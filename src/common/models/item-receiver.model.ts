@@ -1,12 +1,5 @@
-import {
-  Table,
-  Column,
-  Model,
-  DataType,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
-import { User } from 'src/common/models/users.model';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, } from 'sequelize-typescript';
+import { User } from './users.model';
 import { Item } from './item.model';
 
 @Table({

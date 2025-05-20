@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CustomConfigModule } from './common/config/config.module';
 import { DatabaseModule } from './common/database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles/roles.guard';
 import { AuthGuard } from './common/guards/auth/auth.guard';
 import { ItemsModule } from './modules/items/items.module';
@@ -13,11 +13,12 @@ import { GlobalExceptionFilter } from './common/exceptions/global-exception.filt
 import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 import { User } from './common/models/users.model';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware';
 
 @Module({
   imports: [
-    CustomConfigModule,
     DatabaseModule,
+    CustomConfigModule,
     UsersModule,
     AuthModule,
     ItemsModule,
@@ -41,4 +42,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
     },
   ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

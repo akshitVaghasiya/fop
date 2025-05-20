@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, } from 'sequelize-typescript';
 import { Item } from './item.model';
-import { User } from 'src/common/models/users.model';
+import { User } from './users.model';
 
 @Table({
   tableName: 'item_interests',
@@ -17,7 +17,7 @@ export class ItemInterest extends Model {
   declare id: string;
 
   @ForeignKey(() => Item)
-  @Column({ type: DataType.UUID, allowNull: false, field: 'item_id' })
+  @Column({ type: DataType.UUID, primaryKey: true })
   item_id: string;
 
   @BelongsTo(() => Item, { onDelete: 'CASCADE' })

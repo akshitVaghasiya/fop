@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ItemType } from '../types/item-type.enum';
 import { IsEnum, IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { ItemType } from 'src/common/types/enums/items.enum';
 
 export class CreateItemDto {
   @ApiProperty({

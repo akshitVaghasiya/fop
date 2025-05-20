@@ -22,7 +22,7 @@ export class User extends Model {
   })
   declare id: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, primaryKey: true })
   name: string;
 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })

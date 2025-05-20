@@ -1,16 +1,13 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '../../common/models/users.model';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { Item } from 'src/common/models/item.model';
+import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 
 @Injectable()
 export class UsersService {
@@ -19,110 +16,132 @@ export class UsersService {
     private readonly userModel: typeof User,
   ) { }
 
-  async create(createUserDto: SignUpDto): Promise<User> {
-    return this.userModel.create({
-      name: createUserDto.name,
-      email: createUserDto.email,
-      password: createUserDto.password,
+  create(createUserDto: SignUpDto): Promise<User> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user = await this.userModel.create({
+          name: createUserDto.name,
+          email: createUserDto.email,
+          password: createUserDto.password,
+        });
+        resolve(user); // Direct return, not using constant for success
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const data = await this.userModel.findOne({
-      where: { email: email },
-      raw: true,
+  findByEmail(email: string): Promise<User | null> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.userModel.findOne({
+          where: { email },
+          raw: true,
+        });
+        resolve(data);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
     });
-
-    return data;
   }
 
-  async findAll(
-    filters: UserFilterDto,
-  ): Promise<{ data: User[]; total: number }> {
-    const { search, page = 1, limit = 5 } = filters;
+  findAll(filters: UserFilterDto): Promise<{ data: User[]; total: number }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { search, page = 1, limit = 5 } = filters;
+        const { rows: data, count: total } = await this.userModel.findAndCountAll({
+          where: search ? { name: { [Op.iLike]: `%${search}%` } } : undefined,
+          offset: (page - 1) * limit,
+          limit,
+          distinct: true,
+          include: [
+            {
+              model: Item,
+              as: 'items',
+            },
+          ],
+        });
+        resolve({ data, total });
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
+    });
+  }
 
-    const { rows: data, count: total } = await this.userModel.findAndCountAll({
-      where: search ? { name: { [Op.iLike]: `%${search}%` } } : undefined,
-      offset: (page - 1) * limit,
-      limit,
-      distinct: true,
-      include: [
-        {
-          model: Item,
-          as: 'items'
+  me(id: string): Promise<User> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user = await this.userModel.findByPk(id, {
+          attributes: { exclude: ['password'] },
+        });
+        if (!user) {
+          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
         }
-      ],
-      // group: Sequelize.col('items.type')
-      // include: { all: true, nested: true }
-      // include: [
-      //   {
-      //     model: Item,
-      //     // required: false,
-      //     // right: true,
-      //     subQuery: false
-      //   }
-      // ],
+        resolve(user);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
     });
-
-    return { data, total };
   }
 
-  async me(id: string): Promise<User> {
-    const user = await this.userModel.findByPk(id, {
-      attributes: { exclude: ['password'] },
+  findOneById(id: string): Promise<User> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user = await this.userModel.findByPk(id, { raw: true });
+        if (!user) {
+          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+        }
+        resolve(user);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
     });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user;
   }
 
-  async findOneById(id: string): Promise<User> {
-    const user = await this.userModel.findByPk(id, { raw: true });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user;
-  }
-
-  async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
-    const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
-      where: { id },
-      returning: true,
+  updateUser(id: string, dto: UpdateUserDto): Promise<User> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
+          where: { id },
+          returning: true,
+        });
+        if (rowsUpdated === 0) {
+          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+        }
+        resolve(updatedUsers[0]);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
     });
-
-    if (rowsUpdated === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    return updatedUsers[0];
   }
 
-  async updateUserStatus(
+  updateUserStatus(
     user_id: string,
     is_active: boolean,
     currentUser: AuthUser,
   ): Promise<User> {
-    if (user_id === currentUser.id) {
-      throw new ForbiddenException("You can't change your own status");
-    }
-
-    const [rowsUpdated, updatedUsers] = await this.userModel.update(
-      { is_active },
-      {
-        where: { id: user_id },
-        returning: true,
-      },
-    );
-
-    if (rowsUpdated === 0) {
-      throw new NotFoundException('User not found');
-    }
-
-    return updatedUsers[0];
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (user_id === currentUser.id) {
+          return reject({
+            error: ERROR_MESSAGES.FORBIDDEN_SELF_STATUS_CHANGE,
+            statusCode: 403,
+          });
+        }
+        const [rowsUpdated, updatedUsers] = await this.userModel.update(
+          { is_active },
+          {
+            where: { id: user_id },
+            returning: true,
+          },
+        );
+        if (rowsUpdated === 0) {
+          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+        }
+        resolve(updatedUsers[0]);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
+    });
   }
 }

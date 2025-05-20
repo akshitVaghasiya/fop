@@ -11,12 +11,13 @@ import { UserRole } from 'src/common/models/users.model';
 import { AssignReceiverDto } from '../dto/assign-receiver.dto';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { ReceiversService } from './receivers.service';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
 @ApiTags('Item Receivers')
 @ApiBearerAuth()
 @Controller('items/:id/assign-receiver')
 export class ReceiversController {
-  constructor(private readonly receiversService: ReceiversService) {}
+  constructor(private readonly receiversService: ReceiversService) { }
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -30,17 +31,20 @@ export class ReceiversController {
   @ApiParam({
     name: 'id',
     description: 'UUID of the item',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   async assignReceiver(
     @Param('id') item_id: string,
     @Body() dto: AssignReceiverDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.receiversService.assignReceiver(
-      item_id,
-      dto.receiver_user_id,
-      req.user.id,
-    );
+    try {
+      return await this.receiversService.assignReceiver(
+        item_id,
+        dto.receiver_user_id,
+        req.user.id,
+      );
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 }

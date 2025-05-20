@@ -8,9 +8,8 @@ import {
   Max,
   MaxLength,
 } from 'class-validator';
-import { ItemType } from '../types/item-type.enum';
-import { ItemStatus } from '../types/item-status.enum';
 import { Type } from 'class-transformer';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 export class ItemFilterDto {
   @ApiPropertyOptional({ enum: ItemType, description: 'Filter items by type' })

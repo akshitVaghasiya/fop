@@ -20,6 +20,16 @@ export class AppService {
   ): Promise<any> {
     const { search, page = 1, limit = 5 } = filters;
 
+    const data = await this.userModel.findAll({
+      include: [
+        {
+          model: Item,
+        }
+      ],
+      where: Sequelize.literal('1=1'),
+      raw: true,
+      nest: true  
+    });
     // const data = await this.userModel.findAll({
     //   include: [
     //     {
@@ -34,27 +44,27 @@ export class AppService {
     //   group: ['users.id'],
     // });
 
-    const data = await this.userModel.findAll({
-      where: search ? { name: { [Op.iLike]: `%${search}%` } } : undefined,
-      offset: (page - 1) * limit,
-      limit: 10,
-      attributes: {
-        include: [
-          [Sequelize.fn('COUNT', Sequelize.col('items.id')), 'totalItem'],
-          [Sequelize.literal(`SUM(CASE WHEN items.type = 'FREE' THEN 1 ELSE 0 END)`), 'freeItem'],
-        ],
-      },
-      include: [
-        {
-          model: Item,
-          as: 'items',
-          attributes: []
-        }
-      ],
-      group: ['User.id'],
-      subQuery: false,
-      order: [['freeItem', 'DESC'], ['name', 'ASC']]
-    });
+    // const data = await this.userModel.findAll({
+    //   where: search ? { name: { [Op.iLike]: `%${search}%` } } : undefined,
+    //   offset: (page - 1) * limit,
+    //   limit: 10,
+    //   attributes: {
+    //     include: [
+    //       [Sequelize.fn('COUNT', Sequelize.col('items.id')), 'totalItem'],
+    //       [Sequelize.literal(`SUM(CASE WHEN items.type = 'FREE' THEN 1 ELSE 0 END)`), 'freeItem'],
+    //     ],
+    //   },
+    //   include: [
+    //     {
+    //       model: Item,
+    //       as: 'items',
+    //       attributes: []
+    //     }
+    //   ],
+    //   group: ['User.id'],
+    //   subQuery: false,
+    //   order: [['freeItem', 'DESC'], ['name', 'ASC']]
+    // });
 
     return data;
   }

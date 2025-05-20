@@ -10,30 +10,34 @@ import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { UserRole } from 'src/common/models/users.model';
 import { InterestsService } from './interests.service';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
 @ApiTags('Item Interests')
 @ApiBearerAuth()
 @Controller('items/:id/interests')
 export class InterestsController {
-  constructor(private readonly interestsService: InterestsService) {}
+  constructor(private readonly interestsService: InterestsService) { }
 
   @Post()
+  // @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiOperation({ summary: 'Express interest in an item' })
   @ApiResponse({ status: 201, description: 'Interest successfully created' })
   @ApiParam({
     name: 'id',
     description: 'UUID of the item',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   async createInterest(
     @Param('id') item_id: string,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.interestsService.createInterest(
-      item_id,
-      req.user.id,
-      req.user.role,
-    );
+    try {
+      return await this.interestsService.createInterest(
+        item_id,
+        req.user.id,
+      );
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 
   @Get()
@@ -43,13 +47,16 @@ export class InterestsController {
     status: 200,
     description: 'List of interests for the item',
     type: [Object],
-  }) 
+  })
   @ApiParam({
     name: 'id',
     description: 'UUID of the item',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   async getInterests(@Param('id') item_id: string) {
-    return this.interestsService.getInterests(item_id);
+    try {
+      return await this.interestsService.getInterests(item_id);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
 }

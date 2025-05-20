@@ -1,9 +1,8 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, HasOne, } from 'sequelize-typescript';
 import { ItemInterest } from './item-interest.model';
 import { ItemReceiver } from './item-receiver.model';
-import { User } from 'src/common/models/users.model';
-import { ItemType } from 'src/modules/items/types/item-type.enum';
-import { ItemStatus } from 'src/modules/items/types/item-status.enum';
+import { User } from './users.model';
+import { ItemStatus, ItemType } from '../types/enums/items.enum';
 
 @Table({
   tableName: 'items',
@@ -48,7 +47,7 @@ export class Item extends Model {
   status: ItemStatus;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false, field: 'user_id' })
+  @Column({ type: DataType.UUID, primaryKey: true })
   user_id: string;
 
   @BelongsTo(() => User, { onDelete: 'CASCADE' })
