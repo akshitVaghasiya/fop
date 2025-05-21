@@ -14,6 +14,7 @@ import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 import { User } from './common/models/users.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware';
+import { UserPreference } from './common/models/user-preference.model';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware'
     AuthModule,
     ItemsModule,
     CloudinaryModule,
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, UserPreference]),
   ],
   controllers: [AppController],
   providers: [

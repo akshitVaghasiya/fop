@@ -75,4 +75,8 @@ export const ERROR_MESSAGES = {
     error: 'INVALID_FILE_TYPE',
     message: 'Invalid file type',
   },
+  OLD_PASSWORD_INCORRECT: {
+    error: 'OLD_PASSWORD_INCORRECT',
+    message: 'Old password is incorrect',
+  }
 };

@@ -13,7 +13,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
 
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let error = ERROR_MESSAGES.INTERNAL_SERVER_ERROR.error;

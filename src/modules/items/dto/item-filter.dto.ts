@@ -49,4 +49,20 @@ export class ItemFilterDto {
   @MaxLength(50)
   @IsOptional()
   search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    default: 'created_at',
+  })
+  @IsString()
+  @IsOptional()
+  sort_by?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort order (ASC or DESC)',
+    default: 'DESC',
+  })
+  @IsString()
+  @IsOptional()
+  sort_type?: 'ASC' | 'DESC';
 }

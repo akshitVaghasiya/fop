@@ -14,6 +14,26 @@ import { ItemReceiver } from 'src/common/models/item-receiver.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
+type WhereType = {
+    type?: string;
+    status?: string;
+    [Op.or]?: [
+        { title: { [Op.iLike]: string } },
+        { description: { [Op.iLike]: string } }
+    ];
+};
+
+type PageContext = {
+    page: number;
+    limit: number;
+    total: number;
+    type?: string;
+    status?: string;
+    search?: string;
+    sort_by?: string;
+    sort_type?: string;
+};
+
 @Injectable()
 export class ItemsService {
     constructor(
@@ -55,36 +75,52 @@ export class ItemsService {
 
     findAll(
         filters: ItemFilterDto,
-    ): Promise<{ data: Item[]; total: number }> {
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
-            const where: any = {};
+            console.log("filters-->", filters);
 
-            if (filters.type) where.type = filters.type;
-            if (filters.status) where.status = filters.status;
-            if (filters.search) {
-                where[Op.or] = [
-                    { title: { [Op.iLike]: `%${filters.search}%` } },
-                    { description: { [Op.iLike]: `%${filters.search}%` } },
-                ];
-            }
+            const {
+                page = 1,
+                limit = 5,
+                type,
+                status,
+                search,
+                sort_by = 'created_at',
+                sort_type = 'DESC',
+            } = filters;
 
-            const page = filters.page ?? 1;
-            const limit = filters.limit ?? 5;
+            const where: WhereType = {
+                ...(type && { type }),
+                ...(status && { status }),
+                ...(search && {
+                    [Op.or]: [
+                        { title: { [Op.iLike]: `%${search}%` } },
+                        { description: { [Op.iLike]: `%${search}%` } },
+                    ],
+                }),
+            };
 
             try {
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
+                    order: [[sort_by, sort_type]],
                     offset: (page - 1) * limit,
                     limit,
-                    // include: [
-                    //     {
-                    //         model: User,
-                    //         as: 'user',
-                    //         attributes: ['id', 'name', 'email'],
-                    //     },
-                    // ],
                 });
-                resolve({ data: rows, total: count });
+
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(type && { type }),
+                    ...(status && { status }),
+                    ...(search && { search }),
+                    ...(filters.sort_by && { sort_by: filters.sort_by }),
+                    ...(filters.sort_type && { sort_type: filters.sort_type }),
+                };
+
+                resolve({ items: rows, page_context });
+
             } catch (error) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }

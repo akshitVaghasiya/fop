@@ -4,6 +4,7 @@ import { User } from '../models/users.model';
 import { Item } from '../models/item.model';
 import { ItemInterest } from '../models/item-interest.model';
 import { ItemReceiver } from '../models/item-receiver.model';
+import { UserPreference } from '../models/user-preference.model';
 
 export const sequelizeConfig: SequelizeModuleOptions = {
     dialect: 'postgres',
@@ -12,9 +13,9 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    models: [User, Item, ItemInterest, ItemReceiver],
+    models: [User, Item, ItemInterest, ItemReceiver, UserPreference],
     synchronize: false,
     // autoLoadModels: true,
-    logging: false
-    // logging: (msg) => console.log(msg)
+    // logging: false,
+    logging: (msg) => console.log(msg)
 };

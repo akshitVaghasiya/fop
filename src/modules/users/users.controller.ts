@@ -31,18 +31,18 @@ import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
-  @Get('me')
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  @ApiOperation({ summary: 'Get current user details' })
-  @ApiResponse({ status: 200, description: 'Current user details', type: User })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async me(@Req() req: AuthenticatedRequest) {
-    try {
-      return await this.userService.me(req.user.id);
-    } catch (err) {
-      throw new GlobalHttpException(err.error, err.statusCode);
-    }
-  }
+  // @Get('me')
+  // @Roles(UserRole.ADMIN, UserRole.USER)
+  // @ApiOperation({ summary: 'Get current user details' })
+  // @ApiResponse({ status: 200, description: 'Current user details', type: User })
+  // @ApiResponse({ status: 404, description: 'User not found' })
+  // async me(@Req() req: AuthenticatedRequest) {
+  //   try {
+  //     return await this.userService.me(req.user.id);
+  //   } catch (err) {
+  //     throw new GlobalHttpException(err.error, err.statusCode);
+  //   }
+  // }
 
   @Get()
   @Roles(UserRole.ADMIN)

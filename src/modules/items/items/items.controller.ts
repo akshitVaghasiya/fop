@@ -85,7 +85,7 @@ export class ItemsController {
   })
   async findAll(
     @Query() filters: ItemFilterDto,
-  ): Promise<{ data: Item[]; total: number }> {
+  ): Promise<{ items: Item[]; }> {
     try {
       return await this.itemsService.findAll(filters);
     } catch (err) {

@@ -1,17 +1,14 @@
-import {
-  Body,
-  ClassSerializerInterceptor,
-  Controller,
-  Get,
-  Post,
-  UseInterceptors,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, ClassSerializerInterceptor, Controller, Get, Post, Req, UseInterceptors, } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { Public } from 'src/common/decorators/public/public.decorator';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { User, UserRole } from 'src/common/models/users.model';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Authentication')
@@ -53,6 +50,39 @@ export class AuthController {
   async login(@Body() signInDto: SignInDto) {
     try {
       return await this.authService.login(signInDto);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+  @Get('userInfo')
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiOperation({ summary: 'Get current user details' })
+  @ApiResponse({ status: 200, description: 'Current user details', type: User })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async userInfo(@Req() req: AuthenticatedRequest) {
+    try {
+      return await this.authService.userInfo(req.user.id);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+  @Post('changePassword')
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @ApiOperation({ summary: 'Change user password' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid old password' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async changePassword(
+    @Req() req: AuthenticatedRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    try {
+      const userId = req.user.id;
+      return await this.authService.changePassword(userId, changePasswordDto);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }

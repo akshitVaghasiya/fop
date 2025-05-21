@@ -24,7 +24,7 @@ export class UsersService {
           email: createUserDto.email,
           password: createUserDto.password,
         });
-        resolve(user); // Direct return, not using constant for success
+        resolve(user); 
       } catch (error) {
         reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
       }
@@ -68,21 +68,21 @@ export class UsersService {
     });
   }
 
-  me(id: string): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const user = await this.userModel.findByPk(id, {
-          attributes: { exclude: ['password'] },
-        });
-        if (!user) {
-          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
-        }
-        resolve(user);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
-  }
+  // me(id: string): Promise<User> {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const user = await this.userModel.findByPk(id, {
+  //         attributes: { exclude: ['password'] },
+  //       });
+  //       if (!user) {
+  //         return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+  //       }
+  //       resolve(user);
+  //     } catch (error) {
+  //       reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+  //     }
+  //   });
+  // }
 
   findOneById(id: string): Promise<User> {
     return new Promise(async (resolve, reject) => {
