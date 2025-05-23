@@ -13,6 +13,7 @@ import { ItemInterest } from 'src/common/models/item-interest.model';
 import { ItemReceiver } from 'src/common/models/item-receiver.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 type WhereType = {
     type?: string;
@@ -77,7 +78,6 @@ export class ItemsService {
         filters: ItemFilterDto,
     ): Promise<{ items: Item[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
-            console.log("filters-->", filters);
 
             const {
                 page = 1,
@@ -130,25 +130,31 @@ export class ItemsService {
     findSharedItems(
         user_id: string,
         filters: { page?: number; limit?: number; search?: string },
-    ): Promise<{ data: Item[]; total: number }> {
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
 
-            const page = filters.page ?? 1;
-            const limit = filters.limit ?? 5;
-
-            const where: { status: string;[Op.or]?: object[] } = {
-                status: 'CLAIMED',
-            };
-
-            if (filters.search) {
-                where[Op.or] = [
-                    { title: { [Op.iLike]: `%${filters.search}%` } },
-                    { description: { [Op.iLike]: `%${filters.search}%` } },
-                ];
-            }
-            console.log("where-->", where);
-
             try {
+                const {
+                    page = 1,
+                    limit = 5,
+                    search,
+                } = filters;
+
+                const where: {
+                    type: ItemType;
+                    status: ItemStatus;
+                    [Op.or]?: { [key: string]: { [key: symbol]: string } }[];
+                } = {
+                    type: ItemType.FREE,
+                    status: ItemStatus.CLAIMED,
+                };
+
+                if (search) {
+                    where[Op.or] = [
+                        { title: { [Op.iLike]: `%${filters.search}%` } },
+                    ];
+                }
+
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
                     include: [
@@ -163,12 +169,18 @@ export class ItemsService {
                             ]
                         },
                     ],
+                    order: [['created_at', 'DESC']],
                     offset: (page - 1) * limit,
                     limit,
                 });
-                console.log("rows-->", rows);
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(search && { search }),
+                };
 
-                resolve({ data: rows, total: count });
+                resolve({ items: rows, page_context });
             } catch (error) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
@@ -178,8 +190,17 @@ export class ItemsService {
     findUserItems(
         user_id: string,
         filters: ItemFilterDto,
-    ): Promise<{ data: Item[]; total: number }> {
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
+            const {
+                page = 1,
+                limit = 5,
+                type,
+                status,
+                search,
+                sort_by = 'created_at',
+                sort_type = 'DESC',
+            } = filters;
 
             const where: {
                 user_id: string;
@@ -188,27 +209,24 @@ export class ItemsService {
                 [Op.or]?: { [key: string]: { [key: symbol]: string } }[];
             } = { user_id };
 
-            if (filters.type) where.type = filters.type;
-            if (filters.status) where.status = filters.status;
-            if (filters.search) {
+            if (filters.type) where.type = type;
+            if (filters.status) where.status = status;
+            if (search) {
                 where[Op.or] = [
                     { title: { [Op.iLike]: `%${filters.search}%` } },
                     { description: { [Op.iLike]: `%${filters.search}%` } },
                 ];
             }
 
-            const page = filters.page ?? 1;
-            const limit = filters.limit ?? 5;
-
             try {
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
                     include: [
-                        {
-                            model: User,
-                            as: 'user',
-                            attributes: ['id', 'name', 'email'],
-                        },
+                        // {
+                        //     model: User,
+                        //     as: 'user',
+                        //     attributes: ['id', 'name', 'email'],
+                        // },
                         {
                             model: ItemInterest,
                             as: 'interests',
@@ -218,10 +236,24 @@ export class ItemsService {
                             as: 'receiver',
                         },
                     ],
+                    order: [[sort_by, sort_type]],
                     offset: (page - 1) * limit,
                     limit,
                 });
-                resolve({ data: rows, total: count });
+
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(type && { type }),
+                    ...(status && { status }),
+                    ...(search && { search }),
+                    ...(filters.sort_by && { sort_by: filters.sort_by }),
+                    ...(filters.sort_type && { sort_type: filters.sort_type }),
+                };
+
+                resolve({ items: rows, page_context });
+
             } catch (error) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
@@ -304,14 +336,11 @@ export class ItemsService {
         file?: Express.Multer.File,
     ): Promise<Item> {
         return new Promise(async (resolve, reject) => {
-            console.log("updateItemDto-->", updateItemDto);
 
             let oldPublicId: string | undefined;
             let newPublicId: string | undefined;
             try {
                 const item = await this.itemsModel.findByPk(itemId);
-
-                console.log("itemmmm->", item);
 
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
@@ -325,9 +354,7 @@ export class ItemsService {
                 }
 
                 if (file) {
-                    console.log("file-->", file);
                     if (item.image_url) {
-                        console.log("item.image_url-->", item.image_url);
                         oldPublicId = this.cloudinaryService.extractPublicIdFromUrl(item.image_url);
                     }
                     const folder = ITEM_IMAGE_FOLDER;
@@ -359,10 +386,8 @@ export class ItemsService {
             let publicId: string | undefined;
             try {
                 const item = await this.itemsModel.findOne({ where: { id: itemId } });
-                console.log("item-->", item);
 
                 if (!item) {
-                    console.log("in if");
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
 
@@ -374,7 +399,6 @@ export class ItemsService {
 
                 const imageUrl = item.get('image_url');
                 if (imageUrl) {
-                    console.log("image url->", imageUrl);
 
                     publicId = this.cloudinaryService.extractPublicIdFromUrl(imageUrl);
                 }
@@ -382,8 +406,6 @@ export class ItemsService {
                 await item.destroy();
 
                 if (publicId) {
-                    console.log("public id-->", publicId);
-
                     await this.cloudinaryService.deleteImage(publicId);
                 }
 
@@ -395,23 +417,8 @@ export class ItemsService {
         });
     }
 
-    // validateItemAccess(user: AuthUser, item: Item): void {
-    //     try {
-    //         if (
-    //             user.role !== UserRole.ADMIN &&
-    //             (!item.user || item.user.id !== user.id)
-    //         ) {
-    //             throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_ACCESS, 403);
-    //         }
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-
     validateItemOwnership(user: AuthUser, item: Item): void {
         try {
-            console.log("item.user_id--->", item.user_id);
-            console.log("user.id--->", user.id);
 
             if (user.role !== UserRole.ADMIN && (item.user_id !== user.id)) {
                 throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);

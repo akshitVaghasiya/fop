@@ -1,10 +1,9 @@
-// cloudinary/cloudinary.service.ts
 import { Inject, Injectable } from '@nestjs/common';
 import { v2 as Cloudinary, UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class CloudinaryService {
-  constructor(@Inject('CLOUDINARY') private cloudinary: typeof Cloudinary) {}
+  constructor(@Inject('CLOUDINARY') private cloudinary: typeof Cloudinary) { }
 
   async uploadImage(
     file: Express.Multer.File,
@@ -16,9 +15,9 @@ export class CloudinaryService {
           .upload_stream(
             {
               folder,
-              resource_type: 'auto', // Detects file type automatically
-              use_filename: true, // Use original file name
-              unique_filename: true, // Generate a unique file name
+              resource_type: 'auto',
+              use_filename: true,
+              unique_filename: true,
             },
             (error, result) => {
               if (error) {
@@ -38,7 +37,7 @@ export class CloudinaryService {
               resolve(result);
             },
           )
-          .end(file.buffer); // End the stream with the file buffer
+          .end(file.buffer);
       });
     } catch (error) {
       if (error instanceof Error) {

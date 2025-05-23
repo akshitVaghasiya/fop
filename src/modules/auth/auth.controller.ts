@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Post, Req, UseInterceptors, } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -9,20 +9,12 @@ import { User, UserRole } from 'src/common/models/users.model';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
-@UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
-
-  @Public()
-  @Get('hello')
-  @ApiOperation({ summary: 'Hello endpoint (for testing purposes)' })
-  @ApiResponse({ status: 200, description: 'Returns a testing message' })
-  hello() {
-    return 'its hello!';
-  }
 
   @Public()
   @Post('register')
@@ -55,7 +47,7 @@ export class AuthController {
     }
   }
 
-  @Get('userInfo')
+  @Get('user_info')
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiOperation({ summary: 'Get current user details' })
@@ -69,7 +61,22 @@ export class AuthController {
     }
   }
 
-  @Post('changePassword')
+  @Public()
+  @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiResponse({ status: 200, description: 'New access and refresh tokens issued' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ) {
+    try {
+      return await this.authService.refreshToken(refreshTokenDto.refresh_token);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+  @Post('change_password')
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiOperation({ summary: 'Change user password' })

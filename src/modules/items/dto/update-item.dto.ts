@@ -40,11 +40,11 @@ export class UpdateItemDto {
   @IsOptional()
   location?: string;
 
-  @ApiProperty({
-    description: 'URL of the item image',
-    required: false,
-    example: 'https://example.com/image.jpg',
-  })
+  // @ApiProperty({
+  //   description: 'URL of the item image',
+  //   required: false,
+  //   example: 'https://example.com/image.jpg',
+  // })
   @IsString()
   @IsOptional()
   image_url?: string;

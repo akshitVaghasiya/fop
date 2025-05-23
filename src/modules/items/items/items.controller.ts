@@ -106,7 +106,7 @@ export class ItemsController {
   async findSharedItems(
     @Query() filters: Pick<ItemFilterDto, 'page' | 'limit' | 'search'>,
     @Req() req: AuthenticatedRequest,
-  ): Promise<{ data: Item[]; total: number }> {
+  ): Promise<{ items: Item[]; }> {
     try {
       return await this.itemsService.findSharedItems(req.user.id, filters);
     } catch (err) {
@@ -125,7 +125,7 @@ export class ItemsController {
   async findUserItems(
     @Query() filters: ItemFilterDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<{ data: Item[]; total: number }> {
+  ): Promise<{ items: Item[]; }> {
     try {
       return await this.itemsService.findUserItems(req.user.id, filters);
     } catch (err) {
@@ -143,10 +143,7 @@ export class ItemsController {
     @Param('id') id: string,
   ): Promise<Item> {
     try {
-      const item = await this.itemsService.findOne(id, req.user);
-      console.log("itemitemitemitem-->", item);
-
-      return item;
+      return await this.itemsService.findOne(id, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
@@ -196,19 +193,5 @@ export class ItemsController {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
   }
-
-  // private validateItemAccess(user: AuthUser, item: Item) {
-  //   if (user.role !== UserRole.ADMIN && item.user.id !== user.id) {
-  //     console.log("in if");
-
-  //     throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_ACCESS, 403);
-  //   }
-  // }
-
-  // private validateItemOwnership(user: AuthUser, item: Item): void {
-  //   if (user.role !== UserRole.ADMIN && item.user_id !== user.id) {
-  //     throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
-  //   }
-  // }
 
 }

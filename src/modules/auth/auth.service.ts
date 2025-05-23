@@ -21,8 +21,6 @@ export class AuthService {
   async register(signUpDto: SignUpDto): Promise<{ data: Omit<User, 'password'>; message: string }> {
     return new Promise(async (resolve, reject) => {
       try {
-        // const existingUser = await this.userService.findByEmail(signUpDto.email);
-
         const existingUser = await this.userModel.findOne({
           where: { email: signUpDto.email },
           raw: true,
@@ -46,7 +44,7 @@ export class AuthService {
 
         resolve({
           data: createdUser,
-          message: 'User registered successfully', // <-- Direct message here
+          message: 'User registered successfully',
         });
       } catch (err) {
         reject({
@@ -59,13 +57,13 @@ export class AuthService {
 
   async login(signInDto: SignInDto): Promise<{
     access_token: string;
-    data: Omit<User, 'password'>;
-    message: string;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+    refresh_expires_in: number;
   }> {
     return new Promise(async (resolve, reject) => {
       try {
-        // const user = await this.userService.findByEmail(signInDto.email);
-
         const user = await this.userModel.findOne({
           where: { email: signInDto.email },
           raw: true,
@@ -98,20 +96,82 @@ export class AuthService {
           name: user.name,
         };
 
-        const accessToken = this.jwtService.sign(payload);
-        // console.log("accessToken-->", accessToken);
+        const accessToken = this.jwtService.sign(payload, {
+          secret: process.env.JWT_SECRET,
+          expiresIn: Number(process.env.JWT_EXPIRE),
+        });
+
+        const refreshToken = this.jwtService.sign(payload, {
+          secret: process.env.JWT_REFRESH_SECRET,
+          expiresIn: Number(process.env.JWT_REFRESH_EXPIRE),
+        });
 
         resolve({
           access_token: accessToken,
-          data: user,
-          message: ERROR_MESSAGES.LOGIN_SUCCESS.message,
+          token_type: 'Bearer',
+          expires_in: Number(process.env.JWT_EXPIRE),
+          refresh_token: refreshToken,
+          refresh_expires_in: Number(process.env.JWT_REFRESH_EXPIRE),
         });
       } catch (err) {
-        console.log("err-->", err);
-
         reject({
           error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
           statusCode: 500,
+        });
+      }
+    });
+  }
+
+  async refreshToken(refreshToken: string): Promise<{
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+  }> {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        const payload = await this.jwtService.verifyAsync(refreshToken, {
+          secret: process.env.JWT_REFRESH_SECRET,
+        });
+
+        const user = await this.userModel.findOne({
+          where: { id: payload.id },
+          raw: true,
+        });
+
+        if (!user) {
+          return reject({
+            error: ERROR_MESSAGES.USER_NOT_FOUND,
+            statusCode: 404,
+          });
+        }
+
+        if (!user.is_active) {
+          return reject({
+            error: ERROR_MESSAGES.ACCOUNT_DEACTIVATED,
+            statusCode: 403,
+          });
+        }
+
+        const newPayload = {
+          id: user.id,
+          name: user.name,
+        };
+
+        const newAccessToken = this.jwtService.sign(newPayload, {
+          secret: process.env.JWT_SECRET,
+          expiresIn: Number(process.env.JWT_EXPIRE),
+        });
+
+        resolve({
+          access_token: newAccessToken,
+          token_type: 'Bearer',
+          expires_in: Number(process.env.JWT_EXPIRE),
+        });
+      } catch (err) {
+        reject({
+          error: ERROR_MESSAGES.INVALID_TOKEN,
+          statusCode: 401,
         });
       }
     });

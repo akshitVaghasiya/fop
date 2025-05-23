@@ -5,6 +5,22 @@ import { ItemInterest } from 'src/common/models/item-interest.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+import { ItemInterestFilterDto } from '../dto/item-interest-filter.dto';
+import { IncludeOptions, Op, WhereOptions } from 'sequelize';
+
+
+interface PageContext {
+    page: number;
+    limit: number;
+    total: number;
+    search?: string;
+}
+
+type UserInclude = IncludeOptions & {
+    as: 'user';
+    model: typeof User;
+    where?: WhereOptions;
+};
 
 @Injectable()
 export class InterestsService {
@@ -59,32 +75,72 @@ export class InterestsService {
         });
     }
 
-    getInterests(item_id: string): Promise<ItemInterest[]> {
+    getInterests(item_id: string, filters: ItemInterestFilterDto): Promise<{ interests: ItemInterest[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
             try {
-                const item = await this.itemsModel.findOne({
-                    where: {
-                        id: item_id,
-                        type: ItemType.FREE,
-                    },
-                });
-                console.log("item-->", item);
+                const {
+                    page = 1,
+                    limit = 10,
+                    search,
+                } = filters;
 
-                if (!item) {
+                // const item = await this.itemsModel.findOne({
+                //     where: {
+                //         id: item_id,
+                //         type: ItemType.FREE,
+                //     },
+                // });
+
+                // const where: WhereOptions = { item_id };
+                const where: WhereOptions = {};
+                const userInclude: UserInclude = {
+                    model: User,
+                    as: 'user',
+                    required: true,
+                    attributes: { exclude: ['password'] }
+                };
+
+                if (search) {
+                    userInclude.where = {
+                        [Op.or]: [
+                            { name: { [Op.iLike]: `%${search}%` } },
+                        ],
+                    };
+                }
+
+                const { rows, count } = await this.itemInterestModel.findAndCountAll({
+                    where,
+                    include: [
+                        userInclude,
+                        {
+                            model: Item,
+                            as: 'item',
+                            where: {
+                                id: item_id,
+                                type: ItemType.FREE,
+                            },
+                            required: true,
+                        }
+                    ],
+                    raw: true,
+                    nest: true,
+                    offset: (page - 1) * limit,
+                    limit,
+                });
+
+                // console.log("rows-->", rows);
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(search && { search }),
+                };
+
+                if (count === 0) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
 
-                const interests = await this.itemInterestModel.findAll({
-                    where: { item_id },
-                    include: [
-                        {
-                            model: User,
-                            as: 'user',
-                        },
-                    ],
-                });
-
-                resolve(interests);
+                resolve({ interests: rows, page_context });
             } catch (err) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }

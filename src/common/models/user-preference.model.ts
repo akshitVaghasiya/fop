@@ -32,10 +32,6 @@ export class UserPreference extends Model {
     @Column({
         type: DataType.JSONB,
         allowNull: false,
-        // get() {
-        //     return JSON.parse(this.getDataValue("search_filters"));
-        // },
-        // defaultValue: {},
     })
     search_filters: object;
 

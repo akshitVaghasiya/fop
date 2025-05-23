@@ -3,10 +3,17 @@ import { AppService } from './app.service';
 import { UserFilterDto } from './modules/users/dto/user-filter.dto';
 import { Public } from './common/decorators/public/public.decorator';
 import { AuthenticatedRequest } from './common/types/authenticated-request.type';
+import { GlobalHttpException } from './common/exceptions/global-exception';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
+
+  @Public()
+  @Get('ping')
+  ping() {
+    return 'pong';
+  }
 
   @Public()
   @Get()
@@ -34,10 +41,15 @@ export class AppController {
 
   @Public()
   @Get('raw')
-  raw() {
-    return this.appService.raw();
+  async raw() {
+    try {
+      // return await this.authService.userInfo(req.user.id);
+      return await this.appService.raw();
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
   }
-  
+
   @Public()
   @Get('cross')
   cross() {

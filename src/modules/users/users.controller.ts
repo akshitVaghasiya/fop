@@ -24,6 +24,7 @@ import { UserFilterDto } from './dto/user-filter.dto';
 import { UserRole } from '../../common/models/users.model';
 import { UpdateUserStatusDto } from './dto/user-status.dto';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { AuthUser } from 'src/common/types/auth-user.type';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -31,26 +32,13 @@ import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
-  // @Get('me')
-  // @Roles(UserRole.ADMIN, UserRole.USER)
-  // @ApiOperation({ summary: 'Get current user details' })
-  // @ApiResponse({ status: 200, description: 'Current user details', type: User })
-  // @ApiResponse({ status: 404, description: 'User not found' })
-  // async me(@Req() req: AuthenticatedRequest) {
-  //   try {
-  //     return await this.userService.me(req.user.id);
-  //   } catch (err) {
-  //     throw new GlobalHttpException(err.error, err.statusCode);
-  //   }
-  // }
-
   @Get()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   async findAll(
     @Query() filters: UserFilterDto,
-  ): Promise<{ data: User[]; total: number }> {
+  ): Promise<{ users: User[]; }> {
     try {
       return await this.userService.findAll(filters);
     } catch (err) {
@@ -64,7 +52,6 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'UUID of the user',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({ status: 200, description: 'User details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -77,17 +64,18 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiOperation({ summary: 'Update user details' })
   @ApiParam({ name: 'id', description: 'UUID of the user' })
   @ApiResponse({ status: 200, description: 'Updated user details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateUser(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
     @Body() updateDto: UpdateUserDto,
   ) {
     try {
-      return await this.userService.updateUser(id, updateDto);
+      return await this.userService.updateUser(id, updateDto, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
@@ -99,7 +87,6 @@ export class UsersController {
   @ApiParam({
     name: 'id',
     description: 'UUID of the user',
-    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({ status: 200, description: 'Updated user status', type: User })
   @ApiResponse({

@@ -15,7 +15,7 @@ import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 
 @ApiTags('Item Receivers')
 @ApiBearerAuth()
-@Controller('items/:id/assign-receiver')
+@Controller('items/:id/assign_receiver')
 export class ReceiversController {
   constructor(private readonly receiversService: ReceiversService) { }
 

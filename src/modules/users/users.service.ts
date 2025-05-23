@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../common/models/users.model';
+import { User, UserRole } from '../../common/models/users.model';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
@@ -8,6 +8,17 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Item } from 'src/common/models/item.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+
+type PageContext = {
+  page: number;
+  limit: number;
+  total: number;
+  type?: string;
+  status?: string;
+  search?: string;
+  sort_by?: string;
+  sort_type?: string;
+};
 
 @Injectable()
 export class UsersService {
@@ -24,7 +35,7 @@ export class UsersService {
           email: createUserDto.email,
           password: createUserDto.password,
         });
-        resolve(user); 
+        resolve(user);
       } catch (error) {
         reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
       }
@@ -45,12 +56,17 @@ export class UsersService {
     });
   }
 
-  findAll(filters: UserFilterDto): Promise<{ data: User[]; total: number }> {
+  findAll(filters: UserFilterDto): Promise<{ users: User[]; page_context: PageContext }> {
     return new Promise(async (resolve, reject) => {
       try {
+
         const { search, page = 1, limit = 5 } = filters;
-        const { rows: data, count: total } = await this.userModel.findAndCountAll({
-          where: search ? { name: { [Op.iLike]: `%${search}%` } } : undefined,
+        const where = search
+          ? { name: { [Op.iLike]: `%${search}%` } }
+          : undefined;
+
+        const { rows, count } = await this.userModel.findAndCountAll({
+          where,
           offset: (page - 1) * limit,
           limit,
           distinct: true,
@@ -61,28 +77,21 @@ export class UsersService {
             },
           ],
         });
-        resolve({ data, total });
+
+        const page_context: PageContext = {
+          page,
+          limit,
+          total: count,
+          ...(search && { search }),
+        };
+
+        resolve({ users: rows, page_context });
+
       } catch (error) {
         reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
       }
     });
   }
-
-  // me(id: string): Promise<User> {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const user = await this.userModel.findByPk(id, {
-  //         attributes: { exclude: ['password'] },
-  //       });
-  //       if (!user) {
-  //         return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
-  //       }
-  //       resolve(user);
-  //     } catch (error) {
-  //       reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-  //     }
-  //   });
-  // }
 
   findOneById(id: string): Promise<User> {
     return new Promise(async (resolve, reject) => {
@@ -98,9 +107,20 @@ export class UsersService {
     });
   }
 
-  updateUser(id: string, dto: UpdateUserDto): Promise<User> {
+  updateUser(id: string, dto: UpdateUserDto, user: AuthUser): Promise<User> {
     return new Promise(async (resolve, reject) => {
       try {
+
+        if (user.role !== UserRole.ADMIN && user.id !== id) {
+          return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
+        }
+
+        if (user.role !== UserRole.ADMIN) {
+          if ('role' in dto) {
+            delete dto.role;
+          }
+        }
+
         const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
           where: { id },
           returning: true,

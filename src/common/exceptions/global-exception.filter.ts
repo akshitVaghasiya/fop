@@ -7,12 +7,19 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ERROR_MESSAGES } from '../constants/error-response.constant';
+import pino from 'pino';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+
+  private readonly logger = pino({
+    level: 'error',
+  }, pino.destination('logs/app.log'));
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let error = ERROR_MESSAGES.INTERNAL_SERVER_ERROR.error;
@@ -33,8 +40,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = exceptionResponse;
       }
     } else if (exception instanceof Error) {
+      // console.log("in global exception-->", exception);
+
       message = exception.message || message;
     }
+
+    const timestamp = new Date().toISOString();
+    this.logger.error({
+      msg: `[${timestamp}] [ERROR] ${request.method} ${request.url} ${statusCode} - ${message}`,
+    });
 
     const errorResponse = {
       error,

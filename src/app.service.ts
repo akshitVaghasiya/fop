@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import sequelize from 'sequelize';
 import { UserPreference } from './common/models/user-preference.model';
+import { ERROR_MESSAGES } from './common/constants/error-response.constant';
 
 @Injectable()
 export class AppService {
@@ -113,11 +114,23 @@ export class AppService {
 
   async getUserPreference() {
     const data = await this.userPreferenceModel.findAll({
-      where: {
-        preferred_categories: {
-          [Op.contains]: ['clothing']
-        }
-      },
+      // where: Sequelize.json('metadata.theme', 'light'),
+      where: Sequelize.where(
+        Sequelize.cast('search_filters', 'jsonb'),
+        '@>',
+        [{ location: 'university' }]
+      ),
+      // where: {
+      //   preferred_categories: {
+      //     [Op.contains]: ['clothing']
+      //   }
+      // },
+      // where: {
+      //   search_filters: {
+      //     [Op.contains]: [{ location: 'university' }]
+      //   }
+      // },
+      // where: Sequelize.where(Sequelize.literal('[{ "location": "university" }]'), Sequelize.fn('ANY', Sequelize.col('search_filters'))),
       // where: Sequelize.where(
       //   Sequelize.literal(`search_filters #>> '{details,age}'`),
       //   '25'
@@ -174,27 +187,35 @@ export class AppService {
 
   async distinct() {
     const data = this.userModel.findAll({
-      // distinct: true,
-      include: {
+      include: [{
         model: Item,
-        // required: true
-      },
+      }],
+      // distinct: true,
     });
 
     return data;
   }
 
   async raw() {
-    const data = await this.userModel.findAll({
-      include: {
-        model: Item,
-      },
-      // nest: true,
-      raw: true
-    });
-    console.log("data-->", data);
 
-    return data;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.userModel.findAll({
+          include: [{
+            model: Item,
+          }],
+          // nest: true,
+          // raw: false
+        });
+        console.log("data-->", data);
+
+        // return data;
+        resolve(data);
+      } catch (error) {
+        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      }
+    });
+
   }
 
   async cross() {
@@ -206,7 +227,7 @@ export class AppService {
         on: sequelize.literal('1=1')
       },
       raw: true,
-      // nest: true
+      nest: true
     });
     // console.log("data-->", data);
 

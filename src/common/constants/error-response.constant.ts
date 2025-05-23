@@ -65,11 +65,11 @@ export const ERROR_MESSAGES = {
   },
   FORBIDDEN_ACCESS: {
     error: 'FORBIDDEN_ACCESS',
-    message: 'You do not have access to this',
+    message: 'You do not have access.',
   },
   FORBIDDEN_OWNERSHIP: {
     error: 'FORBIDDEN_ITEM_OWNERSHIP',
-    message: 'You do not own this',
+    message: 'You do not own this.',
   },
   INVALID_FILE_TYPE: {
     error: 'INVALID_FILE_TYPE',
@@ -78,5 +78,9 @@ export const ERROR_MESSAGES = {
   OLD_PASSWORD_INCORRECT: {
     error: 'OLD_PASSWORD_INCORRECT',
     message: 'Old password is incorrect',
-  }
+  },
+  INVALID_TOKEN: {
+    error: 'INVALID_TOKEN',
+    message: 'invalid token',
+  },
 };
