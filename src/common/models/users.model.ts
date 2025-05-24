@@ -1,11 +1,20 @@
-import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+// src/common/models/users.model.ts
+import { Table, Column, Model, DataType, HasMany, HasOne } from 'sequelize-typescript';
+import { UserProfile } from './user-profile.model';
 import { Item } from './item.model';
-import { ItemInterest } from './item-interest.model';
-import { ItemReceiver } from './item-receiver.model';
+import { Chat } from './chat.model';
+import { ItemInterests } from './item-interest.model';
 
 export enum UserRole {
   USER = 'USER',
   ADMIN = 'ADMIN',
+}
+
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
 
 @Table({
@@ -22,7 +31,7 @@ export class User extends Model {
   })
   declare id: string;
 
-  @Column({ type: DataType.STRING, primaryKey: true })
+  @Column({ type: DataType.STRING, allowNull: false })
   name: string;
 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
@@ -46,15 +55,21 @@ export class User extends Model {
   })
   is_active: boolean;
 
-  @HasMany(() => Item, { sourceKey: 'id', foreignKey: 'user_id' })
+  @HasOne(() => UserProfile, { foreignKey: 'user_id', onDelete: 'CASCADE' })
+  profile: UserProfile;
+
+  @HasMany(() => Item, { foreignKey: 'user_id', onDelete: 'CASCADE' })
   items: Item[];
 
-  @HasMany(() => ItemInterest, { sourceKey: 'id', foreignKey: 'user_id' })
-  interests: ItemInterest[];
+  @HasMany(() => ItemInterests, { foreignKey: 'user_id', as: 'interests', onDelete: 'CASCADE' })
+  interests: ItemInterests[];
 
-  @HasMany(() => ItemReceiver, { sourceKey: 'id', foreignKey: 'receiver_user_id', as: 'receivers' })
-  receivedItems: ItemReceiver[];
+  @HasMany(() => ItemInterests, { foreignKey: 'assigned_by', as: 'assignments', onDelete: 'SET NULL' })
+  assignments: ItemInterests[];
 
-  @HasMany(() => ItemReceiver, { sourceKey: 'id', foreignKey: 'assigned_by', as: 'assignedItems' })
-  assignedItems: ItemReceiver[];
+  @HasMany(() => Chat, { foreignKey: 'sender_id', as: 'sentMessages', onDelete: 'CASCADE' })
+  sentMessages: Chat[];
+
+  @HasMany(() => Chat, { foreignKey: 'receiver_id', as: 'receivedMessages', onDelete: 'CASCADE' })
+  receivedMessages: Chat[];
 }

@@ -9,7 +9,7 @@ import { Item } from 'src/common/models/item.model';
 import { Op } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
 import { User, UserRole } from 'src/common/models/users.model';
-import { ItemInterest } from 'src/common/models/item-interest.model';
+import { ItemInterests } from 'src/common/models/item-interest.model';
 import { ItemReceiver } from 'src/common/models/item-receiver.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
@@ -127,59 +127,32 @@ export class ItemsService {
         });
     }
 
-    findSharedItems(
+    async findSharedItems(
         user_id: string,
         filters: { page?: number; limit?: number; search?: string },
     ): Promise<{ items: Item[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
-
             try {
-                const {
-                    page = 1,
-                    limit = 5,
-                    search,
-                } = filters;
-
-                const where: {
-                    type: ItemType;
-                    status: ItemStatus;
-                    [Op.or]?: { [key: string]: { [key: symbol]: string } }[];
-                } = {
-                    type: ItemType.FREE,
-                    status: ItemStatus.CLAIMED,
-                };
-
+                const { page = 1, limit = 5, search } = filters;
+                const where: any = { status: 'COMPLETED' };
                 if (search) {
-                    where[Op.or] = [
-                        { title: { [Op.iLike]: `%${filters.search}%` } },
-                    ];
+                    where[Op.or] = [{ title: { [Op.iLike]: `%${search}%` } }];
                 }
-
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
                     include: [
                         {
-                            association: 'receiver',
-                            where: { receiver_user_id: user_id },
-                            // required: true,
-                            include: [
-                                {
-                                    association: 'receiver',
-                                }
-                            ]
+                            model: ItemInterests,
+                            as: 'interests',
+                            where: { user_id, assigned_by: { [Op.ne]: null } },
+                            required: true,
                         },
                     ],
                     order: [['created_at', 'DESC']],
                     offset: (page - 1) * limit,
                     limit,
                 });
-                const page_context: PageContext = {
-                    page,
-                    limit,
-                    total: count,
-                    ...(search && { search }),
-                };
-
+                const page_context: PageContext = { page, limit, total: count, ...(search && { search }) };
                 resolve({ items: rows, page_context });
             } catch (error) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
@@ -219,6 +192,8 @@ export class ItemsService {
             }
 
             try {
+                console.log("filters-->", filters);
+
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
                     include: [
@@ -228,18 +203,16 @@ export class ItemsService {
                         //     attributes: ['id', 'name', 'email'],
                         // },
                         {
-                            model: ItemInterest,
+                            model: ItemInterests,
                             as: 'interests',
-                        },
-                        {
-                            model: ItemReceiver,
-                            as: 'receiver',
                         },
                     ],
                     order: [[sort_by, sort_type]],
                     offset: (page - 1) * limit,
                     limit,
                 });
+                console.log("rows-->", rows);
+
 
                 const page_context: PageContext = {
                     page,

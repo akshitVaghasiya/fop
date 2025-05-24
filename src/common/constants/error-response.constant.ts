@@ -17,7 +17,7 @@ export const ERROR_MESSAGES = {
   },
   INTERNAL_SERVER_ERROR: {
     error: 'INTERNAL_SERVER_ERROR',
-    message: 'An unexpected error occurred.',
+    message: 'Internal server error',
   },
   USER_REGISTERED: {
     error: 'USER_REGISTERED',
@@ -37,7 +37,7 @@ export const ERROR_MESSAGES = {
   },
   ACTIVE_ITEM_NOT_FOUND: {
     error: 'ACTIVE_ITEM_NOT_FOUND',
-    message: 'Active free item not found',
+    message: 'Active item not found',
   },
   RECEIVER_USER_NOT_FOUND: {
     error: 'RECEIVER_USER_NOT_FOUND',
@@ -45,27 +45,47 @@ export const ERROR_MESSAGES = {
   },
   ASSIGN_TO_OWNER_FORBIDDEN: {
     error: 'ASSIGN_TO_OWNER_FORBIDDEN',
-    message: 'Cannot assign item to owner',
+    message: 'Cannot assign item to the owner',
   },
   INVALID_INTEREST: {
     error: 'INVALID_INTEREST',
-    message: 'User has not expressed interest in this item',
-  },
-  OWNER_CANNOT_EXPRESS_INTEREST: {
-    error: 'OWNER_CANNOT_EXPRESS_INTEREST',
-    message: 'Owners cannot express interest in their items',
+    message: 'Invalid interest or claim',
   },
   INTEREST_ALREADY_EXPRESSED: {
     error: 'INTEREST_ALREADY_EXPRESSED',
-    message: 'Interest already expressed for this item',
+    message: 'Interest already expressed',
+  },
+  OWNER_CANNOT_EXPRESS_INTEREST: {
+    error: 'OWNER_CANNOT_EXPRESS_INTEREST',
+    message: 'Owner cannot express interest',
+  },
+  FORBIDDEN_ACCESS: {
+    error: 'FORBIDDEN_ACCESS',
+    message: 'Forbidden access',
+  },
+  INTEREST_NOT_FOUND: {
+    error: 'INTEREST_NOT_FOUND',
+    message: 'Interest or claim not found',
+  },
+  ITEM_NOT_ACTIVE: {
+    error: 'ITEM_NOT_ACTIVE',
+    message: 'Item is not active',
+  },
+  ADMIN_ONLY: {
+    error: 'ADMIN_ONLY',
+    message: 'Admin access only',
+  },
+  INVALID_ITEM_TYPE: {
+    error: 'INVALID_ITEM_TYPE',
+    message: 'Invalid item type',
+  },
+  ITEM_ALREADY_ASSIGNED: {
+    error: 'ITEM_ALREADY_ASSIGNED',
+    message: 'Item already assigned',
   },
   VALIDATION_ERROR: {
     error: 'VALIDATION_ERROR',
     message: 'Validation failed',
-  },
-  FORBIDDEN_ACCESS: {
-    error: 'FORBIDDEN_ACCESS',
-    message: 'You do not have access.',
   },
   FORBIDDEN_OWNERSHIP: {
     error: 'FORBIDDEN_ITEM_OWNERSHIP',
@@ -81,6 +101,26 @@ export const ERROR_MESSAGES = {
   },
   INVALID_TOKEN: {
     error: 'INVALID_TOKEN',
-    message: 'invalid token',
+    message: 'Invalid token',
+  },
+  CLAIM_NOT_FOUND: {
+    error: 'CLAIM_NOT_FOUND',
+    message: 'Claim not found',
+  },
+  UNAUTHORIZED_CHAT_ACCESS: {
+    error: 'UNAUTHORIZED_CHAT_ACCESS',
+    message: 'Unauthorized chat access',
+  },
+  UNAUTHORIZED_MESSAGE_SEND: {
+    error: 'UNAUTHORIZED_MESSAGE_SEND',
+    message: 'Unauthorized to send message',
+  },
+  CLAIM_REQUIRED: {
+    error: 'CLAIM_REQUIRED',
+    message: 'CLAIM_REQUIRED',
+  },
+  CANNOT_MESSAGE_SELF: {
+    error: 'CANNOT_MESSAGE_SELF',
+    message: 'CANNOT_MESSAGE_SELF',
   },
 };

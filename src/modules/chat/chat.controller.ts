@@ -1,0 +1,57 @@
+// src/chats/chats.controller.ts
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+
+import { ChatFilterDto } from './dto/chat-filter.dto';
+import { CreateChatDto } from './dto/create-chat.dto';
+import { ChatsService } from './chat.service';
+import { UserRole } from 'src/common/models/users.model';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
+import { Chat } from 'src/common/models/chat.model';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+
+@ApiTags('Chats')
+@ApiBearerAuth()
+@Controller('chats')
+export class ChatsController {
+    constructor(private readonly chatsService: ChatsService) { }
+
+    @Post(':item_id/messages')
+    @Roles(UserRole.ADMIN, UserRole.USER)
+    @ApiOperation({ summary: 'Send a chat message for an item' })
+    @ApiParam({ name: 'item_id', description: 'UUID of the item' })
+    @ApiResponse({ status: 201, description: 'Message sent', type: Chat })
+    @ApiResponse({ status: 403, description: 'Forbidden (e.g., no claim)' })
+    async sendMessage(
+        @Param('item_id', ParseUUIDPipe) item_id: string,
+        @Req() req: AuthenticatedRequest,
+        @Body() createDto: CreateChatDto,
+    ): Promise<Chat> {
+        try {
+            return await this.chatsService.sendMessage(item_id, createDto, req.user);
+        } catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+
+    @Get(':item_id/messages')
+    @Roles(UserRole.ADMIN, UserRole.USER)
+    @ApiOperation({ summary: 'Get chat messages for an item' })
+    @ApiParam({ name: 'item_id', description: 'UUID of the item' })
+    @ApiQuery({ name: 'claim_id', description: 'UUID of the claim (optional)', required: false })
+    @ApiQuery({ name: 'filters', description: 'Filters for messages', type: ChatFilterDto })
+    @ApiResponse({ status: 200, description: 'List of messages', type: [Chat] })
+    async getMessages(
+        @Param('item_id', ParseUUIDPipe) item_id: string,
+        @Query('claim_id', new ParseUUIDPipe({ optional: true })) claim_id: string | undefined,
+        @Query() filters: ChatFilterDto,
+        @Req() req: AuthenticatedRequest,
+    ): Promise<{ messages: Chat[]; page_context: any }> {
+        try {
+            return await this.chatsService.getMessages(item_id, claim_id, filters, req.user);
+        } catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+}

@@ -15,6 +15,9 @@ import { User } from './common/models/users.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware';
 import { UserPreference } from './common/models/user-preference.model';
+import { UserProfileModule } from './modules/user-profile/user-profile.module';
+import { UserProfileController } from './modules/user-profile/user-profile.controller';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -25,6 +28,8 @@ import { UserPreference } from './common/models/user-preference.model';
     ItemsModule,
     CloudinaryModule,
     SequelizeModule.forFeature([User, UserPreference]),
+    UserProfileModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [

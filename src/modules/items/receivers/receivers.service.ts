@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
-import { ItemInterest } from 'src/common/models/item-interest.model';
+import { ItemInterests } from 'src/common/models/item-interest.model';
 import { ItemReceiver } from 'src/common/models/item-receiver.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
@@ -15,8 +15,8 @@ export class ReceiversService {
         private readonly usersModel: typeof User,
         @InjectModel(Item)
         private readonly itemsModel: typeof Item,
-        @InjectModel(ItemInterest)
-        private readonly itemInterestModel: typeof ItemInterest,
+        @InjectModel(ItemInterests)
+        private readonly itemInterestModel: typeof ItemInterests,
         @InjectModel(ItemReceiver)
         private readonly itemReceiverModel: typeof ItemReceiver,
         @Inject('SEQUELIZE') private readonly sequelize: Sequelize,

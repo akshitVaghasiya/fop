@@ -7,5 +7,6 @@ export enum ItemType {
 export enum ItemStatus {
   ACTIVE = 'ACTIVE',
   CLAIMED = 'CLAIMED',
+  COMPLETED = 'COMPLETED',
   RESOLVED = 'RESOLVED',
 }

@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User } from './users.model';
 import { Item } from './item.model';
 
@@ -8,7 +8,7 @@ import { Item } from './item.model';
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 })
-export class ItemReceiver extends Model {
+export class ItemReceiver extends Model { // Changed from Model<ItemReceiver>
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -34,6 +34,6 @@ export class ItemReceiver extends Model {
   @Column({ type: DataType.UUID, allowNull: true, field: 'assigned_by' })
   assigned_by?: string;
 
-  @BelongsTo(() => User, { foreignKey: 'assigned_by', as: 'assigner' })
+  @BelongsTo(() => User, { foreignKey: 'assigned_by', as: 'assigner', onDelete: 'SET NULL' })
   assigner: User;
 }

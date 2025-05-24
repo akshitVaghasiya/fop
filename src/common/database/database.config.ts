@@ -2,9 +2,12 @@ import 'dotenv/config';
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { User } from '../models/users.model';
 import { Item } from '../models/item.model';
-import { ItemInterest } from '../models/item-interest.model';
+import { ItemInterests } from '../models/item-interest.model';
 import { ItemReceiver } from '../models/item-receiver.model';
 import { UserPreference } from '../models/user-preference.model';
+import { UserProfile } from '../models/user-profile.model';
+import { ItemClaim } from '../models/item-claims.model';
+import { Chat } from '../models/chat.model';
 
 export const sequelizeConfig: SequelizeModuleOptions = {
     dialect: 'postgres',
@@ -13,9 +16,9 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    models: [User, Item, ItemInterest, ItemReceiver, UserPreference],
-    synchronize: false,
-    // autoLoadModels: true,
+    models: [User, Item, UserProfile, ItemReceiver, ItemInterests, UserPreference, ItemClaim, Chat],
+    synchronize: true,
+    autoLoadModels: true,
     // logging: false,
     logging: (msg) => console.log(msg)
 };
