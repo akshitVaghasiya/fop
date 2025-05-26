@@ -30,7 +30,6 @@ import { UserRole } from 'src/common/models/users.model';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthUser } from 'src/common/types/auth-user.type';
 import { Item } from 'src/common/models/item.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';

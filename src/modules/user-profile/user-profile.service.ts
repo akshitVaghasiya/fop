@@ -9,6 +9,8 @@ import { UserRole } from 'src/common/models/users.model';
 import { Op } from 'sequelize';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { User } from 'src/common/models/users.model';
+import { Item } from 'src/common/models/item.model';
+import { ProfileViewPermissionRequests } from 'src/common/models/profile-view-permission.model';
 
 type PageContext = {
     page: number;
@@ -22,6 +24,9 @@ export class UserProfileService {
     constructor(
         @InjectModel(UserProfile)
         private readonly userProfileModel: typeof UserProfile,
+        @InjectModel(ProfileViewPermissionRequests)
+        private readonly permissionRequestsModel: typeof ProfileViewPermissionRequests,
+        @InjectModel(Item) private readonly itemsModel: typeof Item,
     ) { }
 
     create(dto: CreateUserProfileDto, user: AuthUser): Promise<UserProfile> {
@@ -30,14 +35,22 @@ export class UserProfileService {
                 const existingProfile = await this.userProfileModel.findOne({
                     where: { user_id: user.id },
                 });
+                console.log("existing-->", existingProfile);
+                console.log("dto-->", dto);
+                console.log("user-->", user);
+
                 if (existingProfile) {
                     return reject({ error: 'User profile already exists', statusCode: 400 });
                 }
-
-                const profile = await this.userProfileModel.create({
+                const data = {
                     ...dto,
                     user_id: user.id,
-                });
+                }
+                console.log("data-->", data);
+
+                const profile = await this.userProfileModel.create(data);
+                console.log("profile-->", profile);
+
                 resolve(profile);
             } catch (error) {
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
@@ -80,23 +93,60 @@ export class UserProfileService {
         });
     }
 
-    findOneById(id: string, user: AuthUser): Promise<UserProfile> {
+    getProfile(id: string, user: AuthUser, item_id?: string): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
-                const profile = await this.userProfileModel.findByPk(id, {
-                    include: [{ model: User, as: 'user' }],
+                const profile = await this.userProfileModel.findOne({
+                    where: { user_id: id },
+                    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }],
+                    raw: true,
+                    nest: true,
                 });
+                console.log('profile-->', profile);
+                console.log('user-->', user);
+
                 if (!profile) {
-                    return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+                    return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
-                if (user.role !== UserRole.ADMIN && profile.user_id !== user.id) {
-                    return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
+                if (user && (user.id === id || user.role === UserRole.ADMIN)) {
+                    return resolve(profile);
+                }
+
+                if (!item_id) {
+                    return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
+                }
+
+                const item = await this.itemsModel.findByPk(item_id, {
+                    attributes: ['id', 'status'],
+                    raw: true,
+                });
+                console.log('item-->', item);
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                }
+                if (item.status === 'COMPLETED' || item.status === 'REJECTED') {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
+                }
+
+                const permission = await this.permissionRequestsModel.findOne({
+                    where: {
+                        owner_id: id,
+                        requester_id: user?.id,
+                        item_id,
+                        status: 'APPROVED',
+                    },
+                    attributes: ['id', 'status'],
+                    raw: true,
+                });
+                console.log('permission-->', permission);
+                if (!permission) {
+                    return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
                 }
 
                 resolve(profile);
             } catch (error) {
-                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+                reject({ error: error.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: error.statusCode || 500 });
             }
         });
     }

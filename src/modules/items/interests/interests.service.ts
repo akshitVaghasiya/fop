@@ -1,4 +1,3 @@
-// src/item-interests/item-interests.service.ts
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, Sequelize, WhereOptions } from 'sequelize';
@@ -7,6 +6,9 @@ import { ItemInterests } from 'src/common/models/item-interest.model';
 import { Item } from 'src/common/models/item.model';
 import { User, UserRole } from 'src/common/models/users.model';
 import { ItemInterestFilterDto } from '../dto/item-interest-filter.dto';
+import { AuthUser } from 'src/common/types/auth-user.type';
+import { CreateItemInterestDto } from '../dto/create-item-interest.dto';
+import { ProfilePermissionService } from 'src/modules/user-profile-permission/profile-permission.service';
 
 interface PageContext {
     page: number;
@@ -22,38 +24,57 @@ export class ItemInterestsService {
         @InjectModel(ItemInterests) private readonly itemInterestsModel: typeof ItemInterests,
         @InjectModel(User) private readonly usersModel: typeof User,
         @Inject('SEQUELIZE') private readonly sequelize: Sequelize,
+        private readonly profilePermissionService: ProfilePermissionService,
     ) { }
 
-    createInterest(item_id: string, user_id: string): Promise<ItemInterests> {
+    createInterest(dto: CreateItemInterestDto, user_id: string): Promise<ItemInterests> {
         return new Promise(async (resolve, reject) => {
             const transaction = await this.sequelize.transaction();
             try {
                 const item = await this.itemsModel.findOne({
-                    where: { id: item_id, type: { [Op.in]: ['FOUND', 'FREE'] }, status: 'ACTIVE' },
+                    where: { id: dto.item_id, type: { [Op.in]: ['FOUND', 'FREE'] }, status: 'ACTIVE' },
+                    raw: true,
+                    nest: true,
                     transaction,
                 });
                 if (!item) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ACTIVE_ITEM_NOT_FOUND, statusCode: 404 });
                 }
+                console.log("item-->", item);
+
                 if (item.user_id === user_id) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.OWNER_CANNOT_EXPRESS_INTEREST, statusCode: 403 });
                 }
                 const existingInterest = await this.itemInterestsModel.findOne({
-                    where: { item_id, user_id },
+                    where: { item_id: dto.item_id, user_id },
                     transaction,
                 });
                 if (existingInterest) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INTEREST_ALREADY_EXPRESSED, statusCode: 403 });
                 }
-                const interest = await this.itemInterestsModel.create({ item_id, user_id }, { transaction });
+                const interest = await this.itemInterestsModel.create(
+                    { item_id: dto.item_id, user_id },
+                    { transaction }
+                );
+                // if (dto.requestProfileView) {
+                //     await this.profilePermissionService.createPermissionRequest(
+                //         {
+                //             item_id: dto.item_id,
+                //             owner_id: item.user_id,
+                //             requester_id: user_id,
+                //             item_interest_id: interest.id,
+                //         },
+                //         user_id,
+                //     );
+                // }
                 await transaction.commit();
                 resolve(interest);
             } catch (err) {
                 await transaction.rollback();
-                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+                reject({ error: err.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: err.statusCode || 500 });
             }
         });
     }
@@ -61,12 +82,13 @@ export class ItemInterestsService {
     getInterests(
         item_id: string,
         filters: ItemInterestFilterDto,
-        user: { id: string; role: UserRole },
+        user: AuthUser,
     ): Promise<{ interests: ItemInterests[]; page_context: PageContext }> {
         return new Promise(async (resolve, reject) => {
             try {
                 const { page = 1, limit = 10, search } = filters;
-                const item = await this.itemsModel.findByPk(item_id);
+                const item = await this.itemsModel.findByPk(item_id, { raw: true, nest: true });
+                console.log("item-->", item);
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
@@ -87,7 +109,6 @@ export class ItemInterestsService {
                     include: [userInclude, { model: Item, as: 'item' }],
                     offset: (page - 1) * limit,
                     limit,
-                    transaction: null,
                 });
                 const page_context: PageContext = {
                     page,
@@ -102,7 +123,7 @@ export class ItemInterestsService {
         });
     }
 
-    assignReceiver(id: string, receiver_user_id: string, user: { id: string; role: UserRole }): Promise<ItemInterests> {
+    assignReceiver(id: string, user: AuthUser): Promise<{ message: string }> {
         return new Promise(async (resolve, reject) => {
             const transaction = await this.sequelize.transaction();
             try {
@@ -118,6 +139,7 @@ export class ItemInterestsService {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INTEREST_NOT_FOUND, statusCode: 404 });
                 }
+
                 const item = interest.item;
                 console.log("item-->", item);
 
@@ -137,23 +159,25 @@ export class ItemInterestsService {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INVALID_ITEM_TYPE, statusCode: 400 });
                 }
+
                 const receiver = await this.usersModel.findOne({
-                    where: { id: receiver_user_id },
+                    where: { id: interest.user_id },
                     transaction,
                 });
+
                 console.log("receiver-->", receiver);
                 if (!receiver) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.RECEIVER_USER_NOT_FOUND, statusCode: 404 });
                 }
-                if (item.user_id === receiver_user_id) {
+                if (item.user_id === interest.user_id) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ASSIGN_TO_OWNER_FORBIDDEN, statusCode: 403 });
                 }
-                if (interest.user_id !== receiver_user_id) {
-                    await transaction.rollback();
-                    return reject({ error: ERROR_MESSAGES.INVALID_INTEREST, statusCode: 403 });
-                }
+                // if (interest.user_id !== interest.user_id) {
+                //     await transaction.rollback();
+                //     return reject({ error: ERROR_MESSAGES.INVALID_INTEREST, statusCode: 403 });
+                // }
                 const existingAssignment = await this.itemInterestsModel.findOne({
                     where: { item_id: item.id, assigned_by: { [Op.ne]: null } },
                     transaction,
@@ -170,23 +194,21 @@ export class ItemInterestsService {
                     { where: { id }, transaction },
                 );
 
-                // Update Item using direct update
                 await this.itemsModel.update(
                     { status: 'COMPLETED' },
                     { where: { id: item.id }, transaction },
                 );
 
-                // Fetch updated interest to return (non-raw to match return type)
-                const updatedInterest = await this.itemInterestsModel.findByPk(id, {
-                    transaction,
-                });
-                if (!updatedInterest) {
-                    await transaction.rollback();
-                    return reject({ error: ERROR_MESSAGES.INTEREST_NOT_FOUND, statusCode: 404 });
-                }
+                // const updatedInterest = await this.itemInterestsModel.findByPk(id, {
+                //     transaction,
+                // });
+                // if (!updatedInterest) {
+                //     await transaction.rollback();
+                //     return reject({ error: ERROR_MESSAGES.INTEREST_NOT_FOUND, statusCode: 404 });
+                // }
 
                 await transaction.commit();
-                resolve(updatedInterest);
+                resolve({ message: 'item assigned successfully' });
             } catch (err) {
                 await transaction.rollback();
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });

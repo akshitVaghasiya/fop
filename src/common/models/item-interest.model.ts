@@ -3,6 +3,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from '
 import { Item } from './item.model';
 import { User } from './users.model';
 import { Chat } from './chat.model';
+import { ProfileViewPermissionRequests } from './profile-view-permission.model';
 
 @Table({
   tableName: 'item_interests',
@@ -41,4 +42,7 @@ export class ItemInterests extends Model {
 
   @HasMany(() => Chat, { foreignKey: 'claim_id', onDelete: 'CASCADE' })
   chats: Chat[];
+
+  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'item_interest_id', as: 'permissions', onDelete: 'CASCADE' })
+  permissions: ProfileViewPermissionRequests[];
 }

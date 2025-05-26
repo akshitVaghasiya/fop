@@ -123,4 +123,48 @@ export const ERROR_MESSAGES = {
     error: 'CANNOT_MESSAGE_SELF',
     message: 'CANNOT_MESSAGE_SELF',
   },
+  PROFILE_NOT_FOUND: {
+    error: 'PROFILE_NOT_FOUND',
+    message: 'Profile not found',
+  },
+  NO_PROFILE_PERMISSION: {
+    error: 'NO_PROFILE_PERMISSION',
+    message: 'No permission to view profile',
+  },
+  INVALID_PERMISSION_REQUEST: {
+    error: 'INVALID_PERMISSION_REQUEST',
+    message: 'Invalid permission request',
+  },
+  PERMISSION_ALREADY_REQUESTED: {
+    error: 'PERMISSION_ALREADY_REQUESTED',
+    message: 'Permission already requested',
+  },
+  NOT_REQUEST_OWNER: {
+    error: 'NOT_REQUEST_OWNER',
+    message: 'Not authorized to approve or deny this request',
+  },
+  INVALID_INTERACTION: {
+    error: 'INVALID_INTERACTION',
+    message: 'Invalid claim, interest, or chat interaction',
+  },
+  REQUEST_TO_SELF_FORBIDDEN: {
+    error: 'REQUEST_TO_SELF_FORBIDDEN',
+    message: 'Cannot request permission for own profile',
+  },
+  PERMISSION_REQUEST_NOT_FOUND: {
+    error: 'PERMISSION_REQUEST_NOT_FOUND',
+    message: 'Permission request not found',
+  },
+  INVALID_PERMISSION_REQUEST_STATUS: {
+    error: 'INVALID_PERMISSION_REQUEST_STATUS',
+    message: 'Invalid permission request status',
+  },
+  CHAT_CREATION_FAILED: {
+    error: 'CHAT_CREATION_FAILED',
+    message: 'CHAT_CREATION_FAILED',
+  },
+  NOT_ASSIGNED: {
+    error: 'NOT_ASSIGNED',
+    message: 'Not assigned to this item',
+  },
 };

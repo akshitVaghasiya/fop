@@ -1,7 +1,5 @@
-// src/chats/chats.controller.ts
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-
 import { ChatFilterDto } from './dto/chat-filter.dto';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatsService } from './chat.service';
@@ -29,7 +27,7 @@ export class ChatsController {
         @Body() createDto: CreateChatDto,
     ): Promise<Chat> {
         try {
-            return await this.chatsService.sendMessage(item_id, createDto, req.user);
+            return await this.chatsService.create(item_id, createDto, req.user);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }
@@ -49,7 +47,7 @@ export class ChatsController {
         @Req() req: AuthenticatedRequest,
     ): Promise<{ messages: Chat[]; page_context: any }> {
         try {
-            return await this.chatsService.getMessages(item_id, claim_id, filters, req.user);
+            return await this.chatsService.findAll(item_id, claim_id, filters, req.user);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }

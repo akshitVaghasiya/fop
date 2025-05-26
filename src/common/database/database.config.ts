@@ -3,11 +3,10 @@ import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { User } from '../models/users.model';
 import { Item } from '../models/item.model';
 import { ItemInterests } from '../models/item-interest.model';
-import { ItemReceiver } from '../models/item-receiver.model';
 import { UserPreference } from '../models/user-preference.model';
 import { UserProfile } from '../models/user-profile.model';
-import { ItemClaim } from '../models/item-claims.model';
 import { Chat } from '../models/chat.model';
+import { ProfileViewPermissionRequests } from '../models/profile-view-permission.model';
 
 export const sequelizeConfig: SequelizeModuleOptions = {
     dialect: 'postgres',
@@ -16,9 +15,10 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    models: [User, Item, UserProfile, ItemReceiver, ItemInterests, UserPreference, ItemClaim, Chat],
+    models: [User, Item, UserProfile, ItemInterests, UserPreference, Chat, ProfileViewPermissionRequests],
     synchronize: true,
     autoLoadModels: true,
     // logging: false,
-    logging: (msg) => console.log(msg)
+    logging: (msg) => console.log(msg),
+    // sync: { force: true },
 };

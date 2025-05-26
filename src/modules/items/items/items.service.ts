@@ -8,9 +8,8 @@ import { ITEM_IMAGE_FOLDER } from 'src/common/constants/path.constants';
 import { Item } from 'src/common/models/item.model';
 import { Op } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
-import { User, UserRole } from 'src/common/models/users.model';
+import { UserRole } from 'src/common/models/users.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
-import { ItemReceiver } from 'src/common/models/item-receiver.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
@@ -196,6 +195,7 @@ export class ItemsService {
 
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
+                    distinct: true,
                     include: [
                         // {
                         //     model: User,

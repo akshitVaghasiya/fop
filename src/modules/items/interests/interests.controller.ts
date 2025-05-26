@@ -1,4 +1,3 @@
-// src/item-interests/item-interests.controller.ts
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ItemInterestsService } from './interests.service';
@@ -28,7 +27,7 @@ export class ItemInterestsController {
     @Body() createDto: CreateItemInterestDto,
   ): Promise<ItemInterests> {
     try {
-      return await this.itemInterestsService.createInterest(createDto.item_id, req.user.id);
+      return await this.itemInterestsService.createInterest(createDto, req.user.id);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
@@ -62,9 +61,9 @@ export class ItemInterestsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AssignReceiverDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<ItemInterests> {
+  ): Promise<{ message: string }> {
     try {
-      return await this.itemInterestsService.assignReceiver(id, dto.receiver_user_id, req.user);
+      return await this.itemInterestsService.assignReceiver(id, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }

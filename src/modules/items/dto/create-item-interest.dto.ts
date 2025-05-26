@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateItemInterestDto {
@@ -6,4 +6,9 @@ export class CreateItemInterestDto {
     @IsUUID()
     @IsNotEmpty()
     item_id: string;
+
+    // @ApiProperty({ example: true, required: false })
+    // @IsBoolean()
+    // @IsOptional()
+    // requestProfileView?: boolean;
 }

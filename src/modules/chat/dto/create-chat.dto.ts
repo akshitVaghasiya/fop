@@ -1,10 +1,10 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateChatDto {
     @ApiProperty({ example: 'Claim UUID (for FOUND items)', required: false })
     @IsUUID()
-    @IsNotEmpty()
+    @IsOptional()
     claim_id?: string;
 
     @ApiProperty({ example: 'Receiver UUID' })
@@ -16,4 +16,9 @@ export class CreateChatDto {
     @IsString()
     @IsNotEmpty()
     message: string;
+
+    @ApiProperty({ example: true, required: false })
+    @IsBoolean()
+    @IsOptional()
+    requestProfileView?: boolean;
 }

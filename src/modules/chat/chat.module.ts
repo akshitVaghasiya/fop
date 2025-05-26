@@ -7,6 +7,7 @@ import { User } from 'src/common/models/users.model';
 import { Sequelize } from 'sequelize-typescript';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { Item } from 'src/common/models/item.model';
+// import { ProfilePermissionModule } from '../user-profile-permission/profile-permission.module';
 
 
 @Module({
@@ -16,7 +17,9 @@ import { Item } from 'src/common/models/item.model';
             ItemInterests,
             User,
             Item,
-        ]),],
+        ]),
+        // ProfilePermissionModule
+    ],
     controllers: [ChatsController],
     providers: [
         ChatsService,

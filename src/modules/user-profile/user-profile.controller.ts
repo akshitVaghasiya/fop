@@ -15,6 +15,7 @@ import {
     ApiResponse,
     ApiParam,
     ApiBearerAuth,
+    ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
@@ -64,17 +65,19 @@ export class UserProfileController {
 
     @Get(':id')
     @Roles(UserRole.ADMIN, UserRole.USER)
-    @ApiOperation({ summary: 'Get details of a specific user profile' })
+    @ApiOperation({ summary: 'Get a user profile (item_id optional for self/admin)' })
     @ApiParam({ name: 'id', description: 'UUID of the user profile' })
+    @ApiQuery({ name: 'item_id', description: 'UUID of the item for permission check', required: false })
     @ApiResponse({ status: 200, description: 'User profile details', type: UserProfile })
-    @ApiResponse({ status: 404, description: 'User profile not found' })
-    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 403, description: 'No permission to view profile' })
+    @ApiResponse({ status: 404, description: 'Profile not found' })
     async getProfile(
         @Param('id', ParseUUIDPipe) id: string,
         @Req() req: AuthenticatedRequest,
+        @Query('item_id') item_id?: string,
     ): Promise<UserProfile> {
         try {
-            return await this.userProfilesService.findOneById(id, req.user);
+            return await this.userProfilesService.getProfile(id, req.user, item_id);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }

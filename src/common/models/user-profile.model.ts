@@ -31,9 +31,11 @@ export class UserProfile extends Model {
 
     @Column({ type: DataType.TEXT, allowNull: false })
     bio: string;
-
-    @Column({ type: DataType.TEXT, allowNull: false })
-    hobbies: string;
+    
+    @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: false })
+    hobbies: string[];
+    // @Column({ type: DataType.TEXT, allowNull: false })
+    // hobbies: string;
 
     @Column({
         type: DataType.ENUM('MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'),

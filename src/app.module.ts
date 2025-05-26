@@ -5,7 +5,7 @@ import { CustomConfigModule } from './common/config/config.module';
 import { DatabaseModule } from './common/database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles/roles.guard';
 import { AuthGuard } from './common/guards/auth/auth.guard';
 import { ItemsModule } from './modules/items/items.module';
@@ -16,8 +16,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware';
 import { UserPreference } from './common/models/user-preference.model';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
-import { UserProfileController } from './modules/user-profile/user-profile.controller';
 import { ChatModule } from './modules/chat/chat.module';
+import { ProfilePermissionModule } from './modules/user-profile-permission/profile-permission.module';
 
 @Module({
   imports: [
@@ -29,7 +29,8 @@ import { ChatModule } from './modules/chat/chat.module';
     CloudinaryModule,
     SequelizeModule.forFeature([User, UserPreference]),
     UserProfileModule,
-    ChatModule
+    ChatModule,
+    ProfilePermissionModule
   ],
   controllers: [AppController],
   providers: [

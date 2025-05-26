@@ -4,6 +4,7 @@ import { UserProfile } from './user-profile.model';
 import { Item } from './item.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
+import { ProfileViewPermissionRequests } from './profile-view-permission.model';
 
 export enum UserRole {
   USER = 'USER',
@@ -72,4 +73,10 @@ export class User extends Model {
 
   @HasMany(() => Chat, { foreignKey: 'receiver_id', as: 'receivedMessages', onDelete: 'CASCADE' })
   receivedMessages: Chat[];
+
+  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'owner_id', as: 'ownedPermissions', onDelete: 'CASCADE' })
+  ownedPermissions: ProfileViewPermissionRequests[];
+
+  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'requester_id', as: 'requestedPermissions', onDelete: 'CASCADE' })
+  requestedPermissions: ProfileViewPermissionRequests[];
 }

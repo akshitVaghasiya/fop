@@ -3,9 +3,11 @@ import { UserProfileService } from './user-profile.service';
 import { UserProfileController } from './user-profile.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserProfile } from 'src/common/models/user-profile.model';
+import { ProfileViewPermissionRequests } from 'src/common/models/profile-view-permission.model';
+import { Item } from 'src/common/models/item.model';
 
 @Module({
-    imports: [SequelizeModule.forFeature([UserProfile])],
+    imports: [SequelizeModule.forFeature([ProfileViewPermissionRequests, UserProfile, Item])],
     providers: [UserProfileService],
     controllers: [UserProfileController],
 })
