@@ -54,7 +54,7 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     synchronize: true,
     autoLoadModels: true,
     logging: (msg) => console.log(msg),
-    sync: { force: true },
+    // sync: { force: true },
     ssl: true,
     dialectOptions: {
         ssl: {
