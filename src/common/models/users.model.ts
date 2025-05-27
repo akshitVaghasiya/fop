@@ -23,8 +23,8 @@ export enum Gender {
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
-  // paranoid: true,
-  // deletedAt: 'deleted_at',
+  paranoid: true,
+  deletedAt: 'deleted_at',
 })
 export class User extends Model {
   @Column({

@@ -12,6 +12,8 @@ export interface ProfilePictureMetadata {
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    paranoid: true,
+    deletedAt: 'deleted_at',
 })
 export class UserProfile extends Model {
     @Column({

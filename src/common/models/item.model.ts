@@ -10,8 +10,8 @@ import { ProfileViewRequests } from './profile-view-permission.model';
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
-  // paranoid: true,
-  // deletedAt: 'deleted_at',
+  paranoid: true,
+  deletedAt: 'deleted_at',
 })
 export class Item extends Model {
   @Column({
