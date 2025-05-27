@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CustomConfigModule } from './common/config/config.module';
@@ -13,16 +13,27 @@ import { GlobalExceptionFilter } from './common/exceptions/global-exception.filt
 import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 import { User } from './common/models/users.model';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { LoggerMiddleware } from './common/middlewares/logger/logger.middleware';
+import { UserPreference } from './common/models/user-preference.model';
+import { UserProfileModule } from './modules/user-profile/user-profile.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { ProfilePermissionModule } from './modules/user-profile-permission/profile-permission.module';
+import { PermissionGuard } from './common/guards/roles/permission.guard';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({
   imports: [
-    CustomConfigModule,
     DatabaseModule,
+    CustomConfigModule,
     UsersModule,
     AuthModule,
     ItemsModule,
     CloudinaryModule,
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, UserPreference]),
+    UserProfileModule,
+    ChatModule,
+    ProfilePermissionModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [
@@ -31,14 +42,22 @@ import { SequelizeModule } from '@nestjs/sequelize';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PermissionGuard,
+    // },
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
     },
   ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

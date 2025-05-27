@@ -1,15 +1,17 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, HasOne, } from 'sequelize-typescript';
-import { ItemInterest } from './item-interest.model';
-import { ItemReceiver } from './item-receiver.model';
-import { User } from 'src/common/models/users.model';
-import { ItemType } from 'src/modules/items/types/item-type.enum';
-import { ItemStatus } from 'src/modules/items/types/item-status.enum';
+// src/common/models/item.model.ts
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
+import { User } from './users.model';
+import { Chat } from './chat.model';
+import { ItemInterests } from './item-interest.model';
+import { ProfileViewRequests } from './profile-view-permission.model';
 
 @Table({
   tableName: 'items',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  // paranoid: true,
+  // deletedAt: 'deleted_at',
 })
 export class Item extends Model {
   @Column({
@@ -20,12 +22,12 @@ export class Item extends Model {
   declare id: string;
 
   @Column({
-    type: DataType.ENUM(...Object.values(ItemType)),
+    type: DataType.ENUM('LOST', 'FOUND', 'FREE'),
     allowNull: false,
-    defaultValue: ItemType.LOST,
+    defaultValue: 'LOST',
     field: 'type',
   })
-  type: ItemType;
+  type: string;
 
   @Column({ type: DataType.STRING, allowNull: false, field: 'title' })
   title: string;
@@ -40,23 +42,26 @@ export class Item extends Model {
   image_url?: string;
 
   @Column({
-    type: DataType.ENUM(...Object.values(ItemStatus)),
+    type: DataType.ENUM('ACTIVE', 'REJECTED', 'COMPLETED'),
     allowNull: false,
-    defaultValue: ItemStatus.ACTIVE,
+    defaultValue: 'ACTIVE',
     field: 'status',
   })
-  status: ItemStatus;
+  status: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false, field: 'user_id' })
+  @Column({ type: DataType.UUID, allowNull: true })
   user_id: string;
 
   @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User;
 
-  @HasMany(() => ItemInterest, { foreignKey: 'item_id' })
-  interests: ItemInterest[];
+  @HasMany(() => ItemInterests, { foreignKey: 'item_id', as: 'interests', onDelete: 'CASCADE' })
+  interests: ItemInterests[];
 
-  @HasOne(() => ItemReceiver, { foreignKey: 'item_id', as: 'receiver' })
-  receiver: ItemReceiver;
+  @HasMany(() => Chat, { foreignKey: 'item_id', as: 'chats', onDelete: 'CASCADE' })
+  chats: Chat[];
+
+  @HasMany(() => ProfileViewRequests, { foreignKey: 'item_id', as: 'permissions', onDelete: 'CASCADE' })
+  permissions: ProfileViewRequests[];
 }

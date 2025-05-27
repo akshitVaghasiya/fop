@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ERROR_MESSAGES } from './common/constants/error-response.constant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,13 +32,18 @@ async function bootstrap() {
         const result = errors.map((error) => ({
           property: error.property,
           message: error.constraints![Object.keys(error.constraints!)[0]],
+          value: error.value,
         }));
-        return new BadRequestException(result);
+        return new BadRequestException({
+          error: ERROR_MESSAGES.VALIDATION_ERROR.error,
+          message: result,
+          statusCode: 400,
+        });
       },
       stopAtFirstError: true,
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000,);
 }
 bootstrap();

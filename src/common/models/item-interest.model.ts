@@ -1,6 +1,9 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, } from 'sequelize-typescript';
+// src/common/models/item-interests.model.ts
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Item } from './item.model';
-import { User } from 'src/common/models/users.model';
+import { User } from './users.model';
+import { Chat } from './chat.model';
+import { ProfileViewRequests } from './profile-view-permission.model';
 
 @Table({
   tableName: 'item_interests',
@@ -8,7 +11,7 @@ import { User } from 'src/common/models/users.model';
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 })
-export class ItemInterest extends Model {
+export class ItemInterests extends Model {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -20,13 +23,26 @@ export class ItemInterest extends Model {
   @Column({ type: DataType.UUID, allowNull: false, field: 'item_id' })
   item_id: string;
 
-  @BelongsTo(() => Item, { onDelete: 'CASCADE' })
-  item: Item;
-
   @ForeignKey(() => User)
   @Column({ type: DataType.UUID, allowNull: false, field: 'user_id' })
   user_id: string;
 
-  @BelongsTo(() => User, { onDelete: 'CASCADE' })
+  @ForeignKey(() => User)
+  @Column({ type: DataType.UUID, allowNull: true, field: 'assigned_by' })
+  assigned_by: string | null;
+
+  @BelongsTo(() => Item, { onDelete: 'CASCADE' })
+  item: Item;
+
+  @BelongsTo(() => User, { foreignKey: 'user_id', as: 'user', onDelete: 'CASCADE' })
   user: User;
+
+  @BelongsTo(() => User, { foreignKey: 'assigned_by', as: 'assigner', onDelete: 'SET NULL' })
+  assigner: User;
+
+  @HasMany(() => Chat, { foreignKey: 'claim_id', onDelete: 'CASCADE' })
+  chats: Chat[];
+
+  @HasMany(() => ProfileViewRequests, { foreignKey: 'item_interest_id', as: 'permissions', onDelete: 'CASCADE' })
+  permissions: ProfileViewRequests[];
 }

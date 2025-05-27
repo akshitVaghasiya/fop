@@ -8,9 +8,8 @@ import {
   Max,
   MaxLength,
 } from 'class-validator';
-import { ItemType } from '../types/item-type.enum';
-import { ItemStatus } from '../types/item-status.enum';
 import { Type } from 'class-transformer';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 export class ItemFilterDto {
   @ApiPropertyOptional({ enum: ItemType, description: 'Filter items by type' })
@@ -35,8 +34,8 @@ export class ItemFilterDto {
 
   @ApiPropertyOptional({
     description: 'Number of items per page',
-    default: 5,
-    example: 5,
+    default: 10,
+    example: 10,
   })
   @IsNumber()
   @Min(1)
@@ -50,4 +49,20 @@ export class ItemFilterDto {
   @MaxLength(50)
   @IsOptional()
   search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    default: 'created_at',
+  })
+  @IsString()
+  @IsOptional()
+  sort_by?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort order (ASC or DESC)',
+    default: 'DESC',
+  })
+  @IsString()
+  @IsOptional()
+  sort_type?: 'ASC' | 'DESC';
 }

@@ -1,25 +1,16 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { IS_PUBLIC_KEY } from '../../decorators/public/public.decorator';
 import { instanceToPlain } from 'class-transformer';
-import { Request } from 'express';
-import { IS_PUBLIC_KEY } from 'src/common/decorators/public/public.decorator';
-import { UserDeactivatedException } from 'src/common/exceptions/user-deactivated.exception';
-import { AuthUser } from 'src/common/types/auth-user.type';
-import { UsersService } from 'src/modules/users/users.service';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
-    private userService: UsersService,
-  ) { }
+export class AuthGuard extends PassportAuthGuard('jwt') {
+  constructor(private reflector: Reflector) {
+    super();
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -29,40 +20,17 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-
-    if (!token) {
-      throw new UnauthorizedException('Authentication required');
-    }
-
-    let payload: AuthUser;
     try {
-      payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
+      const result = await super.canActivate(context);
+      if (!result) throw new GlobalHttpException(ERROR_MESSAGES.INVALID_TOKEN, 401);
+      // console.log("request.userauthguard-->", request.user);
+
+      if (request.user) {
+        request.user = instanceToPlain(request.user, { excludeExtraneousValues: true });
+      }
+      return true;
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new GlobalHttpException(ERROR_MESSAGES.INVALID_TOKEN, 401);
     }
-
-    const user = await this.userService.findOneById(payload.id);
-
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    if (!user.is_active) {
-      throw new UserDeactivatedException({
-        message: 'Account deactivated',
-        code: 'USER_DEACTIVATED',
-      });
-    }
-
-    request.user = instanceToPlain(user);
-    return true;
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
 import { ItemFilterDto } from '../dto/item-filter.dto';
@@ -8,9 +8,32 @@ import { ITEM_IMAGE_FOLDER } from 'src/common/constants/path.constants';
 import { Item } from 'src/common/models/item.model';
 import { Op } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from 'src/common/models/users.model';
-import { ItemInterest } from 'src/common/models/item-interest.model';
-import { ItemReceiver } from 'src/common/models/item-receiver.model';
+import { UserRole } from 'src/common/models/users.model';
+import { ItemInterests } from 'src/common/models/item-interest.model';
+import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
+import { CreateFreeItemDto } from '../dto/create-free-item.dto';
+
+type WhereType = {
+    type?: string;
+    status?: string;
+    [Op.or]?: [
+        { title: { [Op.iLike]: string } },
+        { description: { [Op.iLike]: string } }
+    ];
+};
+
+type PageContext = {
+    page: number;
+    limit: number;
+    total: number;
+    type?: string;
+    status?: string;
+    search?: string;
+    sort_by?: string;
+    sort_type?: string;
+};
 
 @Injectable()
 export class ItemsService {
@@ -20,290 +43,400 @@ export class ItemsService {
         private readonly cloudinaryService: CloudinaryService,
     ) { }
 
-    async create(
+    create(
         user: AuthUser,
         createItemDto: CreateItemDto,
         file?: Express.Multer.File,
     ): Promise<Item> {
-        let imageUrl: string | undefined;
-        let publicId: string | undefined;
+        return new Promise(async (resolve, reject) => {
+            let imageUrl: string | undefined;
+            let publicId: string | undefined;
+            try {
+                if (file) {
+                    const folder = ITEM_IMAGE_FOLDER;
+                    const uploaded = await this.cloudinaryService.uploadImage(file, folder);
+                    imageUrl = uploaded.secure_url;
+                    publicId = uploaded.public_id;
+                }
+                const item = await this.itemsModel.create({
+                    ...createItemDto,
+                    image_url: imageUrl,
+                    user_id: user.id,
+                });
 
-        try {
-            if (file) {
-                const folder = ITEM_IMAGE_FOLDER;
-                const uploaded = await this.cloudinaryService.uploadImage(file, folder);
-                imageUrl = uploaded.secure_url;
-                publicId = uploaded.public_id;
+                resolve(item);
+            } catch (error) {
+                if (publicId) {
+                    await this.cloudinaryService.deleteImage(publicId);
+                }
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
-
-            const item = await this.itemsModel.create({
-                ...createItemDto,
-                image_url: imageUrl,
-                user_id: user.id,
-            });
-
-            return item;
-        } catch (error) {
-            if (publicId) {
-                await this.cloudinaryService.deleteImage(publicId);
-            }
-            throw new Error('Item creation failed. Rolled back image upload.');
-        }
+        });
     }
 
-    async findAll(
-        filters: ItemFilterDto,
-    ): Promise<{ data: Item[]; total: number }> {
-        const where: any = {};
-
-        if (filters.type) {
-            where.type = filters.type;
-        }
-
-        if (filters.status) {
-            where.status = filters.status;
-        }
-
-        if (filters.search) {
-            where[Op.or] = [
-                { title: { [Op.iLike]: `%${filters.search}%` } },
-                { description: { [Op.iLike]: `%${filters.search}%` } },
-            ];
-        }
-
-        const page = filters.page ?? 1;
-        const limit = filters.limit ?? 5;
-
-        const { rows, count } = await this.itemsModel.findAndCountAll({
-            where,
-            offset: (page - 1) * limit,
-            limit,
-            include: [
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'name', 'email']
+    createFreeItem(
+        createItemDto: CreateFreeItemDto,
+        file?: Express.Multer.File,
+    ): Promise<Item> {
+        return new Promise(async (resolve, reject) => {
+            let imageUrl: string | undefined;
+            let publicId: string | undefined;
+            try {
+                if (file) {
+                    const folder = ITEM_IMAGE_FOLDER;
+                    const uploaded = await this.cloudinaryService.uploadImage(file, folder);
+                    imageUrl = uploaded.secure_url;
+                    publicId = uploaded.public_id;
                 }
-            ]
-        });
+                const item = await this.itemsModel.create({
+                    type: ItemType.FREE,
+                    ...createItemDto,
+                    image_url: imageUrl,
+                });
 
-        return { data: rows, total: count };
+                resolve(item);
+            } catch (error) {
+                if (publicId) {
+                    await this.cloudinaryService.deleteImage(publicId);
+                }
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
+    }
+
+    findAll(
+        filters: ItemFilterDto,
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
+        return new Promise(async (resolve, reject) => {
+
+            const {
+                page = 1,
+                limit = 5,
+                type,
+                status,
+                search,
+                sort_by = 'created_at',
+                sort_type = 'DESC',
+            } = filters;
+
+            const where: WhereType = {
+                ...(type && { type }),
+                ...(status && { status }),
+                ...(search && {
+                    [Op.or]: [
+                        { title: { [Op.iLike]: `%${search}%` } },
+                        { description: { [Op.iLike]: `%${search}%` } },
+                    ],
+                }),
+            };
+
+            try {
+                const { rows, count } = await this.itemsModel.findAndCountAll({
+                    where,
+                    order: [[sort_by, sort_type]],
+                    offset: (page - 1) * limit,
+                    limit,
+                });
+
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(type && { type }),
+                    ...(status && { status }),
+                    ...(search && { search }),
+                    ...(filters.sort_by && { sort_by: filters.sort_by }),
+                    ...(filters.sort_type && { sort_type: filters.sort_type }),
+                };
+
+                resolve({ items: rows, page_context });
+
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
     }
 
     async findSharedItems(
         user_id: string,
         filters: { page?: number; limit?: number; search?: string },
-    ): Promise<{ data: Item[]; total: number }> {
-        console.log('user_id-->', user_id);
-
-        const page = filters.page ?? 1;
-        const limit = filters.limit ?? 5;
-
-        const where: { status: string;[Op.or]?: object[] } = {
-            status: 'CLAIMED',
-        };
-
-        if (filters.search) {
-            where[Op.or] = [
-                { title: { [Op.iLike]: `%${filters.search}%` } },
-                { description: { [Op.iLike]: `%${filters.search}%` } },
-            ];
-        }
-
-        const { rows, count } = await this.itemsModel.findAndCountAll({
-            where,
-            include: [
-                {
-                    association: 'receivers',
-                    where: { receiver_user_id: user_id },
-                    required: true,
-                },
-            ],
-            offset: (page - 1) * limit,
-            limit,
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { page = 1, limit = 5, search } = filters;
+                const where: any = { status: 'COMPLETED' };
+                if (search) {
+                    where[Op.or] = [{ title: { [Op.iLike]: `%${search}%` } }];
+                }
+                const { rows, count } = await this.itemsModel.findAndCountAll({
+                    where,
+                    include: [
+                        {
+                            model: ItemInterests,
+                            as: 'interests',
+                            where: { user_id, assigned_by: { [Op.ne]: null } },
+                            required: true,
+                        },
+                    ],
+                    order: [['created_at', 'DESC']],
+                    offset: (page - 1) * limit,
+                    limit,
+                });
+                const page_context: PageContext = { page, limit, total: count, ...(search && { search }) };
+                resolve({ items: rows, page_context });
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
         });
-
-        return { data: rows, total: count };
     }
 
-    async findUserItems(
+    findUserItems(
         user_id: string,
         filters: ItemFilterDto,
-    ): Promise<{ data: Item[]; total: number }> {
-        const where: any = { user_id };
+    ): Promise<{ items: Item[]; page_context: PageContext }> {
+        return new Promise(async (resolve, reject) => {
+            const {
+                page = 1,
+                limit = 5,
+                type,
+                status,
+                search,
+                sort_by = 'created_at',
+                sort_type = 'DESC',
+            } = filters;
 
-        if (filters.type) {
-            where.type = filters.type;
-        }
+            const where: {
+                user_id: string;
+                type?: string;
+                status?: string;
+                [Op.or]?: { [key: string]: { [key: symbol]: string } }[];
+            } = { user_id };
 
-        if (filters.status) {
-            where.status = filters.status;
-        }
+            if (filters.type) where.type = type;
+            if (filters.status) where.status = status;
+            if (search) {
+                where[Op.or] = [
+                    { title: { [Op.iLike]: `%${filters.search}%` } },
+                    { description: { [Op.iLike]: `%${filters.search}%` } },
+                ];
+            }
 
-        if (filters.search) {
-            where[Op.or] = [
-                { title: { [Op.iLike]: `%${filters.search}%` } },
-                { description: { [Op.iLike]: `%${filters.search}%` } },
-            ];
-        }
+            try {
+                console.log("filters-->", filters);
 
-        const page = filters.page ?? 1;
-        const limit = filters.limit ?? 5;
+                const { rows, count } = await this.itemsModel.findAndCountAll({
+                    where,
+                    distinct: true,
+                    include: [
+                        // {
+                        //     model: User,
+                        //     as: 'user',
+                        //     attributes: ['id', 'name', 'email'],
+                        // },
+                        {
+                            model: ItemInterests,
+                            as: 'interests',
+                        },
+                    ],
+                    order: [[sort_by, sort_type]],
+                    offset: (page - 1) * limit,
+                    limit,
+                });
+                console.log("rows-->", rows);
 
-        const { rows, count } = await this.itemsModel.findAndCountAll({
-            where,
-            include: [
-                {
-                    model: User,
-                    as: "user",
-                    attributes: ['id', 'name', 'email']
-                },
-                {
-                    model: ItemInterest,
-                    as: "interests"
-                },
-                {
-                    model: ItemReceiver,
-                    as: "receiver"
+
+                const page_context: PageContext = {
+                    page,
+                    limit,
+                    total: count,
+                    ...(type && { type }),
+                    ...(status && { status }),
+                    ...(search && { search }),
+                    ...(filters.sort_by && { sort_by: filters.sort_by }),
+                    ...(filters.sort_type && { sort_type: filters.sort_type }),
+                };
+
+                resolve({ items: rows, page_context });
+
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
+    }
+
+    findOneById(id: string): Promise<Item> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const item = await this.itemsModel.findByPk(id, { raw: true });
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
-            ],
-            offset: (page - 1) * limit,
-            limit,
+                resolve(item);
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
         });
-
-        return { data: rows, total: count };
     }
 
-    async findOne(id: string): Promise<Item> {
-        // const item = await this.itemsModel.findOne({
-        //     where: { id },
-        //     include: [
-        //         {
-        //             model: User,
-        //             attributes: { exclude: ['password'] }
-        //         },
-        //         {
-        //             model: ItemInterest,
-        //         },
-        //         {
-        //             model: ItemReceiver
-        //         },
-        //     ],
-        // });
+    findOne(id: string, user: AuthUser): Promise<Item> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const where: { id: string; user_id?: string } = { id };
 
-        const item = await this.itemsModel.findOne({
-            where: { id },
-            include: [
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: { exclude: ['password'] },
-                    // required: true, // for inner join
-                },
-                {
-                    model: ItemInterest,
-                    as: 'interests',
-                    separate: true,
-                    include: [
-                        {
-                            model: User,
-                            attributes: { exclude: ['password'] }
-                        }
-                    ]
-                },
-                {
-                    model: ItemReceiver,
-                    as: 'receivers',
-                    separate: true,
-                    include: [
-                        {
-                            model: User,
-                            as: 'receiver',
-                            attributes: { exclude: ['password'] }
-                        }
-                    ]
-                },
-            ],
+                if (user.role !== UserRole.ADMIN) {
+                    where.user_id = user.id;
+                }
+
+                const item = await this.itemsModel.findOne({
+                    where
+                    // where: { id, },
+                    // include: [
+                    //     {
+                    //         model: User,
+                    //         as: 'user',
+                    //         attributes: { exclude: ['password'] },
+                    //     },
+                    //     {
+                    //         model: ItemInterest,
+                    //         as: 'interests',
+                    //         // separate: true,
+                    //         include: [
+                    //             {
+                    //                 model: User,
+                    //                 as: "user",
+                    //                 attributes: { exclude: ['password'] },
+                    //             },
+                    //         ],
+                    //     },
+                    //     {
+                    //         model: ItemReceiver,
+                    //         as: 'receiver',
+                    //         // separate: true,
+                    //         include: [
+                    //             {
+                    //                 model: User,
+                    //                 as: 'receiver',
+                    //                 attributes: { exclude: ['password'] },
+                    //             },
+                    //         ],
+                    //     },
+                    // ],
+                });
+
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                }
+                resolve(item.dataValues);
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
         });
-
-        if (!item) {
-            throw new NotFoundException(`Item with ID ${id} not found`);
-        }
-
-        return item.dataValues;
     }
 
-    async update(
+    update(
         itemId: string,
         updateItemDto: UpdateItemDto,
+        user: AuthUser,
         file?: Express.Multer.File,
     ): Promise<Item> {
-        let oldPublicId: string | undefined;
-        let newPublicId: string | undefined;
+        return new Promise(async (resolve, reject) => {
 
-        try {
-            const item = await this.itemsModel.findByPk(itemId);
-            if (!item) {
-                throw new NotFoundException(`Item with ID ${itemId} not found`);
-            }
+            let oldPublicId: string | undefined;
+            let newPublicId: string | undefined;
+            try {
+                const item = await this.itemsModel.findByPk(itemId);
 
-            if (file) {
-                if (item.image_url) {
-                    oldPublicId = this.cloudinaryService.extractPublicIdFromUrl(
-                        item.image_url,
-                    );
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
-                const folder = ITEM_IMAGE_FOLDER;
-                const uploaded = await this.cloudinaryService.uploadImage(file, folder);
-                console.log('uploaded-->', uploaded);
 
-                updateItemDto.image_url = uploaded.secure_url;
-                newPublicId = uploaded.public_id;
+                if (user.role !== UserRole.ADMIN && (item.getDataValue('user_id') !== user.id)) {
+                    throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
+                }
+
+                // if (updateItemDto.status === ItemStatus.REJECTED && user.role !== UserRole.ADMIN) {
+                //     return reject({ error: 'only admin can rehect item', statusCode: 403 });
+                // }
+
+                // try {
+                //     this.validateItemOwnership(user, item.dataValues);
+                //     // this.validateItemOwnership(user, item.dataValues);
+                // } catch (ownershipError) {
+                //     return reject(ownershipError);
+                // }
+
+                if (file) {
+                    if (item.image_url) {
+                        oldPublicId = this.cloudinaryService.extractPublicIdFromUrl(item.image_url);
+                    }
+                    const folder = ITEM_IMAGE_FOLDER;
+                    const uploaded = await this.cloudinaryService.uploadImage(file, folder);
+                    updateItemDto.image_url = uploaded.secure_url;
+                    newPublicId = uploaded.public_id;
+                }
+
+                await item.update({
+                    ...updateItemDto,
+                },);
+
+                if (oldPublicId && newPublicId) {
+                    await this.cloudinaryService.deleteImage(oldPublicId);
+                }
+
+                resolve(item);
+            } catch (error) {
+                if (newPublicId) {
+                    await this.cloudinaryService.deleteImage(newPublicId);
+                }
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
-
-            await item.update(updateItemDto);
-
-            if (oldPublicId && newPublicId) {
-                await this.cloudinaryService.deleteImage(oldPublicId);
-            }
-
-            return item;
-        } catch (error) {
-            if (newPublicId) {
-                await this.cloudinaryService.deleteImage(newPublicId);
-            }
-            throw new Error('Item update failed');
-        }
+        });
     }
 
-    async delete(itemId: string, user: AuthUser): Promise<string> {
-        let publicId: string | undefined;
+    delete(itemId: string, user: AuthUser): Promise<{ message: string }> {
+        return new Promise(async (resolve, reject) => {
+            let publicId: string | undefined;
+            try {
+                const item = await this.itemsModel.findOne({ where: { id: itemId } });
 
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                }
+
+                try {
+                    this.validateItemOwnership(user, item.dataValues);
+                } catch (ownershipError) {
+                    return reject(ownershipError);
+                }
+
+                const imageUrl = item.get('image_url');
+                if (imageUrl) {
+
+                    publicId = this.cloudinaryService.extractPublicIdFromUrl(imageUrl);
+                }
+
+                await item.destroy();
+
+                if (publicId) {
+                    await this.cloudinaryService.deleteImage(publicId);
+                }
+
+                resolve({ message: 'deleted successfully' });
+
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
+    }
+
+    validateItemOwnership(user: AuthUser, item: Item): void {
         try {
-            const item = await this.itemsModel.findOne({
-                where: { id: itemId },
-            });
 
-            if (!item) {
-                throw new NotFoundException(`Item with ID ${itemId} not found`);
+            if (user.role !== UserRole.ADMIN && (item.user_id !== user.id)) {
+                throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
             }
-
-            if (item.image_url) {
-                publicId = this.cloudinaryService.extractPublicIdFromUrl(
-                    item.image_url,
-                );
-            }
-
-            await item.destroy();
-
-            if (publicId) {
-                await this.cloudinaryService.deleteImage(publicId);
-            }
-
-            return 'deleted successfully';
         } catch (error) {
-            console.error('Error during item deletion:', error.message);
-            throw new Error('Item deletion failed');
+            throw error;
         }
     }
 }

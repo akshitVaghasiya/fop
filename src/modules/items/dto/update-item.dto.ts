@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsOptional, IsEnum, IsString } from 'class-validator';
-import { ItemStatus } from '../types/item-status.enum';
-import { ItemType } from '../types/item-type.enum';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 export class UpdateItemDto {
   @ApiProperty({
     enum: ItemType,
     description: 'Type of the item',
     required: false,
-    nullable: true,
   })
   @IsEnum(ItemType)
   @IsOptional()
@@ -41,7 +40,11 @@ export class UpdateItemDto {
   @IsOptional()
   location?: string;
 
-  // @ApiProperty({ description: 'URL of the item image', required: false, example: 'https://example.com/image.jpg' })
+  // @ApiProperty({
+  //   description: 'URL of the item image',
+  //   required: false,
+  //   example: 'https://example.com/image.jpg',
+  // })
   @IsString()
   @IsOptional()
   image_url?: string;
@@ -57,9 +60,8 @@ export class UpdateItemDto {
 
   @ApiProperty({
     enum: ItemStatus,
-    required: false,
     description: 'Status of the item',
-    nullable: true,
+    required: false,
   })
   @IsEnum(ItemStatus)
   @IsOptional()
