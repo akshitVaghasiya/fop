@@ -18,6 +18,8 @@ import { UserPreference } from './common/models/user-preference.model';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { ProfilePermissionModule } from './modules/user-profile-permission/profile-permission.module';
+import { PermissionGuard } from './common/guards/roles/permission.guard';
+import { RolesModule } from './modules/roles/roles.module';
 
 @Module({
   imports: [
@@ -30,7 +32,8 @@ import { ProfilePermissionModule } from './modules/user-profile-permission/profi
     SequelizeModule.forFeature([User, UserPreference]),
     UserProfileModule,
     ChatModule,
-    ProfilePermissionModule
+    ProfilePermissionModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [
@@ -39,10 +42,14 @@ import { ProfilePermissionModule } from './modules/user-profile-permission/profi
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PermissionGuard,
+    // },
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,

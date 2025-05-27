@@ -8,6 +8,9 @@ import {
     Post,
     Query,
     Req,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -16,6 +19,7 @@ import {
     ApiParam,
     ApiBearerAuth,
     ApiQuery,
+    ApiConsumes,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
@@ -26,6 +30,9 @@ import { UserProfile } from 'src/common/models/user-profile.model';
 import { UserRole } from 'src/common/models/users.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { UserProfileService } from './user-profile.service';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 
 @ApiTags('User Profiles')
 @ApiBearerAuth()
@@ -34,23 +41,41 @@ export class UserProfileController {
     constructor(private readonly userProfilesService: UserProfileService) { }
 
     @Post()
-    @Roles(UserRole.USER)
+    // @Roles(UserRole.USER)
+    @Roles('user_profile_create')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Create a user profile' })
     @ApiResponse({ status: 201, description: 'Created user profile', type: UserProfile })
     @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('profile_picture', {
+        fileFilter: (req, file, cb) => {
+            if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+                return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
+            }
+            cb(null, true);
+        },
+        limits: { fileSize: 5 * 1024 * 1024 },
+    }))
     async create(
         @Req() req: AuthenticatedRequest,
         @Body() createDto: CreateUserProfileDto,
+        @UploadedFile() file?: Express.Multer.File,
     ): Promise<UserProfile> {
         try {
-            return await this.userProfilesService.create(createDto, req.user);
+            console.log("file-->", file);
+            return await this.userProfilesService.create(createDto, req.user, file);
         } catch (err) {
+            console.log("err->", err);
+
             throw new GlobalHttpException(err.error, err.statusCode);
         }
     }
 
     @Get()
-    @Roles(UserRole.ADMIN,)
+    // @Roles(UserRole.ADMIN)
+    @Roles('user_profile_list')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get all user profiles' })
     @ApiResponse({ status: 200, description: 'List of all user profiles', type: [UserProfile] })
     async findAll(
@@ -64,7 +89,9 @@ export class UserProfileController {
     }
 
     @Get(':id')
-    @Roles(UserRole.ADMIN, UserRole.USER)
+    // @Roles(UserRole.ADMIN, UserRole.USER)
+    @Roles('user_profile_view')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get a user profile (item_id optional for self/admin)' })
     @ApiParam({ name: 'id', description: 'UUID of the user profile' })
     @ApiQuery({ name: 'item_id', description: 'UUID of the item for permission check', required: false })
@@ -84,7 +111,9 @@ export class UserProfileController {
     }
 
     @Patch(':id')
-    @Roles(UserRole.ADMIN, UserRole.USER)
+    // @Roles(UserRole.ADMIN, UserRole.USER)
+    @Roles('user_profile_update')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Update user profile details' })
     @ApiParam({ name: 'id', description: 'UUID of the user profile' })
     @ApiResponse({ status: 200, description: 'Updated user profile', type: UserProfile })

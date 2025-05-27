@@ -7,6 +7,7 @@ import {
   Patch,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,10 +22,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { User } from '../../common/models/users.model';
 import { UserFilterDto } from './dto/user-filter.dto';
-import { UserRole } from '../../common/models/users.model';
 import { UpdateUserStatusDto } from './dto/user-status.dto';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { AuthUser } from 'src/common/types/auth-user.type';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -33,12 +34,13 @@ export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
   @Get()
-  @Roles(UserRole.ADMIN)
+  @Roles('user_list')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   async findAll(
     @Query() filters: UserFilterDto,
-  ): Promise<{ users: User[]; }> {
+  ): Promise<{ users: User[] }> {
     try {
       return await this.userService.findAll(filters);
     } catch (err) {
@@ -47,7 +49,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles('user_view')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get details of a specific user' })
   @ApiParam({
     name: 'id',
@@ -64,7 +67,8 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('user_update')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Update user details' })
   @ApiParam({ name: 'id', description: 'UUID of the user' })
   @ApiResponse({ status: 200, description: 'Updated user details', type: User })
@@ -82,7 +86,8 @@ export class UsersController {
   }
 
   @Patch(':id/status')
-  @Roles(UserRole.ADMIN)
+  @Roles('user_status_update')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Update user active status' })
   @ApiParam({
     name: 'id',

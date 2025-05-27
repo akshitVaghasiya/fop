@@ -167,4 +167,12 @@ export const ERROR_MESSAGES = {
     error: 'NOT_ASSIGNED',
     message: 'Not assigned to this item',
   },
+  ROLE_NOT_FOUND: {
+    error: 'ROLE_NOT_FOUND',
+    message: 'Role not found',
+  },
+  ROLE_IN_USE: {
+    error: 'ROLE_IN_USE',
+    message: 'Role is in use and cannot be deleted',
+  },
 };

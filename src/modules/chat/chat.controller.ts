@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ChatFilterDto } from './dto/chat-filter.dto';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -8,15 +8,18 @@ import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { Chat } from 'src/common/models/chat.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 
 @ApiTags('Chats')
 @ApiBearerAuth()
+// @Roles(UserRole.ADMIN, UserRole.USER)
 @Controller('chats')
 export class ChatsController {
     constructor(private readonly chatsService: ChatsService) { }
 
     @Post(':item_id/messages')
-    @Roles(UserRole.ADMIN, UserRole.USER)
+    @Roles('chat_create')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Send a chat message for an item' })
     @ApiParam({ name: 'item_id', description: 'UUID of the item' })
     @ApiResponse({ status: 201, description: 'Message sent', type: Chat })
@@ -34,7 +37,8 @@ export class ChatsController {
     }
 
     @Get(':item_id/messages')
-    @Roles(UserRole.ADMIN, UserRole.USER)
+    @Roles('chat_messages')
+    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get chat messages for an item' })
     @ApiParam({ name: 'item_id', description: 'UUID of the item' })
     @ApiQuery({ name: 'claim_id', description: 'UUID of the claim (optional)', required: false })

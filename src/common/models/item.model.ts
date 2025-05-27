@@ -3,13 +3,15 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from '
 import { User } from './users.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
-import { ProfileViewPermissionRequests } from './profile-view-permission.model';
+import { ProfileViewRequests } from './profile-view-permission.model';
 
 @Table({
   tableName: 'items',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  // paranoid: true,
+  // deletedAt: 'deleted_at',
 })
 export class Item extends Model {
   @Column({
@@ -48,7 +50,7 @@ export class Item extends Model {
   status: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.UUID, allowNull: false })
+  @Column({ type: DataType.UUID, allowNull: true })
   user_id: string;
 
   @BelongsTo(() => User, { onDelete: 'CASCADE' })
@@ -60,6 +62,6 @@ export class Item extends Model {
   @HasMany(() => Chat, { foreignKey: 'item_id', as: 'chats', onDelete: 'CASCADE' })
   chats: Chat[];
 
-  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'item_id', as: 'permissions', onDelete: 'CASCADE' })
-  permissions: ProfileViewPermissionRequests[];
+  @HasMany(() => ProfileViewRequests, { foreignKey: 'item_id', as: 'permissions', onDelete: 'CASCADE' })
+  permissions: ProfileViewRequests[];
 }

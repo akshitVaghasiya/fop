@@ -32,6 +32,7 @@ async function bootstrap() {
         const result = errors.map((error) => ({
           property: error.property,
           message: error.constraints![Object.keys(error.constraints!)[0]],
+          value: error.value,
         }));
         return new BadRequestException({
           error: ERROR_MESSAGES.VALIDATION_ERROR.error,

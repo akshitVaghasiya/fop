@@ -6,12 +6,12 @@ import { Chat } from './chat.model';
 
 
 @Table({
-    tableName: 'profile_view_permission_requests',
+    tableName: 'profile_view_requests',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
 })
-export class ProfileViewPermissionRequests extends Model {
+export class ProfileViewRequests extends Model {
     @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true })
     declare id: string;
 

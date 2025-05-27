@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -10,6 +10,7 @@ import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -49,7 +50,9 @@ export class AuthController {
 
   @Get('user_info')
   @ApiBearerAuth()
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  // @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('auth_user_info')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get current user details' })
   @ApiResponse({ status: 200, description: 'Current user details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -78,7 +81,9 @@ export class AuthController {
 
   @Post('change_password')
   @ApiBearerAuth()
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  // @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('auth_change_password')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid old password' })

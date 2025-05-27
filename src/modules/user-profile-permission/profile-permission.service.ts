@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, Sequelize, WhereOptions } from 'sequelize';
 import { CreatePermissionRequestDto } from './dto/create-permission-request.dto';
-import { ProfileViewPermissionRequests } from 'src/common/models/profile-view-permission.model';
+import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
 import { Chat } from 'src/common/models/chat.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { User, UserRole } from 'src/common/models/users.model';
@@ -27,12 +27,12 @@ export class ProfilePermissionService {
     @InjectModel(User) private readonly usersModel: typeof User,
     @InjectModel(ItemInterests) private readonly itemInterestsModel: typeof ItemInterests,
     @InjectModel(Chat) private readonly chatModel: typeof Chat,
-    @InjectModel(ProfileViewPermissionRequests)
-    private readonly permissionRequestsModel: typeof ProfileViewPermissionRequests,
+    @InjectModel(ProfileViewRequests)
+    private readonly permissionRequestsModel: typeof ProfileViewRequests,
     @Inject('SEQUELIZE') private readonly sequelize: Sequelize,
   ) { }
 
-  createPermissionRequest(dto: CreatePermissionRequestDto, requester_id: string): Promise<ProfileViewPermissionRequests> {
+  createPermissionRequest(dto: CreatePermissionRequestDto, requester_id: string): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
       const transaction = await this.sequelize.transaction();
       try {
@@ -121,7 +121,7 @@ export class ProfilePermissionService {
   getPermissionRequests(
     filters: PermissionRequestFilterDto,
     user: AuthUser,
-  ): Promise<{ requests: ProfileViewPermissionRequests[]; page_context: PageContext }> {
+  ): Promise<{ requests: ProfileViewRequests[]; page_context: PageContext }> {
     return new Promise(async (resolve, reject) => {
       try {
         const { page = 1, limit = 10, status, item_id } = filters;
@@ -162,7 +162,7 @@ export class ProfilePermissionService {
     });
   }
 
-  approvePermissionRequest(id: string, user_id: string): Promise<ProfileViewPermissionRequests> {
+  approvePermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
       const transaction = await this.sequelize.transaction();
       try {
@@ -192,7 +192,7 @@ export class ProfilePermissionService {
     });
   }
 
-  denyPermissionRequest(id: string, user_id: string): Promise<ProfileViewPermissionRequests> {
+  denyPermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
       const transaction = await this.sequelize.transaction();
       try {
@@ -219,7 +219,7 @@ export class ProfilePermissionService {
     });
   }
 
-  rejectPermissionRequest(id: string, user_id: string): Promise<ProfileViewPermissionRequests> {
+  rejectPermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
       console.log("id-->", id);
       console.log("user_id-->", user_id);
@@ -251,7 +251,7 @@ export class ProfilePermissionService {
   getProfileViewers(
     filters: ApprovePermissionRequestFilterDto,
     user: AuthUser,
-  ): Promise<{ viewers: ProfileViewPermissionRequests[]; page_context: PageContext }> {
+  ): Promise<{ viewers: ProfileViewRequests[]; page_context: PageContext }> {
     return new Promise(async (resolve, reject) => {
       try {
         const { page = 1, limit = 10, item_id } = filters;

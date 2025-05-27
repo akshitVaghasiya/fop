@@ -8,6 +8,7 @@ import { AuthGuard } from '../../common/guards/auth/auth.guard';
 import { UsersModule } from '../users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '../../common/models/users.model';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { User } from '../../common/models/users.model';
     }),
     UsersModule,
     SequelizeModule.forFeature([User]),
+    RolesModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, AuthGuard],

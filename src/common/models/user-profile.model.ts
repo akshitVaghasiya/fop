@@ -1,6 +1,11 @@
-// src/common/models/user-profile.model.ts
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User, Gender } from './users.model';
+
+export interface ProfilePictureMetadata {
+    name?: string;
+    mimeType?: string;
+    encoding?: string;
+}
 
 @Table({
     tableName: 'user_profiles',
@@ -31,11 +36,9 @@ export class UserProfile extends Model {
 
     @Column({ type: DataType.TEXT, allowNull: false })
     bio: string;
-    
+
     @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: false })
     hobbies: string[];
-    // @Column({ type: DataType.TEXT, allowNull: false })
-    // hobbies: string;
 
     @Column({
         type: DataType.ENUM('MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'),
@@ -46,6 +49,27 @@ export class UserProfile extends Model {
     @Column({ type: DataType.DATEONLY, allowNull: false })
     date_of_birth: string;
 
-    @Column({ type: DataType.BLOB, allowNull: true })
-    profile_picture: Buffer;
+    @Column({
+        type: DataType.BLOB(),
+        allowNull: true,
+        // get() {
+        //     const buffer = this.getDataValue('profile_picture');
+        //     const metadata = this.getDataValue('profile_picture_metadata');
+
+        //     // Add null checks
+        //     if (buffer && metadata && metadata.mimeType) {
+        //         const base64String = buffer.toString('base64');
+        //         return `data:${metadata.mimeType};base64,${base64String}`;
+        //     }
+        //     return null;
+        // }
+    })
+    profile_picture: Buffer | string;
+
+    @Column({
+        type: DataType.JSONB,
+        allowNull: true,
+        defaultValue: null
+    })
+    profile_picture_metadata: ProfilePictureMetadata;
 }

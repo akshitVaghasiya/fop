@@ -1,10 +1,10 @@
-// src/common/models/users.model.ts
-import { Table, Column, Model, DataType, HasMany, HasOne } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { UserProfile } from './user-profile.model';
 import { Item } from './item.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
-import { ProfileViewPermissionRequests } from './profile-view-permission.model';
+import { ProfileViewRequests } from './profile-view-permission.model';
+import { Role } from './role.model';
 
 export enum UserRole {
   USER = 'USER',
@@ -23,6 +23,8 @@ export enum Gender {
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  // paranoid: true,
+  // deletedAt: 'deleted_at',
 })
 export class User extends Model {
   @Column({
@@ -48,6 +50,13 @@ export class User extends Model {
   })
   role: UserRole;
 
+  @ForeignKey(() => Role)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  role_id: string;
+
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
@@ -55,6 +64,9 @@ export class User extends Model {
     field: 'is_active',
   })
   is_active: boolean;
+
+  @BelongsTo(() => Role, { foreignKey: 'role_id'})
+  auth_items: Role;
 
   @HasOne(() => UserProfile, { foreignKey: 'user_id', onDelete: 'CASCADE' })
   profile: UserProfile;
@@ -74,9 +86,9 @@ export class User extends Model {
   @HasMany(() => Chat, { foreignKey: 'receiver_id', as: 'receivedMessages', onDelete: 'CASCADE' })
   receivedMessages: Chat[];
 
-  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'owner_id', as: 'ownedPermissions', onDelete: 'CASCADE' })
-  ownedPermissions: ProfileViewPermissionRequests[];
+  @HasMany(() => ProfileViewRequests, { foreignKey: 'owner_id', as: 'ownedPermissions', onDelete: 'CASCADE' })
+  ownedPermissions: ProfileViewRequests[];
 
-  @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'requester_id', as: 'requestedPermissions', onDelete: 'CASCADE' })
-  requestedPermissions: ProfileViewPermissionRequests[];
+  @HasMany(() => ProfileViewRequests, { foreignKey: 'requester_id', as: 'requestedPermissions', onDelete: 'CASCADE' })
+  requestedPermissions: ProfileViewRequests[];
 }

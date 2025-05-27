@@ -1,9 +1,8 @@
-// src/common/models/chat.model.ts
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Item } from './item.model';
 import { User } from './users.model';
 import { ItemInterests } from './item-interest.model';
-import { ProfileViewPermissionRequests } from './profile-view-permission.model';
+import { ProfileViewRequests } from './profile-view-permission.model';
 
 @Table({
     tableName: 'chats',
@@ -50,6 +49,6 @@ export class Chat extends Model {
     @BelongsTo(() => User, { foreignKey: 'receiver_id', as: 'receiver', onDelete: 'CASCADE' })
     receiver: User;
 
-    @HasMany(() => ProfileViewPermissionRequests, { foreignKey: 'chat_id', as: 'permissions', onDelete: 'CASCADE' })
-    permissions: ProfileViewPermissionRequests[];
+    @HasMany(() => ProfileViewRequests, { foreignKey: 'chat_id', as: 'permissions', onDelete: 'CASCADE' })
+    permissions: ProfileViewRequests[];
 }

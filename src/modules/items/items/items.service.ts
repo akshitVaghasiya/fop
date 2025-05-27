@@ -13,6 +13,7 @@ import { ItemInterests } from 'src/common/models/item-interest.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
+import { CreateFreeItemDto } from '../dto/create-free-item.dto';
 
 type WhereType = {
     type?: string;
@@ -61,6 +62,36 @@ export class ItemsService {
                     ...createItemDto,
                     image_url: imageUrl,
                     user_id: user.id,
+                });
+
+                resolve(item);
+            } catch (error) {
+                if (publicId) {
+                    await this.cloudinaryService.deleteImage(publicId);
+                }
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
+    }
+
+    createFreeItem(
+        createItemDto: CreateFreeItemDto,
+        file?: Express.Multer.File,
+    ): Promise<Item> {
+        return new Promise(async (resolve, reject) => {
+            let imageUrl: string | undefined;
+            let publicId: string | undefined;
+            try {
+                if (file) {
+                    const folder = ITEM_IMAGE_FOLDER;
+                    const uploaded = await this.cloudinaryService.uploadImage(file, folder);
+                    imageUrl = uploaded.secure_url;
+                    publicId = uploaded.public_id;
+                }
+                const item = await this.itemsModel.create({
+                    type: ItemType.FREE,
+                    ...createItemDto,
+                    image_url: imageUrl,
                 });
 
                 resolve(item);
@@ -319,12 +350,20 @@ export class ItemsService {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
 
-                try {
-                    this.validateItemOwnership(user, item.dataValues);
-                    // this.validateItemOwnership(user, item.dataValues);
-                } catch (ownershipError) {
-                    return reject(ownershipError);
+                if (user.role !== UserRole.ADMIN && (item.getDataValue('user_id') !== user.id)) {
+                    throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
                 }
+
+                // if (updateItemDto.status === ItemStatus.REJECTED && user.role !== UserRole.ADMIN) {
+                //     return reject({ error: 'only admin can rehect item', statusCode: 403 });
+                // }
+
+                // try {
+                //     this.validateItemOwnership(user, item.dataValues);
+                //     // this.validateItemOwnership(user, item.dataValues);
+                // } catch (ownershipError) {
+                //     return reject(ownershipError);
+                // }
 
                 if (file) {
                     if (item.image_url) {

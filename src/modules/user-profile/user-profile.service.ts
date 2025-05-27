@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { UserProfile } from 'src/common/models/user-profile.model';
+import { ProfilePictureMetadata, UserProfile } from 'src/common/models/user-profile.model';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfileFilterDto } from './dto/user-profile-filter.dto';
@@ -10,7 +10,9 @@ import { Op } from 'sequelize';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
-import { ProfileViewPermissionRequests } from 'src/common/models/profile-view-permission.model';
+import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
+import { raw } from 'express';
+import { log } from 'console';
 
 type PageContext = {
     page: number;
@@ -24,35 +26,62 @@ export class UserProfileService {
     constructor(
         @InjectModel(UserProfile)
         private readonly userProfileModel: typeof UserProfile,
-        @InjectModel(ProfileViewPermissionRequests)
-        private readonly permissionRequestsModel: typeof ProfileViewPermissionRequests,
+        @InjectModel(ProfileViewRequests)
+        private readonly permissionRequestsModel: typeof ProfileViewRequests,
         @InjectModel(Item) private readonly itemsModel: typeof Item,
     ) { }
 
-    create(dto: CreateUserProfileDto, user: AuthUser): Promise<UserProfile> {
+    create(dto: CreateUserProfileDto, user: AuthUser, file?: Express.Multer.File): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
+                console.log("file-->", file);
+
+                console.log("user-+->", user);
+                console.log("dto-+->", dto);
                 const existingProfile = await this.userProfileModel.findOne({
                     where: { user_id: user.id },
                 });
-                console.log("existing-->", existingProfile);
-                console.log("dto-->", dto);
-                console.log("user-->", user);
+                console.log("existingProfile-->", existingProfile);
 
                 if (existingProfile) {
                     return reject({ error: 'User profile already exists', statusCode: 400 });
                 }
-                const data = {
+
+                let profilePictureMetadata: ProfilePictureMetadata | null = null;
+                if (file) {
+                    profilePictureMetadata = {
+                        name: file.originalname,
+                        mimeType: file.mimetype,
+                        encoding: file.encoding,
+                    }
+                }
+
+                const profile = await this.userProfileModel.create({
                     ...dto,
                     user_id: user.id,
-                }
-                console.log("data-->", data);
+                    profile_picture: file ? file.buffer : null,
+                    profile_picture_metadata: profilePictureMetadata,
+                });
 
-                const profile = await this.userProfileModel.create(data);
-                console.log("profile-->", profile);
+                const { profile_picture, profile_picture_metadata, ...profileWithoutPicture } = profile.toJSON();
+                console.log("profileWithoutPicture-->", profileWithoutPicture);
 
-                resolve(profile);
+                // profile.profile_picture = `data:${file?.mimetype};base64,${profile.profile_picture.toString('base64')}`;
+                // const base64String = profile.profile_picture
+                //     ? profile.profile_picture.toString('base64')
+                //     : null;
+
+                // const result = {
+                //     ...profile.toJSON(),
+                //     profile_picture: base64String && file?.mimetype
+                //         ? `data:${file.mimetype};base64,${base64String}`
+                //         : null,
+                // };
+
+                resolve(profileWithoutPicture);
             } catch (error) {
+                console.log("error-+->", error);
+
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
         });
@@ -93,7 +122,7 @@ export class UserProfileService {
         });
     }
 
-    getProfile(id: string, user: AuthUser, item_id?: string): Promise<UserProfile> {
+    getProfile(id: string, user: AuthUser, item_id?: string): Promise<any> {
         return new Promise(async (resolve, reject) => {
             try {
                 const profile = await this.userProfileModel.findOne({
@@ -102,6 +131,8 @@ export class UserProfileService {
                     raw: true,
                     nest: true,
                 });
+
+
                 console.log('profile-->', profile);
                 console.log('user-->', user);
 
@@ -109,8 +140,19 @@ export class UserProfileService {
                     return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
+                const base64String = profile.profile_picture
+                    ? profile.profile_picture.toString('base64')
+                    : null;
+
+                const result = {
+                    ...profile,
+                    profile_picture: base64String && profile.profile_picture_metadata.mimeType
+                        ? `data:${profile.profile_picture_metadata.mimeType};base64,${base64String}`
+                        : null,
+                };
+
                 if (user && (user.id === id || user.role === UserRole.ADMIN)) {
-                    return resolve(profile);
+                    return resolve(result);
                 }
 
                 if (!item_id) {
@@ -146,6 +188,7 @@ export class UserProfileService {
 
                 resolve(profile);
             } catch (error) {
+                console.log('Error fetching user profile:', error);
                 reject({ error: error.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: error.statusCode || 500 });
             }
         });

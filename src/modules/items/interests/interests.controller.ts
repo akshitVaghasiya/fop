@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ItemInterestsService } from './interests.service';
 import { UserRole } from 'src/common/models/users.model';
@@ -9,16 +9,19 @@ import { CreateItemInterestDto } from '../dto/create-item-interest.dto';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ItemInterestFilterDto } from '../dto/item-interest-filter.dto';
 import { AssignReceiverDto } from '../dto/assign-receiver.dto';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 
 
 @ApiTags('Item Interests')
+// @Roles(UserRole.ADMIN, UserRole.USER)
 @ApiBearerAuth()
 @Controller('item-interests')
 export class ItemInterestsController {
   constructor(private readonly itemInterestsService: ItemInterestsService) { }
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('interest_create')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Create a claim (FOUND) or interest (FREE)' })
   @ApiResponse({ status: 201, description: 'Claim/interest created', type: ItemInterests })
   @ApiResponse({ status: 403, description: 'Forbidden (e.g., owner, already claimed)' })
@@ -34,7 +37,8 @@ export class ItemInterestsController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('interest_list')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get claims/interests for an item' })
   @ApiResponse({ status: 200, description: 'List of claims/interests', type: [ItemInterests] })
   @ApiQuery({ name: 'item_id', description: 'UUID of the item', required: true })
@@ -52,7 +56,8 @@ export class ItemInterestsController {
   }
 
   @Post(':id/assign')
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles('interest_assign')
+  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Assign receiver for claim (FOUND) or interest (FREE)' })
   @ApiResponse({ status: 201, description: 'Receiver assigned', type: ItemInterests })
   @ApiResponse({ status: 403, description: 'Not authorized or invalid assignment' })

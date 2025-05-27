@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,6 +10,7 @@ import {
   Query,
   Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -26,22 +26,58 @@ import { ItemsService } from './items.service';
 import { CreateItemDto } from '../dto/create-item.dto';
 import { ItemFilterDto } from '../dto/item-filter.dto';
 import { UpdateItemDto } from '../dto/update-item.dto';
-import { UserRole } from 'src/common/models/users.model';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Item } from 'src/common/models/item.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
+import { Public } from 'src/common/decorators/public/public.decorator';
+import { CreateFreeItemDto } from '../dto/create-free-item.dto';
 
 @ApiTags('Items')
-@ApiBearerAuth()
-@Roles(UserRole.ADMIN, UserRole.USER)
+// @Roles(UserRole.ADMIN, UserRole.USER)
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) { }
 
+  @Public()
+  @Post('free')
+  @ApiOperation({ summary: 'Create a new free item' })
+  @ApiResponse({
+    status: 201,
+    description: 'Item successfully created',
+    type: Item,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid file type or file size exceeds limit',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('itemImage', {
+    fileFilter: (req, file, cb) => {
+      if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+        return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
+      }
+      cb(null, true);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }))
+  async createFreeItem(
+    @Body() createItemDto: CreateFreeItemDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<Item> {
+    try {
+      return await this.itemsService.createFreeItem(createItemDto, file);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
   @Post()
+  @Roles('item_create')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new item' })
   @ApiResponse({
     status: 201,
@@ -74,7 +110,10 @@ export class ItemsController {
     }
   }
 
+  @Public()
   @Get()
+  // @Roles('item_list')
+  // @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get all items' })
   @ApiResponse({ status: 200, description: 'List of items', type: [Item] })
   @ApiQuery({
@@ -93,6 +132,9 @@ export class ItemsController {
   }
 
   @Get('shared')
+  @Roles('item_shared_list')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get shared items for the authenticated user' })
   @ApiResponse({
     status: 200,
@@ -114,6 +156,9 @@ export class ItemsController {
   }
 
   @Get('my')
+  @Roles('item_my_list')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get items created by the authenticated user' })
   @ApiResponse({ status: 200, description: 'List of user-created items', type: [Item] })
   @ApiQuery({
@@ -133,6 +178,9 @@ export class ItemsController {
   }
 
   @Get(':id')
+  @Roles('item_view')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get an item by ID' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
   @ApiResponse({ status: 200, description: 'Item details', type: Item })
@@ -149,6 +197,9 @@ export class ItemsController {
   }
 
   @Patch(':id')
+  @Roles('item_update')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an item' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
   @ApiResponse({ status: 200, description: 'Item successfully updated', type: Item })
@@ -178,6 +229,9 @@ export class ItemsController {
   }
 
   @Delete(':id')
+  @Roles('item_delete')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an item' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
   @ApiResponse({ status: 200, description: 'Item successfully deleted' })

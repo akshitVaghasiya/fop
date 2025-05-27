@@ -23,6 +23,7 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
     try {
       const result = await super.canActivate(context);
       if (!result) throw new GlobalHttpException(ERROR_MESSAGES.INVALID_TOKEN, 401);
+      // console.log("request.userauthguard-->", request.user);
 
       if (request.user) {
         request.user = instanceToPlain(request.user, { excludeExtraneousValues: true });

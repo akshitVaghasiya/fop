@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEnum, IsArray, IsDateString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsString, IsNotEmpty, IsEnum, IsArray, IsDateString, IsOptional } from 'class-validator';
 import { Gender } from 'src/common/models/users.model';
 
 export class CreateUserProfileDto {
@@ -18,8 +19,11 @@ export class CreateUserProfileDto {
     @IsString()
     bio: string;
 
-    @ApiProperty({ description: 'Hobbies of the user', example: ['reading', 'hiking'] })
+    @ApiProperty({ type: [String], description: 'Hobbies of the user', example: ['reading', 'hiking'] })
     @IsNotEmpty()
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.split(',').map(v => v.trim()) : value
+    )
     @IsArray()
     @IsString({ each: true })
     hobbies: string[];
@@ -33,4 +37,14 @@ export class CreateUserProfileDto {
     @IsNotEmpty()
     @IsDateString()
     date_of_birth: string;
+
+
+    @ApiProperty({
+        description: 'Profile Picture (file upload)',
+        required: false,
+        type: 'string',
+        format: 'binary',
+    })
+    @IsOptional()
+    profile_picture?: Express.Multer.File;
 }

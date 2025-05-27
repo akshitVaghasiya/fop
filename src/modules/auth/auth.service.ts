@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from '../users/users.service';
@@ -8,6 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { InjectModel } from '@nestjs/sequelize';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { Role } from 'src/common/models/role.model';
+import { RolesService } from '../roles/roles.service';
+import { UserProfile } from 'src/common/models/user-profile.model';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,8 @@ export class AuthService {
     private readonly userService: UsersService,
     @InjectModel(User)
     private readonly userModel: typeof User,
+    @Inject(RolesService)
+    private readonly rolesService: RolesService,
   ) { }
 
   async register(signUpDto: SignUpDto): Promise<{ data: Omit<User, 'password'>; message: string }> {
@@ -181,12 +186,24 @@ export class AuthService {
     return new Promise(async (resolve, reject) => {
       try {
         const user = await this.userModel.findByPk(id, {
+          include: [
+            { model: UserProfile, as: 'profile' },
+            { model: Role, as: 'auth_items' },
+          ],
           attributes: { exclude: ['password'] },
-          raw: true
+          raw: true,
+          nest: true,
         });
+        console.log('userInfo user:', user);
+
         if (!user) {
           return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
         }
+
+        const [formattedRole] = await this.rolesService.formatRoles([user.auth_items]);
+
+        user.auth_items.auth_items = formattedRole.auth_items;
+
         resolve(user);
       } catch (error) {
         reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
