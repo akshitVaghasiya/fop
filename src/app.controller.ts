@@ -15,11 +15,11 @@ export class AppController {
     return 'pong';
   }
 
-  // @Public()
-  // @Get()
-  // getHello(@Query() filters: UserFilterDto, @Req() req: AuthenticatedRequest): any {
-  //   return this.appService.getHello(filters);
-  // }
+  @Public()
+  @Get()
+  getHello() {
+    return "server is running";
+  }
 
   // @Public()
   // @Get('user-preference')

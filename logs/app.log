@@ -1164,3 +1164,5 @@
 {"level":30,"time":1748422319759,"pid":3076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T08:51:59.759Z] [INFO] GET /auth/user_info 200 - 1283ms"}
 {"level":30,"time":1748422343576,"pid":3076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T08:52:23.576Z] [INFO] GET /user_profiles/d881fecb-47f9-4928-b6d8-d457d41d98d9?item_id=e7bdc5ed-0aaf-43da-9e60-46e95632531a 200 - 2018ms"}
 {"level":50,"time":1748422562881,"pid":3076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T08:56:02.881Z] [ERROR] GET /user_profiles/be6e382f-80c8-4ed2-a4bb-57e9839786af?item_id=e7bdc5ed-0aaf-43da-9e60-46e95632531a 403 - No permission to view profile"}
+{"level":50,"time":1748425445354,"pid":14008,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T09:44:05.352Z] [ERROR] GET / 404 - Cannot GET /"}
+{"level":50,"time":1748425446012,"pid":14008,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T09:44:06.012Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
