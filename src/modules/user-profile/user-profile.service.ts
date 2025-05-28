@@ -10,9 +10,7 @@ import { Op } from 'sequelize';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
-import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
-import { raw } from 'express';
-import { log } from 'console';
+import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
 
 type PageContext = {
     page: number;

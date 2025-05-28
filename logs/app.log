@@ -1118,3 +1118,26 @@
 {"level":30,"time":1748347487069,"pid":14500,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-27T12:04:47.068Z] [INFO] POST /user_profiles 201 - 223ms"}
 {"level":30,"time":1748347824036,"pid":9580,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-27T12:10:24.036Z] [INFO] GET /user_profiles/d881fecb-47f9-4928-b6d8-d457d41d98d9 200 - 90ms"}
 {"level":30,"time":1748348544067,"pid":6512,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-27T12:22:24.066Z] [INFO] GET /user_profiles/d881fecb-47f9-4928-b6d8-d457d41d98d9 200 - 372ms"}
+{"level":30,"time":1748406214887,"pid":8384,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T04:23:34.886Z] [INFO] GET / 200 - 681ms"}
+{"level":50,"time":1748406215472,"pid":8384,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T04:23:35.472Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":30,"time":1748408632383,"pid":12012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:03:52.382Z] [INFO] POST /auth/register 201 - 893ms"}
+{"level":30,"time":1748408641698,"pid":12012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:04:01.698Z] [INFO] POST /auth/login 201 - 192ms"}
+{"level":50,"time":1748408669249,"pid":12012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:04:29.249Z] [ERROR] PATCH /users/3a89f308-8f96-43fe-ab22-a89f7b72bb26 400 - Expected double-quoted property name in JSON at position 125 (line 6 column 1)"}
+{"level":50,"time":1748408682704,"pid":12012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:04:42.704Z] [ERROR] PATCH /users/3a89f308-8f96-43fe-ab22-a89f7b72bb26 500 - Cannot read properties of null (reading 'includes')"}
+{"level":50,"time":1748408809209,"pid":12012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:06:49.209Z] [ERROR] POST /items 500 - Cannot read properties of null (reading 'includes')"}
+{"level":50,"time":1748408965520,"pid":14392,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:09:25.520Z] [ERROR] POST /items 500 - Cannot read properties of null (reading 'includes')"}
+{"level":50,"time":1748408988505,"pid":12004,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:09:48.504Z] [ERROR] POST /items 500 - Cannot read properties of null (reading 'includes')"}
+{"level":50,"time":1748409037692,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:10:37.691Z] [ERROR] POST /items 403 - Forbidden resource"}
+{"level":30,"time":1748409059718,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:10:59.718Z] [INFO] POST /auth/login 201 - 786ms"}
+{"level":30,"time":1748409141116,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:12:21.116Z] [INFO] PATCH /users/3a89f308-8f96-43fe-ab22-a89f7b72bb26 200 - 1101ms"}
+{"level":30,"time":1748409153889,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:12:33.889Z] [INFO] POST /items 201 - 3174ms"}
+{"level":30,"time":1748409173094,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:12:53.094Z] [INFO] DELETE /items/c94b27ba-36bb-4a3a-be3b-97eddf8a4143 200 - 1997ms"}
+{"level":30,"time":1748409198445,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:13:18.445Z] [INFO] GET /items/my?page=1&limit=10&sort_by=created_at&sort_type=DESC&type=LOST&status=ACTIVE&search= 200 - 1559ms"}
+{"level":30,"time":1748409204659,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:13:24.659Z] [INFO] GET /items/my?page=1&limit=10&sort_by=created_at&sort_type=DESC 200 - 877ms"}
+{"level":30,"time":1748409219507,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:13:39.507Z] [INFO] GET /items/my?page=1&limit=10&sort_by=created_at&sort_type=DESC 200 - 1322ms"}
+{"level":30,"time":1748409289182,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:14:49.182Z] [INFO] POST /roles 201 - 962ms"}
+{"level":30,"time":1748409337943,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:15:37.943Z] [INFO] POST /roles 201 - 2164ms"}
+{"level":30,"time":1748409358775,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:15:58.775Z] [INFO] GET /auth/user_info 200 - 1154ms"}
+{"level":30,"time":1748409377663,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:16:17.663Z] [INFO] GET /roles 200 - 1388ms"}
+{"level":30,"time":1748409505685,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:18:25.685Z] [INFO] PATCH /users/fa5161c4-1ef2-4aac-89f5-82edd337c87e 200 - 1633ms"}
+{"level":30,"time":1748409617671,"pid":10980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T05:20:17.671Z] [INFO] GET /auth/user_info 304 - 2062ms"}

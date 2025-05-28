@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery }
 import { ProfilePermissionService } from './profile-permission.service';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { UserRole } from 'src/common/models/users.model';
-import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
+import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { CreatePermissionRequestDto } from './dto/create-permission-request.dto';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';

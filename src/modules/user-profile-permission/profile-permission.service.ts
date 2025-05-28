@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, Sequelize, WhereOptions } from 'sequelize';
 import { CreatePermissionRequestDto } from './dto/create-permission-request.dto';
-import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
 import { Chat } from 'src/common/models/chat.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { User, UserRole } from 'src/common/models/users.model';
@@ -11,6 +10,7 @@ import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { PermissionRequestFilterDto } from './dto/permission-request-filter.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { ApprovePermissionRequestFilterDto } from './dto/approve-permission-request-filter.dto';
+import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
 
 interface PageContext {
   page: number;

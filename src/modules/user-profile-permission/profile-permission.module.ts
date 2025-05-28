@@ -6,8 +6,8 @@ import { Chat } from 'src/common/models/chat.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
-import { ProfileViewRequests } from 'src/common/models/profile-view-permission.model';
 import { Sequelize } from 'sequelize-typescript';
+import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
 
 @Module({
   imports: [

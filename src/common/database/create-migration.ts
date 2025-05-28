@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 
 function generateMigrationFile(migrationName?: string) {
-  const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12); // Generate timestamp in YYYYMMDDHHMM format
+  const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
   const fileName = migrationName ? `${timestamp}-${migrationName}.ts` : `${timestamp}.ts`;
   const filePath = join(__dirname, '../database/migrations', fileName);
 

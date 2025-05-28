@@ -63,6 +63,7 @@ export class ItemsService {
                     image_url: imageUrl,
                     user_id: user.id,
                 });
+                // console.log("item-->",item);
 
                 resolve(item);
             } catch (error) {

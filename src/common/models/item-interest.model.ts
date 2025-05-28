@@ -3,7 +3,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from '
 import { Item } from './item.model';
 import { User } from './users.model';
 import { Chat } from './chat.model';
-import { ProfileViewRequests } from './profile-view-permission.model';
+import { ProfileViewRequests } from './profile-view-request.model';
 
 @Table({
   tableName: 'item_interests',

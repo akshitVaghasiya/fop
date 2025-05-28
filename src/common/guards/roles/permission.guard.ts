@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { log } from 'console';
 import { ROLES_KEY } from 'src/common/decorators/roles/roles.decorator';
 import { AuthChild } from 'src/common/models/auth-child.model';
 import { Role } from 'src/common/models/role.model';
@@ -35,16 +36,20 @@ export class PermissionGuard implements CanActivate {
                 {
                     model: Role,
                     as: 'auth_items',
-                    attributes: ['auth_items']
+                    attributes: ['auth_items'],
+                    // required: false
                 }
             ],
             raw: true,
             nest: true,
         });
 
+        console.log("user-->", user);
+
+
         // console.log("user-->", user);
 
-        if (!user || !user.role) {
+        if (!user || !user.role || !user.auth_items.auth_items) {
             return false;
         }
 

@@ -3,7 +3,7 @@ import { UserProfile } from './user-profile.model';
 import { Item } from './item.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
-import { ProfileViewRequests } from './profile-view-permission.model';
+import { ProfileViewRequests } from './profile-view-request.model';
 import { Role } from './role.model';
 
 export enum UserRole {
@@ -65,7 +65,7 @@ export class User extends Model {
   })
   is_active: boolean;
 
-  @BelongsTo(() => Role, { foreignKey: 'role_id'})
+  @BelongsTo(() => Role, { foreignKey: 'role_id' })
   auth_items: Role;
 
   @HasOne(() => UserProfile, { foreignKey: 'user_id', onDelete: 'CASCADE' })

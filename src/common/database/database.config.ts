@@ -6,7 +6,7 @@
 // import { UserPreference } from '../models/user-preference.model';
 // import { UserProfile } from '../models/user-profile.model';
 // import { Chat } from '../models/chat.model';
-// import { ProfileViewRequests } from '../models/profile-view-permission.model';
+// import { ProfileViewRequests } from '../models/profile-view-request.model';
 // import { Role } from '../models/role.model';
 // import { AuthChild } from '../models/auth-child.model';
 // import { AuthItem } from '../models/auth-item.model';
@@ -35,10 +35,10 @@ import { ItemInterests } from '../models/item-interest.model';
 import { UserPreference } from '../models/user-preference.model';
 import { UserProfile } from '../models/user-profile.model';
 import { Chat } from '../models/chat.model';
-import { ProfileViewRequests } from '../models/profile-view-permission.model';
 import { Role } from '../models/role.model';
 import { AuthChild } from '../models/auth-child.model';
 import { AuthItem } from '../models/auth-item.model';
+import { ProfileViewRequests } from '../models/profile-view-request.model';
 
 
 const caCert = Buffer.from(process.env.PG_CA_CERT_BASE64!, 'base64').toString('utf-8');

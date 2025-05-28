@@ -119,6 +119,9 @@ export class UsersService {
           if ('role' in dto) {
             delete dto.role;
           }
+          if ('role_id' in dto) {
+            delete dto.role_id;
+          }
         }
 
         const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
