@@ -64,18 +64,6 @@ export class UserProfileService {
                 const { profile_picture, profile_picture_metadata, ...profileWithoutPicture } = profile.toJSON();
                 console.log("profileWithoutPicture-->", profileWithoutPicture);
 
-                // profile.profile_picture = `data:${file?.mimetype};base64,${profile.profile_picture.toString('base64')}`;
-                // const base64String = profile.profile_picture
-                //     ? profile.profile_picture.toString('base64')
-                //     : null;
-
-                // const result = {
-                //     ...profile.toJSON(),
-                //     profile_picture: base64String && file?.mimetype
-                //         ? `data:${file.mimetype};base64,${base64String}`
-                //         : null,
-                // };
-
                 resolve(profileWithoutPicture);
             } catch (error) {
                 console.log("error-+->", error);
@@ -125,32 +113,20 @@ export class UserProfileService {
             try {
                 const profile = await this.userProfileModel.findOne({
                     where: { user_id: id },
-                    include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }],
-                    raw: true,
-                    nest: true,
+                    // attributes: {
+                    //     exclude: ['profile_picture', 'profile_picture_metadata'],
+                    // },
+                    // include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }],
+                    // raw: true,
+                    // nest: true,
                 });
-
-
-                console.log('profile-->', profile);
-                console.log('user-->', user);
 
                 if (!profile) {
                     return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
-                const base64String = profile.profile_picture
-                    ? profile.profile_picture.toString('base64')
-                    : null;
-
-                const result = {
-                    ...profile,
-                    profile_picture: base64String && profile.profile_picture_metadata.mimeType
-                        ? `data:${profile.profile_picture_metadata.mimeType};base64,${base64String}`
-                        : null,
-                };
-
                 if (user && (user.id === id || user.role === UserRole.ADMIN)) {
-                    return resolve(result);
+                    return resolve(profile);
                 }
 
                 if (!item_id) {
@@ -192,10 +168,12 @@ export class UserProfileService {
         });
     }
 
-    update(id: string, dto: UpdateUserProfileDto, user: AuthUser): Promise<UserProfile> {
+    update(id: string, dto: UpdateUserProfileDto, user: AuthUser, file?: Express.Multer.File): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
-                const profile = await this.userProfileModel.findByPk(id);
+                const profile = await this.userProfileModel.findByPk(id, { raw: true, nest: true });
+                console.log("profile-->", profile);
+
                 if (!profile) {
                     return reject({ error: 'User profile not found', statusCode: 404 });
                 }
@@ -204,10 +182,25 @@ export class UserProfileService {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
 
-                const [rowsUpdated, updatedProfiles] = await this.userProfileModel.update(dto, {
-                    where: { id },
-                    returning: true,
-                });
+                let profilePictureMetadata: ProfilePictureMetadata | null = null;
+                if (file) {
+                    profilePictureMetadata = {
+                        name: file.originalname,
+                        mimeType: file.mimetype,
+                        encoding: file.encoding,
+                    }
+                }
+
+                const [rowsUpdated, updatedProfiles] = await this.userProfileModel.update(
+                    {
+                        ...dto,
+                        profile_picture: file ? file.buffer : null,
+                        profile_picture_metadata: profilePictureMetadata,
+                    },
+                    {
+                        where: { id },
+                        returning: true,
+                    });
 
                 if (rowsUpdated === 0) {
                     return reject({ error: 'User profile not found', statusCode: 404 });

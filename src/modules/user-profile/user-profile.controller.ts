@@ -119,13 +119,26 @@ export class UserProfileController {
     @ApiResponse({ status: 200, description: 'Updated user profile', type: UserProfile })
     @ApiResponse({ status: 404, description: 'User profile not found' })
     @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('profile_picture', {
+        fileFilter: (req, file, cb) => {
+            if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+                return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
+            }
+            cb(null, true);
+        },
+        limits: { fileSize: 5 * 1024 * 1024 },
+    }))
     async updateProfile(
         @Param('id', ParseUUIDPipe) id: string,
         @Req() req: AuthenticatedRequest,
         @Body() updateDto: UpdateUserProfileDto,
+        @UploadedFile() file?: Express.Multer.File,
     ): Promise<UserProfile> {
         try {
-            return await this.userProfilesService.update(id, updateDto, req.user);
+            console.log("file-->", file);
+
+            return await this.userProfilesService.update(id, updateDto, req.user, file);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }

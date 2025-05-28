@@ -38,7 +38,6 @@ export class CreateUserProfileDto {
     @IsDateString()
     date_of_birth: string;
 
-
     @ApiProperty({
         description: 'Profile Picture (file upload)',
         required: false,

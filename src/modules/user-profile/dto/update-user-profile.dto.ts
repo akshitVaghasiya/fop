@@ -1,4 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsOptional, IsString, IsArray, IsEnum, IsDateString } from 'class-validator';
 import { Gender } from 'src/common/models/users.model';
 
@@ -20,6 +21,9 @@ export class UpdateUserProfileDto {
 
     @ApiPropertyOptional({ description: 'Hobbies of the user', example: ['reading', 'hiking'] })
     @IsOptional()
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.split(',').map(v => v.trim()) : value
+    )
     @IsArray()
     @IsString({ each: true })
     hobbies?: string[];
@@ -33,4 +37,13 @@ export class UpdateUserProfileDto {
     @IsOptional()
     @IsDateString()
     date_of_birth?: string;
+
+    @ApiProperty({
+        description: 'Profile Picture (file upload)',
+        required: false,
+        type: 'string',
+        format: 'binary',
+    })
+    @IsOptional()
+    profile_picture?: Express.Multer.File;
 }

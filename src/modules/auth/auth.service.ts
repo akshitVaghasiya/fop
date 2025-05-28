@@ -187,14 +187,13 @@ export class AuthService {
       try {
         const user = await this.userModel.findByPk(id, {
           include: [
-            { model: UserProfile, as: 'profile' },
+            // { model: UserProfile, as: 'profile' },
             { model: Role, as: 'auth_items' },
           ],
           attributes: { exclude: ['password'] },
           raw: true,
           nest: true,
         });
-        console.log('userInfo user:', user);
 
         if (!user) {
           return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });

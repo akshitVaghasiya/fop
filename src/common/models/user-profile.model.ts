@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Scopes } from 'sequelize-typescript';
 import { User, Gender } from './users.model';
 
 export interface ProfilePictureMetadata {
@@ -7,6 +7,19 @@ export interface ProfilePictureMetadata {
     encoding?: string;
 }
 
+// @Scopes(() => (
+//     getProfilePicture() {
+//         const buffer = this.getDataValue('profile_picture');
+//         const metadata = this.getDataValue('profile_picture_metadata');
+
+//         // Add null checks
+//         if(buffer && metadata && metadata.mimeType) {
+//     const base64String = buffer.toString('base64');
+//     return `data:${metadata.mimeType};base64,${base64String}`;
+// }
+// return null;
+//     }
+// ));
 @Table({
     tableName: 'user_profiles',
     timestamps: true,
@@ -54,19 +67,18 @@ export class UserProfile extends Model {
     @Column({
         type: DataType.BLOB(),
         allowNull: true,
-        // get() {
-        //     const buffer = this.getDataValue('profile_picture');
-        //     const metadata = this.getDataValue('profile_picture_metadata');
+        get: function () {
+            const buffer = this.getDataValue('profile_picture');
+            const metadata = this.getDataValue('profile_picture_metadata');
 
-        //     // Add null checks
-        //     if (buffer && metadata && metadata.mimeType) {
-        //         const base64String = buffer.toString('base64');
-        //         return `data:${metadata.mimeType};base64,${base64String}`;
-        //     }
-        //     return null;
-        // }
+            if (buffer && metadata?.mimeType) {
+                const base64String = buffer.toString('base64');
+                return `data:${metadata.mimeType};base64,${base64String}`;
+            }
+            return null;
+        }
     })
-    profile_picture: Buffer | string;
+    profile_picture: Buffer;
 
     @Column({
         type: DataType.JSONB,

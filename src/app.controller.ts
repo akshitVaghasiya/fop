@@ -15,45 +15,45 @@ export class AppController {
     return 'pong';
   }
 
-  @Public()
-  @Get()
-  getHello(@Query() filters: UserFilterDto, @Req() req: AuthenticatedRequest): any {
-    return this.appService.getHello(filters);
-  }
+  // @Public()
+  // @Get()
+  // getHello(@Query() filters: UserFilterDto, @Req() req: AuthenticatedRequest): any {
+  //   return this.appService.getHello(filters);
+  // }
 
-  @Public()
-  @Get('user-preference')
-  userPreference() {
-    return this.appService.userPreference();
-  }
+  // @Public()
+  // @Get('user-preference')
+  // userPreference() {
+  //   return this.appService.userPreference();
+  // }
 
-  @Public()
-  @Get('get-user-preference')
-  getUserPreference() {
-    return this.appService.getUserPreference();
-  }
+  // @Public()
+  // @Get('get-user-preference')
+  // getUserPreference() {
+  //   return this.appService.getUserPreference();
+  // }
 
-  @Public()
-  @Get('distinct')
-  distinct() {
-    return this.appService.distinct();
-  }
+  // @Public()
+  // @Get('distinct')
+  // distinct() {
+  //   return this.appService.distinct();
+  // }
 
-  @Public()
-  @Get('raw')
-  async raw() {
-    try {
-      // return await this.authService.userInfo(req.user.id);
-      return await this.appService.raw();
-    } catch (err) {
-      throw new GlobalHttpException(err.error, err.statusCode);
-    }
-  }
+  // @Public()
+  // @Get('raw')
+  // async raw() {
+  //   try {
+  //     // return await this.authService.userInfo(req.user.id);
+  //     return await this.appService.raw();
+  //   } catch (err) {
+  //     throw new GlobalHttpException(err.error, err.statusCode);
+  //   }
+  // }
 
-  @Public()
-  @Get('cross')
-  cross() {
-    return this.appService.cross();
-  }
+  // @Public()
+  // @Get('cross')
+  // cross() {
+  //   return this.appService.cross();
+  // }
 
 }
