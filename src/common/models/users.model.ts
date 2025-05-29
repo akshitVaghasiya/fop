@@ -5,18 +5,7 @@ import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
 import { ProfileViewRequests } from './profile-view-request.model';
 import { Role } from './role.model';
-
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
-
-export enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
-  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
-}
+import { UserRole } from '../types/enums/users.enum';
 
 @Table({
   tableName: 'users',

@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { Transaction } from 'sequelize';
 import { Chat } from 'src/common/models/chat.model';
 import { Item } from 'src/common/models/item.model';
-import { User, UserRole } from 'src/common/models/users.model';
+import { User } from 'src/common/models/users.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
-import { ProfilePermissionService } from '../user-profile-permission/profile-permission.service';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { ChatFilterDto } from './dto/chat-filter.dto';
 import { Op } from 'sequelize';
+import { UserRole } from 'src/common/types/enums/users.enum';
+import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 
 interface PageContext {
@@ -58,12 +58,12 @@ export class ChatsService {
 
                 console.log("item-->", item);
 
-                if (item.type === 'FREE') {
+                if (item.type === ItemType.FREE) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
 
-                if (item.status !== 'ACTIVE') {
+                if (item.status !== ItemStatus.ACTIVE) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
                 }
@@ -86,7 +86,7 @@ export class ChatsService {
 
 
                 let validatedClaimId: string | null = null;
-                if (item.type === 'FOUND') {
+                if (item.type === ItemType.FOUND) {
                     if (!claim_id) {
                         await transaction.rollback();
                         return reject({ error: ERROR_MESSAGES.CLAIM_REQUIRED, statusCode: 400 });
@@ -173,12 +173,12 @@ export class ChatsService {
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
-                if (item.type === 'FREE') {
+                if (item.type === ItemType.FREE) {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
 
                 if (user.role !== UserRole.ADMIN && item.user_id !== user.id) {
-                    if (item.type === 'FOUND') {
+                    if (item.type === ItemType.FOUND) {
                         if (!claim_id) {
                             return reject({ error: ERROR_MESSAGES.CLAIM_REQUIRED, statusCode: 400 });
                         }

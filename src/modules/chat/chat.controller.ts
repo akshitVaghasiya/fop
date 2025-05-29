@@ -3,7 +3,6 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery }
 import { ChatFilterDto } from './dto/chat-filter.dto';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatsService } from './chat.service';
-import { UserRole } from 'src/common/models/users.model';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { Chat } from 'src/common/models/chat.model';

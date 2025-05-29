@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Scopes } from 'sequelize-typescript';
-import { User, Gender } from './users.model';
+import { User } from './users.model';
+import { UserGender } from '../types/enums/user-profile.enum';
 
 export interface ProfilePictureMetadata {
     name?: string;
@@ -56,10 +57,10 @@ export class UserProfile extends Model {
     hobbies: string[];
 
     @Column({
-        type: DataType.ENUM('MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'),
+        type: DataType.ENUM(...Object.values(UserGender)),
         allowNull: false,
     })
-    gender: Gender;
+    gender: UserGender;
 
     @Column({ type: DataType.DATEONLY, allowNull: false })
     date_of_birth: string;

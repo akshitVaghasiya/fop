@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ItemInterestsService } from './interests.service';
-import { UserRole } from 'src/common/models/users.model';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';

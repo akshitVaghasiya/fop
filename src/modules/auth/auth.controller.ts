@@ -5,7 +5,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { Public } from 'src/common/decorators/public/public.decorator';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
-import { User, UserRole } from 'src/common/models/users.model';
+import { User } from 'src/common/models/users.model';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { ChangePasswordDto } from './dto/change-password.dto';

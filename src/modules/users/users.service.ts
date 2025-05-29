@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserRole } from '../../common/models/users.model';
+import { User } from '../../common/models/users.model';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Item } from 'src/common/models/item.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+import { UserRole } from 'src/common/types/enums/users.enum';
 
 type PageContext = {
   page: number;

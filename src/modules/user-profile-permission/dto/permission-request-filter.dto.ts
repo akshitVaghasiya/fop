@@ -1,6 +1,7 @@
 import { IsNumber, IsOptional, IsString, IsEnum, Min, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ProfileViewStatus } from 'src/common/types/enums/profile-view-request.enum';
 
 export class PermissionRequestFilterDto {
     @ApiProperty({ example: 1, required: false })
@@ -17,10 +18,9 @@ export class PermissionRequestFilterDto {
     @Type(() => Number)
     limit?: number = 10;
 
-    @ApiProperty({ example: 'PENDING', required: false, enum: ['PENDING', 'APPROVED', 'DENIED'] })
-    @IsEnum(['PENDING', 'APPROVED', 'DENIED'])
+    @ApiProperty({ example: 'PENDING', required: false, enum: ProfileViewStatus })
     @IsOptional()
-    status?: 'PENDING' | 'APPROVED' | 'DENIED';
+    status?: ProfileViewStatus;
 
     @ApiProperty({ example: 'UUID of the item', required: false })
     @IsString()

@@ -5,12 +5,12 @@ import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfileFilterDto } from './dto/user-profile-filter.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
-import { UserRole } from 'src/common/models/users.model';
 import { Op } from 'sequelize';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
 import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
+import { UserRole } from 'src/common/types/enums/users.enum';
 
 type PageContext = {
     page: number;
@@ -32,14 +32,9 @@ export class UserProfileService {
     create(dto: CreateUserProfileDto, user: AuthUser, file?: Express.Multer.File): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log("file-->", file);
-
-                console.log("user-+->", user);
-                console.log("dto-+->", dto);
                 const existingProfile = await this.userProfileModel.findOne({
                     where: { user_id: user.id },
                 });
-                console.log("existingProfile-->", existingProfile);
 
                 if (existingProfile) {
                     return reject({ error: 'User profile already exists', statusCode: 400 });
@@ -62,12 +57,9 @@ export class UserProfileService {
                 });
 
                 const { profile_picture, profile_picture_metadata, ...profileWithoutPicture } = profile.toJSON();
-                console.log("profileWithoutPicture-->", profileWithoutPicture);
 
                 resolve(profileWithoutPicture);
             } catch (error) {
-                console.log("error-+->", error);
-
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
         });
@@ -155,7 +147,6 @@ export class UserProfileService {
                     attributes: ['id', 'status'],
                     raw: true,
                 });
-                console.log('permission-->', permission);
                 if (!permission) {
                     return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
                 }
@@ -172,7 +163,6 @@ export class UserProfileService {
         return new Promise(async (resolve, reject) => {
             try {
                 const profile = await this.userProfileModel.findByPk(id, { raw: true, nest: true });
-                console.log("profile-->", profile);
 
                 if (!profile) {
                     return reject({ error: 'User profile not found', statusCode: 404 });

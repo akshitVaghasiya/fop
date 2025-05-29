@@ -1166,3 +1166,29 @@
 {"level":50,"time":1748422562881,"pid":3076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T08:56:02.881Z] [ERROR] GET /user_profiles/be6e382f-80c8-4ed2-a4bb-57e9839786af?item_id=e7bdc5ed-0aaf-43da-9e60-46e95632531a 403 - No permission to view profile"}
 {"level":50,"time":1748425445354,"pid":14008,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T09:44:05.352Z] [ERROR] GET / 404 - Cannot GET /"}
 {"level":50,"time":1748425446012,"pid":14008,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T09:44:06.012Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":30,"time":1748425543566,"pid":14580,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T09:45:43.566Z] [INFO] GET / 200 - 4ms"}
+{"level":30,"time":1748429152592,"pid":10096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T10:45:52.592Z] [INFO] GET /items?page=1&limit=10 200 - 4931ms"}
+{"level":50,"time":1748429175726,"pid":10096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T10:46:15.726Z] [ERROR] GET /items?page=1&limit=10&type=LOST&status=ACTIVE&search=&sort_by=i1d&sort_type=ASC 400 - [object Object]"}
+{"level":50,"time":1748429198567,"pid":10096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T10:46:38.567Z] [ERROR] GET /items?page=1&limit=10&type=LOST&status=ACTIVE&search=&sort_by=i1d&sort_type=ASC 400 - [object Object]"}
+{"level":30,"time":1748430031342,"pid":7156,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:00:31.341Z] [INFO] POST /auth/login 201 - 1941ms"}
+{"level":30,"time":1748430046025,"pid":7156,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:00:46.025Z] [INFO] GET /roles 200 - 1340ms"}
+{"level":30,"time":1748431577033,"pid":10280,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:26:17.032Z] [INFO] GET /roles 304 - 2013ms"}
+{"level":30,"time":1748431884238,"pid":3096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:31:24.237Z] [INFO] GET /roles 304 - 3325ms"}
+{"level":30,"time":1748432411303,"pid":17096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:40:11.300Z] [INFO] GET /roles 304 - 2871ms"}
+{"level":30,"time":1748432502912,"pid":17096,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T11:41:42.912Z] [INFO] GET /auth/user_info 200 - 3544ms"}
+{"level":30,"time":1748434647248,"pid":4352,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-28T12:17:27.247Z] [INFO] GET /auth/user_info 304 - 2424ms"}
+{"level":50,"time":1748493468961,"pid":4216,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T04:37:48.959Z] [ERROR] GET /api 404 - Cannot GET /api"}
+{"level":50,"time":1748497505439,"pid":4928,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T05:45:05.438Z] [ERROR] GET /users?page=1&limit=10&search=wallet 401 - Invalid or expired token"}
+{"level":50,"time":1748498643901,"pid":5896,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:04:03.901Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748498700849,"pid":8708,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:05:00.848Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748498724744,"pid":14320,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:05:24.743Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748498876573,"pid":13888,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:07:56.573Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748498888707,"pid":13888,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:08:08.707Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748499040648,"pid":9892,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:10:40.648Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748499113681,"pid":9296,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:11:53.680Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748499331758,"pid":12108,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:15:31.757Z] [ERROR] POST /auth/register 409 - Email already registered"}
+{"level":50,"time":1748499383954,"pid":8876,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:16:23.952Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748499401372,"pid":9320,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:16:41.371Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":30,"time":1748499620294,"pid":9320,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:20:20.294Z] [INFO] POST /auth/register 201 - 309ms"}
+{"level":30,"time":1748500713631,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:38:33.629Z] [INFO] POST /auth/register 201 - 244ms"}
+{"level":50,"time":1748500715496,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:38:35.496Z] [ERROR] POST /auth/register 409 - Email already registered"}

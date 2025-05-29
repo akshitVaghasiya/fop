@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsString, IsNotEmpty, IsEnum, IsArray, IsDateString, IsOptional } from 'class-validator';
-import { Gender } from 'src/common/models/users.model';
+import { UserGender } from 'src/common/types/enums/user-profile.enum';
 
 export class CreateUserProfileDto {
     @ApiProperty({ description: 'Address of the user', example: '123 Main St, City' })
@@ -28,10 +28,10 @@ export class CreateUserProfileDto {
     @IsString({ each: true })
     hobbies: string[];
 
-    @ApiProperty({ description: 'Gender of the user', example: 'MALE', enum: Gender })
+    @ApiProperty({ description: 'Gender of the user', example: 'MALE', enum: UserGender })
     @IsNotEmpty()
-    @IsEnum(Gender)
-    gender: Gender;
+    @IsEnum(UserGender)
+    gender: UserGender;
 
     @ApiProperty({ description: 'Date of birth of the user', example: '1990-01-01' })
     @IsNotEmpty()

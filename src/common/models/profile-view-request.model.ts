@@ -3,6 +3,7 @@ import { Item } from './item.model';
 import { User } from './users.model';
 import { ItemInterests } from './item-interest.model';
 import { Chat } from './chat.model';
+import { ProfileViewStatus } from '../types/enums/profile-view-request.enum';
 
 
 @Table({
@@ -39,8 +40,8 @@ export class ProfileViewRequests extends Model {
     @Column({ type: DataType.UUID })
     chat_id?: string;
 
-    @Column({ type: DataType.ENUM('PENDING', 'APPROVED', 'DENIED'), allowNull: false, defaultValue: 'PENDING' })
-    status: 'PENDING' | 'APPROVED' | 'DENIED';
+    @Column({ type: DataType.ENUM(...Object.values(ProfileViewStatus)), allowNull: false, defaultValue: 'PENDING' })
+    status: string;
 
     @BelongsTo(() => Item, { foreignKey: 'item_id', as: 'item', onDelete: 'CASCADE' })
     item: Item;

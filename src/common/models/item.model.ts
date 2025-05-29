@@ -1,9 +1,9 @@
-// src/common/models/item.model.ts
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { User } from './users.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
 import { ProfileViewRequests } from './profile-view-request.model';
+import { ItemStatus, ItemType } from '../types/enums/items.enum';
 
 @Table({
   tableName: 'items',
@@ -22,9 +22,9 @@ export class Item extends Model {
   declare id: string;
 
   @Column({
-    type: DataType.ENUM('LOST', 'FOUND', 'FREE'),
+    type: DataType.ENUM(...Object.values(ItemType)),
     allowNull: false,
-    defaultValue: 'LOST',
+    defaultValue: ItemType.FOUND,
     field: 'type',
   })
   type: string;
@@ -42,9 +42,9 @@ export class Item extends Model {
   image_url?: string;
 
   @Column({
-    type: DataType.ENUM('ACTIVE', 'REJECTED', 'COMPLETED'),
+    type: DataType.ENUM(...Object.values(ItemStatus)),
     allowNull: false,
-    defaultValue: 'ACTIVE',
+    defaultValue: ItemStatus.ACTIVE,
     field: 'status',
   })
   status: string;

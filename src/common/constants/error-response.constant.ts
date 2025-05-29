@@ -101,7 +101,7 @@ export const ERROR_MESSAGES = {
   },
   INVALID_TOKEN: {
     error: 'INVALID_TOKEN',
-    message: 'Invalid token',
+    message: 'Invalid or expired token',
   },
   CLAIM_NOT_FOUND: {
     error: 'CLAIM_NOT_FOUND',

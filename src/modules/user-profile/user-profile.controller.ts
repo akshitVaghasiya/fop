@@ -27,7 +27,6 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfileFilterDto } from './dto/user-profile-filter.dto';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { UserProfile } from 'src/common/models/user-profile.model';
-import { UserRole } from 'src/common/models/users.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { UserProfileService } from './user-profile.service';
 import { PermissionGuard } from 'src/common/guards/roles/permission.guard';

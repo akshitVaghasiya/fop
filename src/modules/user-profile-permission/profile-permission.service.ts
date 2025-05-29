@@ -4,13 +4,15 @@ import { Op, Sequelize, WhereOptions } from 'sequelize';
 import { CreatePermissionRequestDto } from './dto/create-permission-request.dto';
 import { Chat } from 'src/common/models/chat.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
-import { User, UserRole } from 'src/common/models/users.model';
+import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { PermissionRequestFilterDto } from './dto/permission-request-filter.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { ApprovePermissionRequestFilterDto } from './dto/approve-permission-request-filter.dto';
 import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
+import { UserRole } from 'src/common/types/enums/users.enum';
+import { ProfileViewStatus } from '../../common/types/enums/profile-view-request.enum';
 
 interface PageContext {
   page: number;
@@ -36,11 +38,8 @@ export class ProfilePermissionService {
     return new Promise(async (resolve, reject) => {
       const transaction = await this.sequelize.transaction();
       try {
-        console.log("dto-->", dto);
-        console.log("requester_id-->", requester_id);
 
         const item = await this.itemsModel.findByPk(dto.item_id, { raw: true, nest: true, transaction });
-        console.log("item-->", item);
 
         if (!item) {
           await transaction.rollback();
@@ -50,8 +49,6 @@ export class ProfilePermissionService {
         //   await transaction.rollback();
         //   return reject({ error: ERROR_MESSAGES.INVALID_ITEM_TYPE, statusCode: 400 });
         // }
-        console.log("item-->", item);
-        console.log("dto-->", dto);
 
         if (item.user_id !== dto.owner_id) {
           await transaction.rollback();
@@ -68,7 +65,6 @@ export class ProfilePermissionService {
 
         if (dto.item_interest_id) {
           const interest = await this.itemInterestsModel.findByPk(dto.item_interest_id, { raw: true, nest: true, transaction });
-          console.log("interest-->", interest);
 
           if (!interest || interest.item_id !== dto.item_id || interest.user_id !== requester_id) {
             await transaction.rollback();
@@ -89,7 +85,7 @@ export class ProfilePermissionService {
           where: {
             item_id: dto.item_id,
             requester_id: requester_id,
-            [Op.or]: [{ status: 'PENDING' }, { status: 'APPROVED' }],
+            [Op.or]: [{ status: ProfileViewStatus.PENDING }, { status: ProfileViewStatus.APPROVED }],
             ...(item.type !== 'LOST' && dto.item_interest_id ? { item_interest_id: dto.item_interest_id } : {}),
           },
           transaction,
@@ -105,7 +101,7 @@ export class ProfilePermissionService {
             requester_id: requester_id,
             item_interest_id: dto.item_interest_id,
             chat_id: dto.chat_id,
-            status: 'PENDING',
+            status: ProfileViewStatus.PENDING,
           },
           { transaction },
         );
@@ -167,8 +163,6 @@ export class ProfilePermissionService {
       const transaction = await this.sequelize.transaction();
       try {
         const request = await this.permissionRequestsModel.findByPk(id, { transaction });
-        console.log("request-->", request?.getDataValue('owner_id'));
-        console.log("user_id-->", user_id);
 
         if (!request) {
           await transaction.rollback();
@@ -178,11 +172,11 @@ export class ProfilePermissionService {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
         }
-        if (request.getDataValue('status') !== 'PENDING') {
+        if (request.getDataValue('status') !== ProfileViewStatus.PENDING) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
         }
-        await request.update({ status: 'APPROVED' }, { transaction });
+        await request.update({ status: ProfileViewStatus.APPROVED }, { transaction });
         await transaction.commit();
         resolve(request);
       } catch (err) {
@@ -205,11 +199,11 @@ export class ProfilePermissionService {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
         }
-        if (request.getDataValue('status') !== 'PENDING') {
+        if (request.getDataValue('status') !== ProfileViewStatus.PENDING) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
         }
-        await request.update({ status: 'DENIED' }, { transaction });
+        await request.update({ status: ProfileViewStatus.DENIED }, { transaction });
         await transaction.commit();
         resolve(request);
       } catch (err) {
@@ -221,12 +215,9 @@ export class ProfilePermissionService {
 
   rejectPermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
-      console.log("id-->", id);
-      console.log("user_id-->", user_id);
       const t = await this.sequelize.transaction();
       try {
         const request = await this.permissionRequestsModel.findByPk(id, { transaction: t });
-        console.log("request-->", request);
 
         if (!request) {
           return reject({ error: ERROR_MESSAGES.PERMISSION_REQUEST_NOT_FOUND, statusCode: 404 });
@@ -234,11 +225,11 @@ export class ProfilePermissionService {
         if (request.getDataValue('owner_id') !== user_id) {
           return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
         }
-        if (request.getDataValue('status') !== 'APPROVED') {
+        if (request.getDataValue('status') !== ProfileViewStatus.APPROVED) {
           return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
         }
 
-        await request.update({ status: 'DENIED' }, { transaction: t });
+        await request.update({ status: ProfileViewStatus.DENIED }, { transaction: t });
         await t.commit();
         resolve(request);
       } catch (err) {
@@ -260,7 +251,7 @@ export class ProfilePermissionService {
 
         const where: WhereOptions = {
           owner_id: filters.owner_id || user.id,
-          status: 'APPROVED',
+          status: ProfileViewStatus.APPROVED,
           ...(item_id && { item_id }),
         };
 
@@ -279,12 +270,12 @@ export class ProfilePermissionService {
 
         resolve({
           viewers: rows,
-          page_context: { page, limit, total: count, status: 'APPROVED', ...(item_id && { item_id }) },
+          page_context: { page, limit, total: count, status: ProfileViewStatus.APPROVED, ...(item_id && { item_id }) },
         });
       } catch (err) {
         reject({ error: err.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: err.statusCode || 500 });
       }
     });
   }
-  
+
 }

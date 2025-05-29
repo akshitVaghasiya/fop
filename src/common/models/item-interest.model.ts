@@ -1,4 +1,3 @@
-// src/common/models/item-interests.model.ts
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Item } from './item.model';
 import { User } from './users.model';

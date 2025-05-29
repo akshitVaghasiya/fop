@@ -4,11 +4,13 @@ import { Op, Sequelize, WhereOptions } from 'sequelize';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { Item } from 'src/common/models/item.model';
-import { User, UserRole } from 'src/common/models/users.model';
+import { User } from 'src/common/models/users.model';
 import { ItemInterestFilterDto } from '../dto/item-interest-filter.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { CreateItemInterestDto } from '../dto/create-item-interest.dto';
 import { ProfilePermissionService } from 'src/modules/user-profile-permission/profile-permission.service';
+import { UserRole } from 'src/common/types/enums/users.enum';
+import { ItemType, ItemStatus } from 'src/common/types/enums/items.enum';
 
 interface PageContext {
     page: number;
@@ -32,7 +34,7 @@ export class ItemInterestsService {
             const transaction = await this.sequelize.transaction();
             try {
                 const item = await this.itemsModel.findOne({
-                    where: { id: dto.item_id, type: { [Op.in]: ['FOUND', 'FREE'] }, status: 'ACTIVE' },
+                    where: { id: dto.item_id, type: { [Op.in]: [ItemType.FOUND, ItemType.FREE] }, status: ItemStatus.ACTIVE },
                     raw: true,
                     nest: true,
                     transaction,
@@ -143,19 +145,19 @@ export class ItemInterestsService {
                 const item = interest.item;
                 console.log("item-->", item);
 
-                if (item.status !== 'ACTIVE') {
+                if (item.status !== ItemStatus.ACTIVE) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
                 }
-                if (item.type === 'FREE' && user.role !== UserRole.ADMIN) {
+                if (item.type === ItemType.FREE && user.role !== UserRole.ADMIN) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ADMIN_ONLY, statusCode: 403 });
                 }
-                if (item.type === 'FOUND' && user.role !== UserRole.ADMIN && item.user_id !== user.id) {
+                if (item.type === ItemType.FOUND && user.role !== UserRole.ADMIN && item.user_id !== user.id) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
-                if (item.type !== 'FOUND' && item.type !== 'FREE') {
+                if (item.type !== ItemType.FOUND && item.type !== ItemType.FREE) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INVALID_ITEM_TYPE, statusCode: 400 });
                 }
@@ -195,7 +197,7 @@ export class ItemInterestsService {
                 );
 
                 await this.itemsModel.update(
-                    { status: 'COMPLETED' },
+                    { status: ItemStatus.COMPLETED },
                     { where: { id: item.id }, transaction },
                 );
 

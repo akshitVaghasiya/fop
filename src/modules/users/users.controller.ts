@@ -1,21 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -24,7 +8,6 @@ import { User } from '../../common/models/users.model';
 import { UserFilterDto } from './dto/user-filter.dto';
 import { UpdateUserStatusDto } from './dto/user-status.dto';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
-import { AuthUser } from 'src/common/types/auth-user.type';
 import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 
 @ApiTags('Users')

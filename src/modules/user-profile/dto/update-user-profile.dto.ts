@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString, IsArray, IsEnum, IsDateString } from 'class-validator';
-import { Gender } from 'src/common/models/users.model';
+import { UserGender } from 'src/common/types/enums/user-profile.enum';
 
 export class UpdateUserProfileDto {
     @ApiPropertyOptional({ description: 'Address of the user', example: '123 Main St, City' })
@@ -28,10 +28,10 @@ export class UpdateUserProfileDto {
     @IsString({ each: true })
     hobbies?: string[];
 
-    @ApiPropertyOptional({ description: 'Gender of the user', example: 'MALE', enum: Gender })
+    @ApiPropertyOptional({ description: 'Gender of the user', example: 'MALE', enum: UserGender })
     @IsOptional()
-    @IsEnum(Gender)
-    gender?: Gender;
+    @IsEnum(UserGender)
+    gender?: UserGender;
 
     @ApiPropertyOptional({ description: 'Date of birth of the user', example: '1990-01-01' })
     @IsOptional()

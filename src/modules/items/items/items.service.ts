@@ -8,12 +8,12 @@ import { ITEM_IMAGE_FOLDER } from 'src/common/constants/path.constants';
 import { Item } from 'src/common/models/item.model';
 import { Op } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
-import { UserRole } from 'src/common/models/users.model';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
-import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
+import { ItemType, ItemStatus } from 'src/common/types/enums/items.enum';
 import { CreateFreeItemDto } from '../dto/create-free-item.dto';
+import { UserRole } from 'src/common/types/enums/users.enum';
 
 type WhereType = {
     type?: string;
@@ -165,7 +165,7 @@ export class ItemsService {
         return new Promise(async (resolve, reject) => {
             try {
                 const { page = 1, limit = 5, search } = filters;
-                const where: any = { status: 'COMPLETED' };
+                const where: any = { status: ItemStatus.COMPLETED };
                 if (search) {
                     where[Op.or] = [{ title: { [Op.iLike]: `%${search}%` } }];
                 }

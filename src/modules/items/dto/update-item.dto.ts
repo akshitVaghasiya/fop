@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsOptional, IsEnum, IsString } from 'class-validator';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 

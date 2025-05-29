@@ -25,7 +25,7 @@ export class RolesService {
         try {
             const role = await this.roleModel.create({
                 name: dto.name,
-                auth_items: [], // Empty auth_items as per requirement
+                auth_items: [], 
             });
             return role;
         } catch (error) {
@@ -48,14 +48,12 @@ export class RolesService {
         }
     }
 
-    // New reusable function that can be used for single/multiple roles
     public async formatRoles(roles: Role[]): Promise<any[]> {
         const [authChildren, authItems] = await Promise.all([
             this.authChildModel.findAll({ raw: true, attributes: ['parent', 'child'] }),
             this.authItemModel.findAll({ raw: true, attributes: ['name'] })
         ]);
 
-        // Build parent-child relationships
         const parentMap = new Map<string, string[]>();
         const allChildren = new Set<string>();
         authChildren.forEach(({ parent, child }) => {
@@ -64,11 +62,9 @@ export class RolesService {
             allChildren.add(child);
         });
 
-        // Categorize permissions
         const categories: Record<string, string[]> = {};
         const allPermissions = authItems.map(item => item.name);
 
-        // Build category structure
         parentMap.forEach((children, parent) => {
             categories[parent] = children.filter(child =>
                 allPermissions.includes(child)
@@ -78,7 +74,6 @@ export class RolesService {
         return roles.map(role => this.processRole(role, parentMap, categories));
     }
 
-    // Reusable role processing function
     private processRole(
         role: Role,
         parentMap: Map<string, string[]>,
@@ -86,7 +81,6 @@ export class RolesService {
     ) {
         const rolePermissions = new Set(role.auth_items || []);
 
-        // Expand parent permissions to include children
         role.auth_items?.forEach(permission => {
             if (parentMap.has(permission)) {
                 parentMap.get(permission)!.forEach(child =>
@@ -95,7 +89,6 @@ export class RolesService {
             }
         });
 
-        // Build nested auth_items structure
         const authItemsStructure = {};
         Object.entries(categories).forEach(([category, permissions]) => {
             authItemsStructure[category] = permissions.reduce((acc, perm) => {

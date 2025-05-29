@@ -10,7 +10,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Role } from 'src/common/models/role.model';
 import { RolesService } from '../roles/roles.service';
-import { UserProfile } from 'src/common/models/user-profile.model';
 
 @Injectable()
 export class AuthService {
