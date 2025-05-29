@@ -15,9 +15,8 @@ import { AuthItem } from '../models/auth-item.model';
 let dialectOptions = {};
 let ssl = false;
 
+const caCert = Buffer.from(process.env.PG_CA_CERT_BASE64!, 'base64').toString('utf-8');
 if (process.env.NODE_ENV === 'production') {
-    const caCert = Buffer.from(process.env.PG_CA_CERT_BASE64!, 'base64').toString('utf-8');
-    ssl = true;
     dialectOptions = {
         ssl: {
             require: true,
@@ -36,6 +35,12 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     database: process.env.DB_NAME,
     models: [User, Item, UserProfile, ItemInterests, UserPreference, Chat, ProfileViewRequests, Role, AuthChild, AuthItem],
     logging: (msg) => console.log(msg),
-    ssl,
-    dialectOptions,
+    ssl: true,
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: true,
+            ca: caCert,
+        },
+    },
 };
