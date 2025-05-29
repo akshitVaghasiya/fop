@@ -1192,3 +1192,7 @@
 {"level":30,"time":1748499620294,"pid":9320,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:20:20.294Z] [INFO] POST /auth/register 201 - 309ms"}
 {"level":30,"time":1748500713631,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:38:33.629Z] [INFO] POST /auth/register 201 - 244ms"}
 {"level":50,"time":1748500715496,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:38:35.496Z] [ERROR] POST /auth/register 409 - Email already registered"}
+{"level":50,"time":1748501990648,"pid":4984,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T06:59:50.647Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":30,"time":1748502021148,"pid":3800,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:00:21.148Z] [INFO] POST /auth/register 201 - 150ms"}
+{"level":30,"time":1748502082221,"pid":12736,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:01:22.220Z] [INFO] POST /auth/register 201 - 395ms"}
+{"level":50,"time":1748502133104,"pid":9452,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:02:13.104Z] [ERROR] POST /auth/register 500 - Internal server error"}
