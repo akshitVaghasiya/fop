@@ -1346,3 +1346,6 @@
 {"level":50,"time":1748536789229,"pid":14860,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:39:49.229Z] [ERROR] PATCH /profile_permissions/336ffe8f-a27f-4438-9880-d40940417996/status 403 - Forbidden resource"}
 {"level":50,"time":1748537029881,"pid":14860,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:43:49.881Z] [ERROR] PATCH /profile_permissions/336ffe8f-a27f-4438-9880-d40940417996/status 403 - Not authorized to approve or deny this request"}
 {"level":30,"time":1748537111109,"pid":14860,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:45:11.109Z] [INFO] PATCH /profile_permissions/9d96fc9f-1045-4bbf-866f-1496697c69c1/status 200 - 397ms"}
+{"level":30,"time":1748579643423,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:34:03.420Z] [INFO] POST /auth/login 201 - 1213ms"}
+{"level":30,"time":1748579770236,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:36:10.236Z] [INFO] PATCH /items/7561ca41-d1b2-447d-a5bc-bfa00a12267a 200 - 763ms"}
+{"level":30,"time":1748579798439,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:36:38.439Z] [INFO] GET /items/my?page=1&limit=10 200 - 390ms"}

@@ -84,11 +84,11 @@ export class UpdateItemDto {
   itemImage?: Express.Multer.File;
 
   @ApiProperty({
-    enum: ItemStatus,
+    enum: [ItemStatus.ACTIVE, ItemStatus.COMPLETED],
     description: 'Status of the item',
     required: false,
   })
-  @IsEnum(ItemStatus)
+  @IsEnum([ItemStatus.ACTIVE, ItemStatus.COMPLETED])
   @IsOptional()
-  status?: ItemStatus;
+  status?: ItemStatus.ACTIVE | ItemStatus.COMPLETED;
 }
