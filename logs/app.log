@@ -1349,3 +1349,5 @@
 {"level":30,"time":1748579643423,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:34:03.420Z] [INFO] POST /auth/login 201 - 1213ms"}
 {"level":30,"time":1748579770236,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:36:10.236Z] [INFO] PATCH /items/7561ca41-d1b2-447d-a5bc-bfa00a12267a 200 - 763ms"}
 {"level":30,"time":1748579798439,"pid":8944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:36:38.439Z] [INFO] GET /items/my?page=1&limit=10 200 - 390ms"}
+{"level":30,"time":1748580652752,"pid":832,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:50:52.751Z] [INFO] POST /auth/login 201 - 1149ms"}
+{"level":50,"time":1748580659705,"pid":832,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-30T04:50:59.705Z] [ERROR] POST /auth/login 404 - No user found with the given email"}
