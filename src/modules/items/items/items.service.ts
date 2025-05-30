@@ -354,9 +354,13 @@ export class ItemsService {
                     updateItemDto.image_url = uploaded.secure_url;
                     newPublicId = uploaded.public_id;
                 }
+                const locationLiteral = updateItemDto.location
+                    ? literal(`POINT(${updateItemDto.location[0]}, ${updateItemDto.location[1]})`)
+                    : undefined;
 
                 await item.update({
                     ...updateItemDto,
+                    ...(locationLiteral && { location: locationLiteral }),
                 },);
 
                 if (oldPublicId && newPublicId) {

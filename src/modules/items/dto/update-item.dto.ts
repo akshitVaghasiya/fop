@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsEnum, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsEnum, IsString, IsNumber, ArrayMinSize, ArrayMaxSize, Validate } from 'class-validator';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 
 export class UpdateItemDto {
@@ -31,13 +32,38 @@ export class UpdateItemDto {
   description?: string;
 
   @ApiProperty({
-    description: 'Location where the item was found or lost',
+    description: 'Geographic coordinates as [longitude, latitude] or "longitude,latitude" string',
+    example: [2.2945, 48.8584],
+    type: [Number],
     required: false,
-    example: 'New York City',
   })
-  @IsString()
   @IsOptional()
-  location?: string;
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        const [lon, lat] = value.split(',').map(Number);
+        return [lon, lat];
+      }
+    }
+    return value;
+  })
+  @IsNumber({}, { each: true })
+  @ArrayMinSize(2)
+  @ArrayMaxSize(2)
+  @Validate((value: [number, number]) => {
+    const [lon, lat] = value;
+    if (isNaN(lon) || isNaN(lat)) {
+      throw new Error('Coordinates must be valid numbers');
+    }
+    if (lon < -180 || lon > 180 || lat < -90 || lat > 90) {
+      throw new Error('Invalid longitude or latitude values');
+    }
+    return true;
+  })
+  location?: [number, number];
 
   // @ApiProperty({
   //   description: 'URL of the item image',
