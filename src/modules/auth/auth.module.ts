@@ -9,6 +9,7 @@ import { UsersModule } from '../users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '../../common/models/users.model';
 import { RolesModule } from '../roles/roles.module';
+import { Role } from 'src/common/models/role.model';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { RolesModule } from '../roles/roles.module';
       signOptions: { expiresIn: Number(process.env.JWT_EXPIRE) },
     }),
     UsersModule,
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, Role]),
     RolesModule
   ],
   controllers: [AuthController],

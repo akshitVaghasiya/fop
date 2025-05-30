@@ -10,6 +10,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Role } from 'src/common/models/role.model';
 import { RolesService } from '../roles/roles.service';
+import { Scopes } from 'sequelize-typescript';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,8 @@ export class AuthService {
     private readonly userService: UsersService,
     @InjectModel(User)
     private readonly userModel: typeof User,
+    @InjectModel(Role)
+    private roleModel: typeof Role,
     @Inject(RolesService)
     private readonly rolesService: RolesService,
   ) { }
@@ -68,7 +71,7 @@ export class AuthService {
   }> {
     return new Promise(async (resolve, reject) => {
       try {
-        const user = await this.userModel.findOne({
+        const user = await this.userModel.scope('withPassword').findOne({
           where: { email: signInDto.email },
           raw: true,
         });
@@ -184,23 +187,28 @@ export class AuthService {
   async userInfo(id: string): Promise<User> {
     return new Promise(async (resolve, reject) => {
       try {
-        const user = await this.userModel.findByPk(id, {
+        // const user = await this.userModel.findByPk(id, {
+        const user = await this.userModel.scope().findByPk(id, {
           include: [
-            // { model: UserProfile, as: 'profile' },
-            { model: Role, as: 'auth_items' },
+            {
+              model: this.roleModel.scope('withDetail'),
+              as: 'auth_items'
+            },
           ],
-          attributes: { exclude: ['password'] },
           raw: true,
           nest: true,
         });
 
+        console.log('userInfo user:', user);
+
         if (!user) {
           return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
         }
+        if (user.auth_items) {
+          const [formattedRole] = await this.rolesService.formatRoles([user.auth_items]);
 
-        const [formattedRole] = await this.rolesService.formatRoles([user.auth_items]);
-
-        user.auth_items.auth_items = formattedRole.auth_items;
+          user.auth_items.auth_items = formattedRole.auth_items;
+        }
 
         resolve(user);
       } catch (error) {

@@ -1,18 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -74,6 +60,7 @@ export class ItemsController {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
   }
+  
   @Post()
   @Roles('item_create')
   @UseGuards(PermissionGuard)
@@ -221,8 +208,26 @@ export class ItemsController {
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<Item> {
     try {
+      return await this.itemsService.update(id, updateItemDto, req.user, file);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
 
-      return this.itemsService.update(id, updateItemDto, req.user, file);
+  @Patch(':id/reject')
+  @Roles('item_reject')
+  @UseGuards(PermissionGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reject an item' })
+  @ApiParam({ name: 'id', description: 'UUID of the item' })
+  @ApiResponse({ status: 200, description: 'Item successfully rejected' })
+  @ApiResponse({ status: 403, description: 'You do not have permission' })
+  async rejectItem(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<{ message: string }> {
+    try {
+      return await this.itemsService.rejectItem(id, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
@@ -241,7 +246,7 @@ export class ItemsController {
     @Param('id') id: string,
   ): Promise<{ message: string }> {
     try {
-      return this.itemsService.delete(id, req.user);
+      return await this.itemsService.delete(id, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }

@@ -5,7 +5,7 @@ export class CreateChatDto {
     @ApiProperty({ example: 'Claim UUID (for FOUND items)', required: false })
     @IsUUID()
     @IsOptional()
-    claim_id?: string;
+    item_interest_id?: string;
 
     @ApiProperty({ example: 'Receiver UUID' })
     @IsUUID()

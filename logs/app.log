@@ -1197,3 +1197,145 @@
 {"level":30,"time":1748502082221,"pid":12736,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:01:22.220Z] [INFO] POST /auth/register 201 - 395ms"}
 {"level":50,"time":1748502133104,"pid":9452,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:02:13.104Z] [ERROR] POST /auth/register 500 - Internal server error"}
 {"level":30,"time":1748502362088,"pid":2012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:06:02.087Z] [INFO] POST /auth/register 201 - 491ms"}
+{"level":50,"time":1748502675327,"pid":14012,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:11:15.326Z] [ERROR] POST /auth/register 500 - Internal server error"}
+{"level":50,"time":1748505464892,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:57:44.892Z] [ERROR] GET /api_docs 404 - Cannot GET /api_docs"}
+{"level":50,"time":1748505465443,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:57:45.443Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":50,"time":1748505476611,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:57:56.611Z] [ERROR] GET /api_docs 404 - Cannot GET /api_docs"}
+{"level":50,"time":1748505485912,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:58:05.912Z] [ERROR] GET /api_docs 404 - Cannot GET /api_docs"}
+{"level":50,"time":1748505488336,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:58:08.336Z] [ERROR] GET /api_docs 404 - Cannot GET /api_docs"}
+{"level":50,"time":1748505523298,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:58:43.298Z] [ERROR] GET /items?page=1&limit=10&sort_by=created_at&sort_type=DESC&type=LOST&status=ACTIVE&search= 500 - Internal server error"}
+{"level":50,"time":1748505532323,"pid":12536,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:58:52.323Z] [ERROR] GET /items?page=1&limit=10 500 - Internal server error"}
+{"level":30,"time":1748505588108,"pid":9448,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T07:59:48.108Z] [INFO] GET /items?page=1&limit=10 200 - 357ms"}
+{"level":30,"time":1748505862162,"pid":1968,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:04:22.161Z] [INFO] GET /items?page=1&limit=10 304 - 407ms"}
+{"level":30,"time":1748505972956,"pid":3792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:06:12.956Z] [INFO] POST /auth/register 201 - 510ms"}
+{"level":50,"time":1748506670526,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:17:50.526Z] [ERROR] GET /api_docs/favicon-32x32.png 404 - Cannot GET /api_docs/favicon-32x32.png"}
+{"level":50,"time":1748506670551,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:17:50.551Z] [ERROR] GET /api_docs/favicon-16x16.png 404 - Cannot GET /api_docs/favicon-16x16.png"}
+{"level":30,"time":1748506676379,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:17:56.379Z] [INFO] POST /auth/login 201 - 356ms"}
+{"level":30,"time":1748506691767,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:18:11.767Z] [INFO] GET /auth/user_info 200 - 213ms"}
+{"level":50,"time":1748506716158,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:18:36.158Z] [ERROR] GET /api_docs 404 - Cannot GET /api_docs"}
+{"level":50,"time":1748506769722,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:19:29.721Z] [ERROR] GET /items?status=ACTIVE&page=1&limit=10&type=LOST&search=&sort_by=name&sort_type=ASC 500 - Internal server error"}
+{"level":30,"time":1748506775986,"pid":9044,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:19:35.986Z] [INFO] GET /items?status=ACTIVE&page=1&limit=10 200 - 19ms"}
+{"level":30,"time":1748506866775,"pid":13836,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:21:06.774Z] [INFO] GET /items?status=ACTIVE&page=1&limit=10 304 - 282ms"}
+{"level":30,"time":1748506899665,"pid":13836,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:21:39.665Z] [INFO] POST /auth/login 201 - 215ms"}
+{"level":50,"time":1748506930697,"pid":13836,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:22:10.697Z] [ERROR] PATCH /profile-permissions/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 404 - Permission request not found"}
+{"level":50,"time":1748506978554,"pid":13836,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:22:58.554Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 403 - Forbidden resource"}
+{"level":50,"time":1748507031637,"pid":3588,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:23:51.636Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":30,"time":1748507062110,"pid":10576,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:24:22.109Z] [INFO] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 200 - 309ms"}
+{"level":30,"time":1748507292876,"pid":14200,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:28:12.875Z] [INFO] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 200 - 390ms"}
+{"level":30,"time":1748507317164,"pid":3336,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:28:37.163Z] [INFO] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 200 - 470ms"}
+{"level":30,"time":1748507369743,"pid":14704,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:29:29.743Z] [INFO] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 200 - 535ms"}
+{"level":30,"time":1748507380998,"pid":14568,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:29:40.996Z] [INFO] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 200 - 417ms"}
+{"level":50,"time":1748507465547,"pid":14612,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:31:05.546Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507510067,"pid":9604,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:31:50.067Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507517137,"pid":9604,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:31:57.137Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f5/reject 500 - Internal server error"}
+{"level":50,"time":1748507553877,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:32:33.877Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507555428,"pid":4980,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:32:35.428Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507577888,"pid":15332,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:32:57.888Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507716027,"pid":13368,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:35:16.027Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507751296,"pid":13228,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:35:51.295Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507783181,"pid":14256,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:36:23.180Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507817015,"pid":11056,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:36:57.014Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 403 - Forbidden resource"}
+{"level":50,"time":1748507825110,"pid":11056,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:37:05.110Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 403 - Forbidden resource"}
+{"level":50,"time":1748507866467,"pid":11056,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:37:46.467Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748507973751,"pid":15020,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:39:33.750Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508011176,"pid":13340,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:40:11.175Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508043251,"pid":11820,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:40:43.250Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508068290,"pid":6316,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:41:08.290Z] [ERROR] POST /auth/register 409 - Email already registered"}
+{"level":50,"time":1748508188988,"pid":9472,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:43:08.987Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508203505,"pid":9472,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:43:23.505Z] [ERROR] POST /auth/register 409 - Email already registered"}
+{"level":50,"time":1748508369946,"pid":1384,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:46:09.945Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508527532,"pid":10944,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:48:47.529Z] [ERROR] DELETE /items/3a8e8425-beb1-4e6f-b452-a351a4bad235 500 - Internal server error"}
+{"level":50,"time":1748508801941,"pid":8252,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:53:21.940Z] [ERROR] POST /auth/register 409 - Email already registered"}
+{"level":50,"time":1748508871991,"pid":15020,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:54:31.990Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 500 - Internal server error"}
+{"level":50,"time":1748508909735,"pid":10616,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:55:09.734Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 404 - Active item not found"}
+{"level":50,"time":1748508944521,"pid":12196,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:55:44.520Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 404 - Active item not found"}
+{"level":50,"time":1748508998827,"pid":6408,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T08:56:38.826Z] [ERROR] PATCH /items/453605d6-e2fd-4141-a7ec-a1864aeb08f9/reject 404 - Active item not found"}
+{"level":30,"time":1748509324684,"pid":3680,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:02:04.677Z] [INFO] POST /auth/login 201 - 670ms"}
+{"level":30,"time":1748509350911,"pid":3680,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:02:30.911Z] [INFO] POST /auth/login 201 - 272ms"}
+{"level":30,"time":1748511224128,"pid":3680,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:33:44.128Z] [INFO] GET /auth/user_info 304 - 200ms"}
+{"level":30,"time":1748511491878,"pid":372,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:38:11.877Z] [INFO] GET /auth/user_info 200 - 434ms"}
+{"level":30,"time":1748511548416,"pid":14968,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:39:08.415Z] [INFO] GET /auth/user_info 200 - 825ms"}
+{"level":50,"time":1748511723567,"pid":10076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:42:03.566Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":30,"time":1748511784369,"pid":2616,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:43:04.368Z] [INFO] GET /auth/user_info 200 - 542ms"}
+{"level":50,"time":1748511946969,"pid":4024,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:45:46.968Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":50,"time":1748511972766,"pid":9996,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:46:12.765Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":30,"time":1748511997537,"pid":14408,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:46:37.535Z] [INFO] GET /auth/user_info 200 - 476ms"}
+{"level":50,"time":1748512045430,"pid":1424,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:47:25.429Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":30,"time":1748512220300,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:50:20.300Z] [INFO] GET /auth/user_info 200 - 486ms"}
+{"level":30,"time":1748512345208,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T09:52:25.208Z] [INFO] GET /auth/user_info 304 - 324ms"}
+{"level":50,"time":1748514760991,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:32:40.991Z] [ERROR] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10 403 - Forbidden resource"}
+{"level":50,"time":1748514818085,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:33:38.085Z] [ERROR] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10 403 - Forbidden resource"}
+{"level":50,"time":1748514870132,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:34:30.132Z] [ERROR] POST /auth/login 500 - Internal server error"}
+{"level":50,"time":1748514898130,"pid":1208,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:34:58.130Z] [ERROR] POST /auth/login 500 - Internal server error"}
+{"level":30,"time":1748514930317,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:35:30.316Z] [INFO] POST /auth/login 201 - 502ms"}
+{"level":50,"time":1748514969872,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:36:09.872Z] [ERROR] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10 403 - Forbidden resource"}
+{"level":30,"time":1748515002063,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:36:42.063Z] [INFO] POST /items 201 - 162ms"}
+{"level":30,"time":1748515024561,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:37:04.561Z] [INFO] POST /item_interests 201 - 398ms"}
+{"level":50,"time":1748515124831,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:38:44.831Z] [ERROR] POST /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages 400 - [object Object]"}
+{"level":30,"time":1748515149617,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:39:09.617Z] [INFO] POST /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages 201 - 396ms"}
+{"level":50,"time":1748515175362,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:39:35.362Z] [ERROR] GET /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages?page=1&limit=10 403 - Forbidden resource"}
+{"level":30,"time":1748515312329,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:41:52.329Z] [INFO] GET /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages?page=1&limit=10 200 - 511ms"}
+{"level":30,"time":1748515350230,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:42:30.230Z] [INFO] POST /auth/login 201 - 350ms"}
+{"level":30,"time":1748515400385,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:43:20.384Z] [INFO] POST /item_interests 201 - 410ms"}
+{"level":30,"time":1748515477776,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:44:37.776Z] [INFO] POST /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages 201 - 334ms"}
+{"level":50,"time":1748515523829,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:45:23.829Z] [ERROR] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10 400 - CLAIM_REQUIRED"}
+{"level":30,"time":1748515612223,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:46:52.223Z] [INFO] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10&claim_id=35e699d3-b0ff-4858-b3ce-a8c77753668d 200 - 206ms"}
+{"level":30,"time":1748515621618,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:47:01.618Z] [INFO] GET /chats/3a8e8425-beb1-4e6f-b452-a351a4bad235/messages?page=1&limit=10&claim_id=35e699d3-b0ff-4858-b3ce-a8c77753668d 304 - 161ms"}
+{"level":30,"time":1748515687141,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:48:07.141Z] [INFO] GET /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages?page=1&limit=10&claim_id=35e699d3-b0ff-4858-b3ce-a8c77753668d 200 - 158ms"}
+{"level":30,"time":1748515739809,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T10:48:59.809Z] [INFO] GET /chats/4de733ce-b561-46a6-8bfa-0339ef7e3a40/messages?page=1&limit=10 200 - 159ms"}
+{"level":30,"time":1748517173792,"pid":6864,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:12:53.792Z] [INFO] GET /roles 200 - 262ms"}
+{"level":30,"time":1748519430381,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:50:30.380Z] [INFO] POST /auth/login 201 - 399ms"}
+{"level":30,"time":1748519453441,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:50:53.441Z] [INFO] POST /auth/login 201 - 355ms"}
+{"level":30,"time":1748519478247,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:51:18.247Z] [INFO] POST /auth/login 201 - 254ms"}
+{"level":30,"time":1748519505545,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:51:45.545Z] [INFO] POST /auth/login 201 - 219ms"}
+{"level":30,"time":1748519547972,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:52:27.972Z] [INFO] POST /items 201 - 231ms"}
+{"level":50,"time":1748519563984,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:52:43.984Z] [ERROR] POST /item_interests 404 - Active item not found"}
+{"level":30,"time":1748519657358,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:54:17.358Z] [INFO] POST /chats/89e0b367-144a-4a29-9f92-6733113d5bc9/messages 201 - 625ms"}
+{"level":30,"time":1748519678514,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:54:38.514Z] [INFO] GET /chats/89e0b367-144a-4a29-9f92-6733113d5bc9/messages?page=1&limit=10 200 - 223ms"}
+{"level":30,"time":1748519727367,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:55:27.367Z] [INFO] POST /items 201 - 134ms"}
+{"level":30,"time":1748519743612,"pid":9740,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T11:55:43.612Z] [INFO] POST /item_interests 201 - 194ms"}
+{"level":30,"time":1748521746234,"pid":11060,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:29:06.233Z] [INFO] POST /auth/login 201 - 490ms"}
+{"level":50,"time":1748521764182,"pid":11060,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:29:24.182Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":50,"time":1748521793366,"pid":11060,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:29:53.365Z] [ERROR] GET /auth/user_info 500 - Internal server error"}
+{"level":30,"time":1748521809390,"pid":11060,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:30:09.390Z] [INFO] GET /user_profiles/d881fecb-47f9-4928-b6d8-d457d41d98d9?item_id=e7bdc5ed-0aaf-43da-9e60-46e95632531a 200 - 155ms"}
+{"level":30,"time":1748521857125,"pid":13284,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:30:57.124Z] [INFO] GET /user_profiles/d881fecb-47f9-4928-b6d8-d457d41d98d9?item_id=e7bdc5ed-0aaf-43da-9e60-46e95632531a 200 - 454ms"}
+{"level":30,"time":1748521917748,"pid":14604,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:31:57.747Z] [INFO] GET /auth/user_info 200 - 356ms"}
+{"level":50,"time":1748522307530,"pid":13792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:38:27.528Z] [ERROR] POST /items 401 - Invalid or expired token"}
+{"level":50,"time":1748522335112,"pid":13792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:38:55.111Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":50,"time":1748522348160,"pid":13792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:39:08.160Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":50,"time":1748522355919,"pid":13792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:39:15.919Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":50,"time":1748522472384,"pid":7452,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:41:12.384Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748522561479,"pid":13772,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:42:41.478Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748522867665,"pid":13772,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:47:47.665Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748523009898,"pid":9396,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:50:09.897Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748523042399,"pid":3792,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:50:42.398Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748523197675,"pid":12076,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:53:17.674Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748523434475,"pid":9620,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:57:14.474Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748523452806,"pid":9620,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T12:57:32.806Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748524437046,"pid":13744,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:13:57.038Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":30,"time":1748525015052,"pid":15160,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:23:35.051Z] [INFO] GET /auth/user_info 200 - 472ms"}
+{"level":30,"time":1748525087712,"pid":3680,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:24:47.711Z] [INFO] GET /auth/user_info 304 - 419ms"}
+{"level":30,"time":1748525129239,"pid":12216,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:25:29.238Z] [INFO] GET /auth/user_info 200 - 536ms"}
+{"level":30,"time":1748525140802,"pid":10104,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:25:40.801Z] [INFO] GET /auth/user_info 200 - 447ms"}
+{"level":50,"time":1748525180806,"pid":14968,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:26:20.805Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748525352242,"pid":14968,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:29:12.242Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748525693483,"pid":1548,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:34:53.482Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748526097980,"pid":1548,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:41:37.980Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748526172329,"pid":4956,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:42:52.325Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748526431801,"pid":4956,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T13:47:11.801Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748527478140,"pid":10408,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:04:38.132Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":50,"time":1748527528361,"pid":3260,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:05:28.360Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":50,"time":1748527593402,"pid":15708,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:06:33.401Z] [ERROR] POST /items 500 - Internal server error"}
+{"level":30,"time":1748527764826,"pid":4388,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:09:24.825Z] [INFO] POST /items 201 - 1871ms"}
+{"level":30,"time":1748527820920,"pid":15716,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:10:20.919Z] [INFO] POST /items 201 - 509ms"}
+{"level":30,"time":1748528268571,"pid":8556,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:17:48.571Z] [INFO] POST /items 201 - 526ms"}
+{"level":50,"time":1748528276146,"pid":8556,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:17:56.145Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":50,"time":1748528310883,"pid":8556,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:18:30.883Z] [ERROR] POST /items 400 - [object Object]"}
+{"level":30,"time":1748528313786,"pid":8556,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:18:33.786Z] [INFO] POST /items 201 - 30ms"}
+{"level":30,"time":1748528581805,"pid":8556,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T14:23:01.805Z] [INFO] GET /items?page=1&limit=10 200 - 252ms"}
+{"level":50,"time":1748534117540,"pid":16812,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T15:55:17.538Z] [ERROR] POST /auth/login 500 - Internal server error"}
+{"level":30,"time":1748534189154,"pid":10156,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T15:56:29.153Z] [INFO] POST /auth/login 201 - 880ms"}
+{"level":30,"time":1748534265897,"pid":15272,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T15:57:45.894Z] [INFO] GET /auth/user_info 200 - 1311ms"}
+{"level":30,"time":1748534408209,"pid":8764,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:00:08.208Z] [INFO] GET /auth/user_info 304 - 621ms"}
+{"level":30,"time":1748534483024,"pid":16620,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:01:23.020Z] [INFO] GET /auth/user_info 304 - 1156ms"}
+{"level":30,"time":1748534503354,"pid":15676,"hostname":"DESKTOP-030UCRK","msg":"[2025-05-29T16:01:43.346Z] [INFO] GET /auth/user_info 200 - 1172ms"}

@@ -40,17 +40,17 @@ export class ChatsController {
     @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get chat messages for an item' })
     @ApiParam({ name: 'item_id', description: 'UUID of the item' })
-    @ApiQuery({ name: 'claim_id', description: 'UUID of the claim (optional)', required: false })
+    @ApiQuery({ name: 'item_interest_id', description: 'UUID of the claim (optional)', required: false })
     @ApiQuery({ name: 'filters', description: 'Filters for messages', type: ChatFilterDto })
     @ApiResponse({ status: 200, description: 'List of messages', type: [Chat] })
     async getMessages(
         @Param('item_id', ParseUUIDPipe) item_id: string,
-        @Query('claim_id', new ParseUUIDPipe({ optional: true })) claim_id: string | undefined,
+        @Query('item_interest_id', new ParseUUIDPipe({ optional: true })) item_interest_id: string | undefined,
         @Query() filters: ChatFilterDto,
         @Req() req: AuthenticatedRequest,
     ): Promise<{ messages: Chat[]; page_context: any }> {
         try {
-            return await this.chatsService.findAll(item_id, claim_id, filters, req.user);
+            return await this.chatsService.findAll(item_id, item_interest_id, filters, req.user);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }

@@ -1,7 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsNumber, Min, Max, MaxLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsNumber, Min, Max, MaxLength, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
+
+const ALLOWED_SORT_BY_FIELDS = ['id', 'title', 'created_at'];
+const ALLOWED_SORT_TYPES = ['ASC', 'DESC'];
 
 export class ItemFilterDto {
   @ApiPropertyOptional({ enum: ItemType, description: 'Filter items by type' })
@@ -44,17 +47,17 @@ export class ItemFilterDto {
 
   @ApiPropertyOptional({
     description: 'Field to sort by',
-    default: 'created_at',
+    enum: ALLOWED_SORT_BY_FIELDS,
   })
-  @IsString()
+  @IsIn(ALLOWED_SORT_BY_FIELDS)
   @IsOptional()
   sort_by?: string;
 
   @ApiPropertyOptional({
     description: 'Sort order (ASC or DESC)',
-    default: 'DESC',
+    enum: ALLOWED_SORT_TYPES,
   })
-  @IsString()
+  @IsIn(ALLOWED_SORT_TYPES)
   @IsOptional()
   sort_type?: 'ASC' | 'DESC';
 }

@@ -9,8 +9,6 @@ import { ProfileViewRequests } from './profile-view-request.model';
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
-  paranoid: true,
-  deletedAt: 'deleted_at',
 })
 export class ItemInterests extends Model {
   @Column({
@@ -41,7 +39,7 @@ export class ItemInterests extends Model {
   @BelongsTo(() => User, { foreignKey: 'assigned_by', as: 'assigner', onDelete: 'SET NULL' })
   assigner: User;
 
-  @HasMany(() => Chat, { foreignKey: 'claim_id', onDelete: 'CASCADE' })
+  @HasMany(() => Chat, { foreignKey: 'item_interest_id', onDelete: 'CASCADE' })
   chats: Chat[];
 
   @HasMany(() => ProfileViewRequests, { foreignKey: 'item_interest_id', as: 'permissions', onDelete: 'CASCADE' })

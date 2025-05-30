@@ -40,8 +40,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = exceptionResponse;
       }
     } else if (exception instanceof Error) {
-      // console.log("in global exception-->", exception);
-      
       message = exception.message || message;
     }
     console.log("in global exception-->", exception);

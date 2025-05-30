@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo, DefaultScope, Scopes } from 'sequelize-typescript';
 import { UserProfile } from './user-profile.model';
 import { Item } from './item.model';
 import { Chat } from './chat.model';
@@ -6,6 +6,26 @@ import { ItemInterests } from './item-interest.model';
 import { ProfileViewRequests } from './profile-view-request.model';
 import { Role } from './role.model';
 import { UserRole } from '../types/enums/users.enum';
+
+@DefaultScope(() => ({
+  attributes: { exclude: ['password', 'created_at', 'updated_at', 'deleted_at'] },
+}))
+
+@Scopes(() => ({
+  withAuthItem: {
+    include: [
+      {
+        model: Role,
+        as: 'auth_items',
+      },
+    ],
+  },
+  withPassword: {
+    attributes: {
+      include: ['password']
+    }
+  }
+}))
 
 @Table({
   tableName: 'users',

@@ -44,7 +44,7 @@ export class PermissionGuard implements CanActivate {
             nest: true,
         });
 
-        console.log("user-->", user);
+        // console.log("user-->", user);
 
 
         // console.log("user-->", user);

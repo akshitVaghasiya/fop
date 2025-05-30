@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ProfilePermissionService } from './profile-permission.service';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
@@ -9,11 +9,12 @@ import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { PermissionRequestFilterDto } from './dto/permission-request-filter.dto';
 import { ApprovePermissionRequestFilterDto } from './dto/approve-permission-request-filter.dto';
 import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
+import { UpdateStatusProfileDto } from './dto/update-status.dto';
 
 
 @ApiTags('Profile Permissions')
 @ApiBearerAuth()
-@Controller('profile-permissions')
+@Controller('profile_permissions')
 export class ProfilePermissionController {
     constructor(private readonly profilePermissionService: ProfilePermissionService) { }
 
@@ -68,57 +69,28 @@ export class ProfilePermissionController {
         catch (err) { throw new GlobalHttpException(err.error, err.statusCode); }
     }
 
-    @Patch(':id/approve')
-    // @Roles(UserRole.ADMIN, UserRole.USER)
-    @Roles('profile_permission_approve')
+    @Patch(':id/status')
+    @Roles('profile_permission_update')
     @UseGuards(PermissionGuard)
-    @ApiOperation({ summary: 'Approve a profile view permission request' })
-    @ApiResponse({ status: 200, description: 'Request approved', type: ProfileViewRequests })
-    @ApiResponse({ status: 403, description: 'Not authorized to approve' })
+    @ApiOperation({ summary: 'Update the status of a profile view permission request' })
+    @ApiResponse({ status: 200, description: 'Request status updated', type: ProfileViewRequests })
+    @ApiResponse({ status: 403, description: 'Not authorized to update status' })
+    @ApiResponse({ status: 400, description: 'Invalid status transition' })
     @ApiParam({ name: 'id', description: 'UUID of the permission request' })
-    async approvePermissionRequest(
+    @ApiBody({ type: UpdateStatusProfileDto, description: 'New status for the permission request' })
+    async updatePermissionRequestStatus(
         @Param('id', ParseUUIDPipe) id: string,
+        @Body() updateStatusDto: UpdateStatusProfileDto,
         @Req() req: AuthenticatedRequest,
     ): Promise<ProfileViewRequests> {
         try {
-            return await this.profilePermissionService.approvePermissionRequest(id, req.user.id);
+            return await this.profilePermissionService.updatePermissionRequestStatus(
+                id,
+                req.user.id,
+                updateStatusDto.status,
+            );
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }
-    }
-
-    @Patch(':id/deny')
-    // @Roles(UserRole.ADMIN, UserRole.USER)
-    @Roles('profile_permission_deny')
-    @UseGuards(PermissionGuard)
-    @ApiOperation({ summary: 'Deny a profile view permission request' })
-    @ApiResponse({ status: 200, description: 'Request denied', type: ProfileViewRequests })
-    @ApiResponse({ status: 403, description: 'Not authorized to deny' })
-    @ApiParam({ name: 'id', description: 'UUID of the permission request' })
-    async denyPermissionRequest(
-        @Param('id', ParseUUIDPipe) id: string,
-        @Req() req: AuthenticatedRequest,
-    ): Promise<ProfileViewRequests> {
-        try {
-            return await this.profilePermissionService.denyPermissionRequest(id, req.user.id);
-        } catch (err) {
-            throw new GlobalHttpException(err.error, err.statusCode);
-        }
-    }
-
-    @Patch(':id/reject')
-    // @Roles(UserRole.ADMIN, UserRole.USER).
-    @Roles('profile_permission_reject')
-    @UseGuards(PermissionGuard)
-    @ApiOperation({ summary: 'Reject (revoke) an approved profile view permission' })
-    @ApiResponse({ status: 200, type: ProfileViewRequests })
-    @ApiResponse({ status: 403, description: 'Not authorized to reject' })
-    @ApiParam({ name: 'id', description: 'UUID of the permission request' })
-    async rejectPermissionRequest(
-        @Param('id', ParseUUIDPipe) id: string,
-        @Req() req: AuthenticatedRequest,
-    ): Promise<ProfileViewRequests> {
-        try { return await this.profilePermissionService.rejectPermissionRequest(id, req.user.id); }
-        catch (err) { throw new GlobalHttpException(err.error, err.statusCode); }
     }
 }

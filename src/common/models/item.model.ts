@@ -35,8 +35,8 @@ export class Item extends Model {
   @Column({ type: DataType.TEXT, allowNull: false, field: 'description' })
   description: string;
 
-  @Column({ type: DataType.STRING, allowNull: false, field: 'location' })
-  location: string;
+  @Column({ type: DataType.GEOGRAPHY('POINT'), allowNull: true, field: 'location' })
+  location: any;
 
   @Column({ type: DataType.STRING, allowNull: true, field: 'image_url' })
   image_url?: string;

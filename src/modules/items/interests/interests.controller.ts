@@ -14,7 +14,7 @@ import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 @ApiTags('Item Interests')
 // @Roles(UserRole.ADMIN, UserRole.USER)
 @ApiBearerAuth()
-@Controller('item-interests')
+@Controller('item_interests')
 export class ItemInterestsController {
   constructor(private readonly itemInterestsService: ItemInterestsService) { }
 

@@ -11,8 +11,6 @@ import { ProfileViewStatus } from '../types/enums/profile-view-request.enum';
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    paranoid: true,
-    deletedAt: 'deleted_at',
 })
 export class ProfileViewRequests extends Model {
     @Column({ type: DataType.UUID, defaultValue: DataType.UUIDV4, primaryKey: true })

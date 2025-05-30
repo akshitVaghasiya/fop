@@ -26,7 +26,7 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
       // console.log("request.userauthguard-->", request.user);
 
       if (request.user) {
-        request.user = instanceToPlain(request.user, { excludeExtraneousValues: true });
+        request.user = request.user
       }
       return true;
     } catch (error) {

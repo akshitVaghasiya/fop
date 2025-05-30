@@ -31,51 +31,32 @@ export class ItemInterestsService {
 
     createInterest(dto: CreateItemInterestDto, user_id: string): Promise<ItemInterests> {
         return new Promise(async (resolve, reject) => {
-            const transaction = await this.sequelize.transaction();
             try {
                 const item = await this.itemsModel.findOne({
                     where: { id: dto.item_id, type: { [Op.in]: [ItemType.FOUND, ItemType.FREE] }, status: ItemStatus.ACTIVE },
                     raw: true,
                     nest: true,
-                    transaction,
                 });
                 if (!item) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ACTIVE_ITEM_NOT_FOUND, statusCode: 404 });
                 }
                 console.log("item-->", item);
 
                 if (item.user_id === user_id) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.OWNER_CANNOT_EXPRESS_INTEREST, statusCode: 403 });
                 }
                 const existingInterest = await this.itemInterestsModel.findOne({
                     where: { item_id: dto.item_id, user_id },
-                    transaction,
                 });
                 if (existingInterest) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INTEREST_ALREADY_EXPRESSED, statusCode: 403 });
                 }
                 const interest = await this.itemInterestsModel.create(
                     { item_id: dto.item_id, user_id },
-                    { transaction }
                 );
-                // if (dto.requestProfileView) {
-                //     await this.profilePermissionService.createPermissionRequest(
-                //         {
-                //             item_id: dto.item_id,
-                //             owner_id: item.user_id,
-                //             requester_id: user_id,
-                //             item_interest_id: interest.id,
-                //         },
-                //         user_id,
-                //     );
-                // }
-                await transaction.commit();
+
                 resolve(interest);
             } catch (err) {
-                await transaction.rollback();
                 reject({ error: err.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: err.statusCode || 500 });
             }
         });
@@ -101,7 +82,6 @@ export class ItemInterestsService {
                 const userInclude = {
                     model: User,
                     as: 'user',
-                    attributes: { exclude: ['password'] },
                     ...(search && {
                         where: { name: { [Op.iLike]: `%${search}%` } },
                     }),
@@ -135,30 +115,23 @@ export class ItemInterestsService {
                     nest: true,
                     transaction,
                 });
-                console.log("interest-->", interest);
 
                 if (!interest) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INTEREST_NOT_FOUND, statusCode: 404 });
                 }
 
                 const item = interest.item;
-                console.log("item-->", item);
 
                 if (item.status !== ItemStatus.ACTIVE) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
                 }
                 if (item.type === ItemType.FREE && user.role !== UserRole.ADMIN) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ADMIN_ONLY, statusCode: 403 });
                 }
                 if (item.type === ItemType.FOUND && user.role !== UserRole.ADMIN && item.user_id !== user.id) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
                 if (item.type !== ItemType.FOUND && item.type !== ItemType.FREE) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.INVALID_ITEM_TYPE, statusCode: 400 });
                 }
 
@@ -167,13 +140,10 @@ export class ItemInterestsService {
                     transaction,
                 });
 
-                console.log("receiver-->", receiver);
                 if (!receiver) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.RECEIVER_USER_NOT_FOUND, statusCode: 404 });
                 }
                 if (item.user_id === interest.user_id) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ASSIGN_TO_OWNER_FORBIDDEN, statusCode: 403 });
                 }
                 // if (interest.user_id !== interest.user_id) {
@@ -184,10 +154,8 @@ export class ItemInterestsService {
                     where: { item_id: item.id, assigned_by: { [Op.ne]: null } },
                     transaction,
                 });
-                console.log("existingAssignment-->", existingAssignment);
 
                 if (existingAssignment) {
-                    await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ITEM_ALREADY_ASSIGNED, statusCode: 400 });
                 }
 

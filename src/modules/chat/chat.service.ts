@@ -46,7 +46,7 @@ export class ChatsService {
             const transaction = await this.sequelize.transaction();
             try {
 
-                const { claim_id, receiver_id, message, requestProfileView } = dto;
+                const { item_interest_id, receiver_id, message, requestProfileView } = dto;
 
                 console.log("dto-->", dto);
 
@@ -82,17 +82,17 @@ export class ChatsService {
                     return reject({ error: ERROR_MESSAGES.CANNOT_MESSAGE_SELF, statusCode: 400 });
                 }
 
-                console.log("user-->", user);
+                // console.log("user-->", user);
 
 
                 let validatedClaimId: string | null = null;
                 if (item.type === ItemType.FOUND) {
-                    if (!claim_id) {
+                    if (!item_interest_id) {
                         await transaction.rollback();
                         return reject({ error: ERROR_MESSAGES.CLAIM_REQUIRED, statusCode: 400 });
                     }
                     const claim = await this.ItemInterestsModel.findOne({
-                        where: { id: claim_id, item_id },
+                        where: { id: item_interest_id, item_id },
                         attributes: ['id'],
                         raw: true,
                         transaction,
@@ -102,13 +102,13 @@ export class ChatsService {
                         await transaction.rollback();
                         return reject({ error: ERROR_MESSAGES.NOT_ASSIGNED, statusCode: 400 });
                     }
-                    validatedClaimId = claim_id;
+                    validatedClaimId = item_interest_id;
                 }
 
                 const chat = await this.chatModel.create(
                     {
                         item_id,
-                        claim_id: validatedClaimId,
+                        item_interest_id: validatedClaimId,
                         sender_id: user.id,
                         receiver_id,
                         message,
@@ -138,7 +138,7 @@ export class ChatsService {
                         { model: User, as: 'sender', attributes: ['id', 'name', 'email'] },
                         { model: User, as: 'receiver', attributes: ['id', 'name', 'email'] },
                     ],
-                    attributes: ['id', 'item_id', 'claim_id', 'sender_id', 'receiver_id', 'message', 'created_at'],
+                    attributes: ['id', 'item_id', 'item_interest_id', 'sender_id', 'receiver_id', 'message', 'created_at'],
                     raw: true,
                     nest: true,
                     transaction,
@@ -157,7 +157,7 @@ export class ChatsService {
 
     findAll(
         item_id: string,
-        claim_id: string | undefined,
+        item_interest_id: string | undefined,
         filters: ChatFilterDto,
         user: AuthUser,
     ): Promise<{ messages: Chat[]; page_context: PageContext }> {
@@ -179,7 +179,7 @@ export class ChatsService {
 
                 if (user.role !== UserRole.ADMIN && item.user_id !== user.id) {
                     if (item.type === ItemType.FOUND) {
-                        if (!claim_id) {
+                        if (!item_interest_id) {
                             return reject({ error: ERROR_MESSAGES.CLAIM_REQUIRED, statusCode: 400 });
                         }
                         const isAssigned = await this.ItemInterestsModel.findOne({
@@ -198,8 +198,8 @@ export class ChatsService {
                     item_id,
                     [Op.or]: [{ sender_id: user.id }, { receiver_id: user.id }],
                 };
-                if (claim_id) {
-                    where.claim_id = claim_id;
+                if (item_interest_id) {
+                    where.item_interest_id = item_interest_id;
                 }
 
                 const { rows, count } = await this.chatModel.findAndCountAll({
@@ -210,7 +210,7 @@ export class ChatsService {
                         { model: User, as: 'sender', attributes: ['id', 'name', 'email'] },
                         { model: User, as: 'receiver', attributes: ['id', 'name', 'email'] },
                     ],
-                    attributes: ['id', 'item_id', 'claim_id', 'sender_id', 'receiver_id', 'message', 'created_at'],
+                    attributes: ['id', 'item_id', 'item_interest_id', 'sender_id', 'receiver_id', 'message', 'created_at'],
                     offset: (page - 1) * limit,
                     limit,
                     raw: true,

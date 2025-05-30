@@ -133,7 +133,7 @@ export class ProfilePermissionService {
           include: [
             { model: Item, as: 'item' },
             // { model: User, as: 'owner', attributes: { exclude: ['password'] } },
-            { model: User, as: 'requester', attributes: { exclude: ['password'] } },
+            { model: User, as: 'requester' },
             // { model: ItemInterests, as: 'item_interest' },
             // { model: Chat, as: 'chat' },
           ],
@@ -158,7 +158,11 @@ export class ProfilePermissionService {
     });
   }
 
-  approvePermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
+  async updatePermissionRequestStatus(
+    id: string,
+    user_id: string,
+    newStatus: ProfileViewStatus,
+  ): Promise<ProfileViewRequests> {
     return new Promise(async (resolve, reject) => {
       const transaction = await this.sequelize.transaction();
       try {
@@ -168,72 +172,29 @@ export class ProfilePermissionService {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.PERMISSION_REQUEST_NOT_FOUND, statusCode: 404 });
         }
+
         if (request.getDataValue('owner_id') !== user_id) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
         }
-        if (request.getDataValue('status') !== ProfileViewStatus.PENDING) {
+
+        const currentStatus = request.getDataValue('status');
+        const validTransitions: { [key in ProfileViewStatus]?: ProfileViewStatus[] } =
+        {
+          [ProfileViewStatus.PENDING]: [ProfileViewStatus.APPROVED, ProfileViewStatus.DENIED],
+          [ProfileViewStatus.APPROVED]: [ProfileViewStatus.DENIED],
+        };
+
+        if (!validTransitions[currentStatus]?.includes(newStatus)) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
         }
-        await request.update({ status: ProfileViewStatus.APPROVED }, { transaction });
+
+        await request.update({ status: newStatus }, { transaction });
         await transaction.commit();
         resolve(request);
       } catch (err) {
         await transaction.rollback();
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
-  }
-
-  denyPermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
-    return new Promise(async (resolve, reject) => {
-      const transaction = await this.sequelize.transaction();
-      try {
-        const request = await this.permissionRequestsModel.findByPk(id, { transaction });
-        if (!request) {
-          await transaction.rollback();
-          return reject({ error: ERROR_MESSAGES.PERMISSION_REQUEST_NOT_FOUND, statusCode: 404 });
-        }
-        if (request.getDataValue('owner_id') !== user_id) {
-          await transaction.rollback();
-          return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
-        }
-        if (request.getDataValue('status') !== ProfileViewStatus.PENDING) {
-          await transaction.rollback();
-          return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
-        }
-        await request.update({ status: ProfileViewStatus.DENIED }, { transaction });
-        await transaction.commit();
-        resolve(request);
-      } catch (err) {
-        await transaction.rollback();
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
-  }
-
-  rejectPermissionRequest(id: string, user_id: string): Promise<ProfileViewRequests> {
-    return new Promise(async (resolve, reject) => {
-      const t = await this.sequelize.transaction();
-      try {
-        const request = await this.permissionRequestsModel.findByPk(id, { transaction: t });
-
-        if (!request) {
-          return reject({ error: ERROR_MESSAGES.PERMISSION_REQUEST_NOT_FOUND, statusCode: 404 });
-        }
-        if (request.getDataValue('owner_id') !== user_id) {
-          return reject({ error: ERROR_MESSAGES.NOT_REQUEST_OWNER, statusCode: 403 });
-        }
-        if (request.getDataValue('status') !== ProfileViewStatus.APPROVED) {
-          return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST_STATUS, statusCode: 400 });
-        }
-
-        await request.update({ status: ProfileViewStatus.DENIED }, { transaction: t });
-        await t.commit();
-        resolve(request);
-      } catch (err) {
-        await t.rollback();
         reject({ error: err.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: err.statusCode || 500 });
       }
     });

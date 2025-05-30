@@ -6,7 +6,7 @@ import { AuthUser } from 'src/common/types/auth-user.type';
 import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 import { ITEM_IMAGE_FOLDER } from 'src/common/constants/path.constants';
 import { Item } from 'src/common/models/item.model';
-import { Op } from 'sequelize';
+import { fn, literal, Op } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
 import { ItemInterests } from 'src/common/models/item-interest.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
@@ -49,6 +49,9 @@ export class ItemsService {
         file?: Express.Multer.File,
     ): Promise<Item> {
         return new Promise(async (resolve, reject) => {
+            console.log("createItemDto-->", createItemDto);
+            console.log("file-->", file);
+
             let imageUrl: string | undefined;
             let publicId: string | undefined;
             try {
@@ -58,15 +61,23 @@ export class ItemsService {
                     imageUrl = uploaded.secure_url;
                     publicId = uploaded.public_id;
                 }
+                // let locationData;
+                // if (createItemDto.location && createItemDto.location.length === 2) {
+                //     const [longitude, latitude] = createItemDto.location;
+                //     locationData = literal(`POINT(${longitude}, ${latitude})`);
+                // }
+
                 const item = await this.itemsModel.create({
                     ...createItemDto,
+                    location: createItemDto.location ? literal(`POINT(${createItemDto.location[0]}, ${createItemDto.location[1]})`) : null,
                     image_url: imageUrl,
                     user_id: user.id,
                 });
-                // console.log("item-->",item);
 
                 resolve(item);
             } catch (error) {
+                console.log("error-->", error);
+
                 if (publicId) {
                     await this.cloudinaryService.deleteImage(publicId);
                 }
@@ -290,38 +301,6 @@ export class ItemsService {
 
                 const item = await this.itemsModel.findOne({
                     where
-                    // where: { id, },
-                    // include: [
-                    //     {
-                    //         model: User,
-                    //         as: 'user',
-                    //         attributes: { exclude: ['password'] },
-                    //     },
-                    //     {
-                    //         model: ItemInterest,
-                    //         as: 'interests',
-                    //         // separate: true,
-                    //         include: [
-                    //             {
-                    //                 model: User,
-                    //                 as: "user",
-                    //                 attributes: { exclude: ['password'] },
-                    //             },
-                    //         ],
-                    //     },
-                    //     {
-                    //         model: ItemReceiver,
-                    //         as: 'receiver',
-                    //         // separate: true,
-                    //         include: [
-                    //             {
-                    //                 model: User,
-                    //                 as: 'receiver',
-                    //                 attributes: { exclude: ['password'] },
-                    //             },
-                    //         ],
-                    //     },
-                    // ],
                 });
 
                 if (!item) {
@@ -394,14 +373,45 @@ export class ItemsService {
         });
     }
 
+    async rejectItem(itemId: string, user: AuthUser): Promise<{ message: string }> {
+        return new Promise(async (resolve, reject) => {
+            try {
+
+                if (user.role !== UserRole.ADMIN) {
+                    return reject({ error: ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, statusCode: 403 });
+                }
+
+                const item = await this.itemsModel.findOne({ where: { id: itemId }, raw: true });
+
+                if (!item) {
+                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                }
+
+                if (item.status !== ItemStatus.ACTIVE) {
+                    return reject({ error: ERROR_MESSAGES.ACTIVE_ITEM_NOT_FOUND, statusCode: 404 });
+                }
+
+                await this.itemsModel.update(
+                    { status: ItemStatus.REJECTED },
+                    { where: { id: itemId } },
+                );
+
+                resolve({ message: 'rejected successfully' });
+
+            } catch (error) {
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+            }
+        });
+    }
+
     delete(itemId: string, user: AuthUser): Promise<{ message: string }> {
         return new Promise(async (resolve, reject) => {
             let publicId: string | undefined;
             try {
-                const item = await this.itemsModel.findOne({ where: { id: itemId } });
+                const item = await this.itemsModel.findOne({ where: { id: itemId, status: ItemStatus.ACTIVE } });
 
                 if (!item) {
-                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                    return reject({ error: ERROR_MESSAGES.ACTIVE_ITEM_NOT_FOUND, statusCode: 404 });
                 }
 
                 try {

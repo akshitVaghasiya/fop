@@ -1,5 +1,17 @@
-import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, DefaultScope, Scopes } from 'sequelize-typescript';
 import { User } from './users.model';
+
+@DefaultScope(() => ({
+    attributes: { exclude: ['created_at', 'updated_at', 'deleted_at'] },
+}))
+
+@Scopes(() => ({
+    withDetail: {
+        attributes: {
+            include: ['created_at', 'updated_at', 'deleted_at'],
+        },
+    }
+}))
 
 @Table({
     tableName: 'roles',

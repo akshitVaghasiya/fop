@@ -9,8 +9,6 @@ import { ProfileViewRequests } from './profile-view-request.model';
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    paranoid: true,
-    deletedAt: 'deleted_at',
 })
 export class Chat extends Model {
     @Column({
@@ -25,8 +23,8 @@ export class Chat extends Model {
     item_id: string;
 
     @ForeignKey(() => ItemInterests)
-    @Column({ type: DataType.UUID, allowNull: true, field: 'claim_id' })
-    claim_id: string | null;
+    @Column({ type: DataType.UUID, allowNull: true, field: 'item_interest_id' })
+    item_interest_id: string | null;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.UUID, allowNull: false, field: 'sender_id' })
@@ -42,7 +40,7 @@ export class Chat extends Model {
     @BelongsTo(() => Item, { onDelete: 'CASCADE' })
     item: Item;
 
-    @BelongsTo(() => ItemInterests, { foreignKey: 'claim_id', onDelete: 'CASCADE' })
+    @BelongsTo(() => ItemInterests, { foreignKey: 'item_interest_id', onDelete: 'CASCADE' })
     claim: ItemInterests;
 
     @BelongsTo(() => User, { foreignKey: 'sender_id', as: 'sender', onDelete: 'CASCADE' })
