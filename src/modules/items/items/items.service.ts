@@ -100,6 +100,7 @@ export class ItemsService {
                 }
                 const item = await this.itemsModel.create({
                     type: ItemType.FREE,
+                    location: createItemDto.location ? literal(`POINT(${createItemDto.location[0]}, ${createItemDto.location[1]})`) : null,
                     ...createItemDto,
                     image_url: imageUrl,
                 });
