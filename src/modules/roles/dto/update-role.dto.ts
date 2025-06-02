@@ -6,7 +6,7 @@ export class UpdateRoleDto {
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    title?: string;
+    name?: string;
 
     @ApiProperty({
         description: 'Array of permissions for the role',
