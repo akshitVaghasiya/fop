@@ -74,7 +74,7 @@ export class ProfilePermissionController {
     }
 
     @Patch(':id/status')
-    @Roles('profile_permission_update')
+    @Roles('profile_permission_status_update')
     @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Update the status of a profile view permission request' })
     @ApiResponse({ status: 200, description: 'Request status updated', type: ProfileViewRequests })

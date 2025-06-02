@@ -2,7 +2,6 @@ import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../decorators/public/public.decorator';
-import { instanceToPlain } from 'class-transformer';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 

@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { log } from 'console';
 import { ROLES_KEY } from 'src/common/decorators/roles/roles.decorator';
 import { AuthChild } from 'src/common/models/auth-child.model';
 import { Role } from 'src/common/models/role.model';

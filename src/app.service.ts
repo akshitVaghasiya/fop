@@ -8,6 +8,8 @@ import { Sequelize } from 'sequelize-typescript';
 import sequelize from 'sequelize';
 import { UserPreference } from './common/models/user-preference.model';
 import { ERROR_MESSAGES } from './common/constants/error-response.constant';
+import { AuthChild } from './common/models/auth-child.model';
+import { AuthItem } from './common/models/auth-item.model';
 
 @Injectable()
 export class AppService {
@@ -17,7 +19,21 @@ export class AppService {
     private readonly userModel: typeof User,
     @InjectModel(UserPreference)
     private userPreferenceModel: typeof UserPreference,
+    @InjectModel(AuthChild)
+    private authChildModel: typeof AuthChild,
+    @InjectModel(AuthItem)
+    private authItemModel: typeof AuthItem,
   ) { }
+
+  async authChild(): Promise<any> {
+    const parentPermissions = await this.authChildModel.findAll()
+    return parentPermissions;
+  }
+
+  async authItem(): Promise<any> {
+    const parentPermissions = await this.authItemModel.findAll()
+    return parentPermissions;
+  }
 
   async getHello(
     filters: UserFilterDto,

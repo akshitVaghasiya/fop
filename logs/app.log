@@ -1494,3 +1494,9 @@
 {"level":50,"time":1748845244470,"pid":12112,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:20:44.469Z] [ERROR] PATCH /user_profiles/acccc872-6414-416f-8602-c8cee88fb652 404 - Profile not found"}
 {"level":30,"time":1748845263518,"pid":12112,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:21:03.518Z] [INFO] PATCH /user_profiles/383b774c-55a0-4d82-9e7a-42dcee05892c 200 - 308ms"}
 {"level":30,"time":1748845308772,"pid":12112,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:21:48.772Z] [INFO] GET /user_profiles/acccc872-6414-416f-8602-c8cee88fb652 200 - 394ms"}
+{"level":50,"time":1748846750367,"pid":1444,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:45:50.366Z] [ERROR] GET /auth_child 500 - column \"createdAt\" does not exist"}
+{"level":50,"time":1748846807581,"pid":12556,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:46:47.580Z] [ERROR] GET /auth_child 500 - column \"createdAt\" does not exist"}
+{"level":50,"time":1748846866629,"pid":15776,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:47:46.628Z] [ERROR] GET /auth_child 500 - column \"createdAt\" does not exist"}
+{"level":50,"time":1748846918768,"pid":15500,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T06:48:38.767Z] [ERROR] GET /auth_child 500 - column \"createdAt\" does not exist"}
+{"level":50,"time":1748848194217,"pid":2492,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T07:09:54.216Z] [ERROR] GET /auth_child 500 - column \"createdAt\" does not exist"}
+{"level":30,"time":1748848299547,"pid":14832,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-02T07:11:39.546Z] [INFO] GET /auth_child 200 - 277ms"}

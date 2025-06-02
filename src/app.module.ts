@@ -20,6 +20,8 @@ import { ChatModule } from './modules/chat/chat.module';
 import { ProfilePermissionModule } from './modules/user-profile-permission/profile-permission.module';
 import { PermissionGuard } from './common/guards/roles/permission.guard';
 import { RolesModule } from './modules/roles/roles.module';
+import { AuthChild } from './common/models/auth-child.model';
+import { AuthItem } from './common/models/auth-item.model';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { RolesModule } from './modules/roles/roles.module';
     AuthModule,
     ItemsModule,
     CloudinaryModule,
-    SequelizeModule.forFeature([User, UserPreference]),
+    SequelizeModule.forFeature([User, UserPreference, AuthChild, AuthItem]),
     UserProfileModule,
     ChatModule,
     ProfilePermissionModule,

@@ -1,11 +1,8 @@
 import { Table, Column, Model, DataType, DefaultScope } from 'sequelize-typescript';
 
-@DefaultScope(() => ({
-    attributes: { exclude: ['created_at', 'updated_at'] },
-}))
-
 @Table({
     tableName: 'auth_item',
+    timestamps: false,
 })
 export class AuthItem extends Model {
     @Column({
