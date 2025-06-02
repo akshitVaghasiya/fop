@@ -2,13 +2,13 @@ import { Table, Column, Model, DataType, HasMany, DefaultScope, Scopes } from 's
 import { User } from './users.model';
 
 @DefaultScope(() => ({
-    attributes: { exclude: ['created_at', 'updated_at', 'deleted_at'] },
+    attributes: { exclude: ['created_at', 'updated_at'] },
 }))
 
 @Scopes(() => ({
     withDetail: {
         attributes: {
-            include: ['created_at', 'updated_at', 'deleted_at'],
+            include: ['created_at', 'updated_at'],
         },
     }
 }))

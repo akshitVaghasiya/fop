@@ -211,6 +211,8 @@ export class AuthService {
 
         resolve(user);
       } catch (error) {
+        console.log('Error-->', error);
+
         reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
       }
     });
