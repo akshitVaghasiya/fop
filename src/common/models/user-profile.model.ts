@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Scopes } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, Scopes, DefaultScope } from 'sequelize-typescript';
 import { User } from './users.model';
 import { UserGender } from '../types/enums/user-profile.enum';
 
@@ -8,19 +8,10 @@ export interface ProfilePictureMetadata {
     encoding?: string;
 }
 
-// @Scopes(() => (
-//     getProfilePicture() {
-//         const buffer = this.getDataValue('profile_picture');
-//         const metadata = this.getDataValue('profile_picture_metadata');
+@DefaultScope(() => ({
+    attributes: { exclude: ['created_at', 'updated_at', 'deleted_at'] },
+}))
 
-//         // Add null checks
-//         if(buffer && metadata && metadata.mimeType) {
-//     const base64String = buffer.toString('base64');
-//     return `data:${metadata.mimeType};base64,${base64String}`;
-// }
-// return null;
-//     }
-// ));
 @Table({
     tableName: 'user_profiles',
     timestamps: true,
@@ -74,6 +65,8 @@ export class UserProfile extends Model {
 
             if (buffer && metadata?.mimeType) {
                 const base64String = buffer.toString('base64');
+                console.log("base64-->", base64String);
+
                 return `data:${metadata.mimeType};base64,${base64String}`;
             }
             return null;

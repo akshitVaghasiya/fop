@@ -119,6 +119,10 @@ export const ERROR_MESSAGES = {
     error: 'CLAIM_REQUIRED',
     message: 'CLAIM_REQUIRED',
   },
+  ITEM_INTEREST_REQUIRED: {
+    error: 'ITEM_INTEREST_REQUIRED',
+    message: 'ITEM_INTEREST_REQUIRED',
+  },
   CANNOT_MESSAGE_SELF: {
     error: 'CANNOT_MESSAGE_SELF',
     message: 'CANNOT_MESSAGE_SELF',
@@ -174,5 +178,17 @@ export const ERROR_MESSAGES = {
   ROLE_IN_USE: {
     error: 'ROLE_IN_USE',
     message: 'Role is in use and cannot be deleted',
+  },
+  UNIQUE_ROLE: {
+    error: 'UNIQUE_ROLE',
+    message: 'Role with this name already exists',
+  },
+  UPDATE_ADMIN_ROLE: {
+    error: 'UPDATE_ADMIN_ROLE',
+    message: 'Cannot update admin role',
+  },
+  DELETE_ADMIN_ROLE: {
+    error: 'DELETE_ADMIN_ROLE:',
+    message: 'Cannot delete admin role',
   },
 };

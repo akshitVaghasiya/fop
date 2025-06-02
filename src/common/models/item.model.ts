@@ -1,9 +1,13 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, DefaultScope } from 'sequelize-typescript';
 import { User } from './users.model';
 import { Chat } from './chat.model';
 import { ItemInterests } from './item-interest.model';
 import { ProfileViewRequests } from './profile-view-request.model';
 import { ItemStatus, ItemType } from '../types/enums/items.enum';
+
+@DefaultScope(() => ({
+  attributes: { exclude: ['created_at', 'updated_at', 'deleted_at'] },
+}))
 
 @Table({
   tableName: 'items',

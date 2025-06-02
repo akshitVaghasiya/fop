@@ -12,6 +12,7 @@ import { ChatFilterDto } from './dto/chat-filter.dto';
 import { Op } from 'sequelize';
 import { UserRole } from 'src/common/types/enums/users.enum';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 
 interface PageContext {
@@ -46,7 +47,7 @@ export class ChatsService {
             const transaction = await this.sequelize.transaction();
             try {
 
-                const { item_interest_id, receiver_id, message, requestProfileView } = dto;
+                const { item_interest_id, receiver_id, message } = dto;
 
                 console.log("dto-->", dto);
 
@@ -177,7 +178,7 @@ export class ChatsService {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
 
-                if (user.role !== UserRole.ADMIN && item.user_id !== user.id) {
+                if (!isAdminRole(user.role_name) && item.user_id !== user.id) {
                     if (item.type === ItemType.FOUND) {
                         if (!item_interest_id) {
                             return reject({ error: ERROR_MESSAGES.CLAIM_REQUIRED, statusCode: 400 });

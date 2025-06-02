@@ -11,6 +11,7 @@ import { CreateItemInterestDto } from '../dto/create-item-interest.dto';
 import { ProfilePermissionService } from 'src/modules/user-profile-permission/profile-permission.service';
 import { UserRole } from 'src/common/types/enums/users.enum';
 import { ItemType, ItemStatus } from 'src/common/types/enums/items.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 interface PageContext {
     page: number;
@@ -75,7 +76,7 @@ export class ItemInterestsService {
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
-                if (user.role !== UserRole.ADMIN && item.user_id !== user.id) {
+                if (!isAdminRole(user.role_name) && item.user_id !== user.id) {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
                 const where: WhereOptions = { item_id };
@@ -125,10 +126,10 @@ export class ItemInterestsService {
                 if (item.status !== ItemStatus.ACTIVE) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
                 }
-                if (item.type === ItemType.FREE && user.role !== UserRole.ADMIN) {
+                if (item.type === ItemType.FREE && !isAdminRole(user.role_name)) {
                     return reject({ error: ERROR_MESSAGES.ADMIN_ONLY, statusCode: 403 });
                 }
-                if (item.type === ItemType.FOUND && user.role !== UserRole.ADMIN && item.user_id !== user.id) {
+                if (item.type === ItemType.FOUND && !isAdminRole(user.role_name) && item.user_id !== user.id) {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
                 if (item.type !== ItemType.FOUND && item.type !== ItemType.FREE) {

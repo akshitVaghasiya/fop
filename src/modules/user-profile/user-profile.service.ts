@@ -11,6 +11,7 @@ import { User } from 'src/common/models/users.model';
 import { Item } from 'src/common/models/item.model';
 import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
 import { UserRole } from 'src/common/types/enums/users.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 type PageContext = {
     page: number;
@@ -113,11 +114,13 @@ export class UserProfileService {
                     // nest: true,
                 });
 
+                console.log('profile-->', profile);
+
                 if (!profile) {
                     return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
-                if (user && (user.id === id || user.role === UserRole.ADMIN)) {
+                if (user && (user.id === id || isAdminRole(user.role_name))) {
                     return resolve(profile);
                 }
 
@@ -162,13 +165,15 @@ export class UserProfileService {
     update(id: string, dto: UpdateUserProfileDto, user: AuthUser, file?: Express.Multer.File): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
+                console.log("dto-->", dto);
+
                 const profile = await this.userProfileModel.findByPk(id, { raw: true, nest: true });
 
                 if (!profile) {
-                    return reject({ error: 'User profile not found', statusCode: 404 });
+                    return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
-                if (user.role !== UserRole.ADMIN && profile.user_id !== user.id) {
+                if (!isAdminRole(user.role_name) && profile.user_id !== user.id) {
                     return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
                 }
 

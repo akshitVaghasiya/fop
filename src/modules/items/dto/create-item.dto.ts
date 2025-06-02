@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsString, IsOptional, IsNotEmpty, IsNumber, ArrayMinSize, ArrayMaxSize, Validate, IsArray } from 'class-validator';
+import { IsEnum, IsString, IsOptional, IsNotEmpty, IsNumber, ArrayMinSize, ArrayMaxSize, Validate, IsArray, ValidateIf } from 'class-validator';
 import { ItemType } from 'src/common/types/enums/items.enum';
 
 export class CreateItemDto {
@@ -42,9 +42,11 @@ export class CreateItemDto {
   })
   @IsOptional()
   @Transform(({ value }) => {
+    if (value === null || value === undefined) return value;
     if (typeof value === 'string') {
       try {
         const parsed = JSON.parse(value);
+
         if (Array.isArray(parsed)) return parsed;
       } catch {
         const [lon, lat] = value.split(',').map(Number);
@@ -66,7 +68,7 @@ export class CreateItemDto {
     }
     return true;
   })
-  location?: [number, number];
+  location?: [number, number] | string | null;
 
   // @ApiProperty({ description: 'URL of the item image', required: false, example: 'https://example.com/image.jpg' })
   @IsString()

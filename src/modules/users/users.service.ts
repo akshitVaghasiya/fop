@@ -9,6 +9,7 @@ import { Op } from 'sequelize';
 import { Item } from 'src/common/models/item.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { UserRole } from 'src/common/types/enums/users.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 type PageContext = {
   page: number;
@@ -111,12 +112,15 @@ export class UsersService {
   updateUser(id: string, dto: UpdateUserDto, user: AuthUser): Promise<User> {
     return new Promise(async (resolve, reject) => {
       try {
-
-        if (user.role !== UserRole.ADMIN && user.id !== id) {
+        //  user.role_name.toLowerCase() !== UserRole.ADMIN.toLowerCase()
+        if (!isAdminRole(user.role_name) && user.id !== id) {
           return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
         }
 
-        if (user.role !== UserRole.ADMIN) {
+        console.log("req.user-->", user);
+        console.log("dto before-->", dto);
+
+        if (!isAdminRole(user.role_name)) {
           if ('role' in dto) {
             delete dto.role;
           }
@@ -124,6 +128,7 @@ export class UsersService {
             delete dto.role_id;
           }
         }
+        console.log("dto after-->", dto);
 
         const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
           where: { id },

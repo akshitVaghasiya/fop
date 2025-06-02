@@ -11,8 +11,9 @@ import { PermissionRequestFilterDto } from './dto/permission-request-filter.dto'
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { ApprovePermissionRequestFilterDto } from './dto/approve-permission-request-filter.dto';
 import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
-import { UserRole } from 'src/common/types/enums/users.enum';
 import { ProfileViewStatus } from '../../common/types/enums/profile-view-request.enum';
+import { ItemType } from 'src/common/types/enums/items.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 interface PageContext {
   page: number;
@@ -40,41 +41,64 @@ export class ProfilePermissionService {
       try {
 
         const item = await this.itemsModel.findByPk(dto.item_id, { raw: true, nest: true, transaction });
+        console.log("item-->", item);
 
         if (!item) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
         }
-        // if (!['FOUND', 'FREE', 'LOST'].includes(item.type)) {
+
+        // if (item.user_id !== dto.owner_id) {
         //   await transaction.rollback();
-        //   return reject({ error: ERROR_MESSAGES.INVALID_ITEM_TYPE, statusCode: 400 });
+        //   return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST, statusCode: 403 });
         // }
 
-        if (item.user_id !== dto.owner_id) {
-          await transaction.rollback();
-          return reject({ error: ERROR_MESSAGES.INVALID_PERMISSION_REQUEST, statusCode: 403 });
-        }
-        // if (dto.requester_id !== requester_id) {
-        //   await transaction.rollback();
-        //   return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
-        // }
-        if (requester_id === dto.owner_id) {
+        if (requester_id === item.user_id) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.REQUEST_TO_SELF_FORBIDDEN, statusCode: 403 });
         }
 
-        if (dto.item_interest_id) {
-          const interest = await this.itemInterestsModel.findByPk(dto.item_interest_id, { raw: true, nest: true, transaction });
+        if (item.type === ItemType.FOUND) {
+          const interest = await this.itemInterestsModel.findOne({
+            where: {
+              item_id: dto.item_id,
+              user_id: requester_id
+            },
+            raw: true,
+            nest: true,
+            transaction
+          });
+          console.log("interest-->", interest);
 
-          if (!interest || interest.item_id !== dto.item_id || interest.user_id !== requester_id) {
+          if (!interest) {
             await transaction.rollback();
+            // interest not found, so cannot request permission
             return reject({ error: ERROR_MESSAGES.INVALID_INTERACTION, statusCode: 403 });
           }
-        } else if (dto.chat_id) {
-          const chat = await this.chatModel.findByPk(dto.chat_id, { raw: true, nest: true, transaction });
-          if (!chat || chat.item_id !== dto.item_id || chat.sender_id !== requester_id || chat.receiver_id !== dto.owner_id) {
+        } else if (item.type === ItemType.LOST) {
+          console.log("requester_id-->", requester_id);
+
+          const chat = await this.chatModel.findOne({
+            where: {
+              item_id: dto.item_id,
+              [Op.or]: [
+                { sender_id: requester_id }, { receiver_id: requester_id },
+              ]
+            },
+            raw: true,
+            nest: true,
+            transaction
+          });
+          console.log("chat-->", chat);
+
+          if (!chat) {
             await transaction.rollback();
-            return reject({ error: ERROR_MESSAGES.INVALID_INTERACTION, statusCode: 403 });
+            return reject({
+              error: {
+                error: "NO_INTERACTION",
+                message: "For request view profile first need to interection via chat"
+              }, statusCode: 403
+            });
           }
         } else {
           await transaction.rollback();
@@ -86,10 +110,11 @@ export class ProfilePermissionService {
             item_id: dto.item_id,
             requester_id: requester_id,
             [Op.or]: [{ status: ProfileViewStatus.PENDING }, { status: ProfileViewStatus.APPROVED }],
-            ...(item.type !== 'LOST' && dto.item_interest_id ? { item_interest_id: dto.item_interest_id } : {}),
           },
           transaction,
         });
+        console.log("existingRequest-->", existingRequest);
+
         if (existingRequest) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.PERMISSION_ALREADY_REQUESTED, statusCode: 400 });
@@ -97,14 +122,16 @@ export class ProfilePermissionService {
         const request = await this.permissionRequestsModel.create(
           {
             item_id: dto.item_id,
-            owner_id: dto.owner_id,
+            owner_id: item.user_id,
             requester_id: requester_id,
-            item_interest_id: dto.item_interest_id,
-            chat_id: dto.chat_id,
+            // item_interest_id: dto.item_interest_id,
+            // chat_id: dto.chat_id,
             status: ProfileViewStatus.PENDING,
           },
           { transaction },
         );
+        console.log("request-->", request);
+
         await transaction.commit();
         resolve(request);
       } catch (err) {
@@ -207,7 +234,7 @@ export class ProfilePermissionService {
     return new Promise(async (resolve, reject) => {
       try {
         const { page = 1, limit = 10, item_id } = filters;
-        if (user.role !== UserRole.ADMIN && user.id !== filters.owner_id)
+        if (!isAdminRole(user.role_name) && user.id !== filters.owner_id)
           return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
 
         const where: WhereOptions = {

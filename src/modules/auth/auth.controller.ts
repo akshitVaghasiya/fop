@@ -58,6 +58,8 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async userInfo(@Req() req: AuthenticatedRequest) {
     try {
+      console.log("req.user-->", req.user);
+
       return await this.authService.userInfo(req.user.id);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);

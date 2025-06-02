@@ -36,7 +36,7 @@ export class PermissionGuard implements CanActivate {
                 {
                     model: Role,
                     as: 'auth_items',
-                    attributes: ['auth_items'],
+                    attributes: ['auth_items', 'name'],
                     // required: false
                 }
             ],
@@ -44,14 +44,16 @@ export class PermissionGuard implements CanActivate {
             nest: true,
         });
 
-        // console.log("user-->", user);
+        console.log("user-->", user);
 
 
         // console.log("user-->", user);
 
-        if (!user || !user.role || !user.auth_items.auth_items) {
+        if (!user || !user.auth_items.auth_items) {
             return false;
         }
+
+        request.user.role_name = user.auth_items.name;
 
         const userPermissions = user.auth_items.auth_items;
         // const userPermissions = user.role;

@@ -18,9 +18,9 @@ export class ApprovePermissionRequestFilterDto {
     @Type(() => Number)
     limit?: number = 10;
 
-    @ApiProperty({ example: 'PENDING', required: false, enum: ProfileViewStatus })
-    @IsOptional()
-    status?: ProfileViewStatus;
+    // @ApiProperty({ example: 'PENDING', required: false, enum: ProfileViewStatus })
+    // @IsOptional()
+    // status?: ProfileViewStatus;
 
     @ApiProperty({ required: false })
     @IsString()

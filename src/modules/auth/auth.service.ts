@@ -188,7 +188,8 @@ export class AuthService {
     return new Promise(async (resolve, reject) => {
       try {
         // const user = await this.userModel.findByPk(id, {
-        const user = await this.userModel.scope().findByPk(id, {
+        // const user = await this.userModel.unscoped().findByPk(id, {
+        const user = await this.userModel.scope('withAuthItem').findByPk(id, {
           include: [
             {
               model: this.roleModel.scope('withDetail'),

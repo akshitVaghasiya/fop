@@ -65,8 +65,12 @@ export class ProfilePermissionController {
         @Query() filters: ApprovePermissionRequestFilterDto,
         @Req() req: AuthenticatedRequest,
     ): Promise<{ viewers: ProfileViewRequests[]; page_context: any }> {
-        try { return await this.profilePermissionService.getProfileViewers(filters, req.user); }
-        catch (err) { throw new GlobalHttpException(err.error, err.statusCode); }
+        try {
+            return await this.profilePermissionService.getProfileViewers(filters, req.user);
+        }
+        catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
     }
 
     @Patch(':id/status')

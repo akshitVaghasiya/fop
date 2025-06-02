@@ -17,8 +17,8 @@ export class CreateChatDto {
     @IsNotEmpty()
     message: string;
 
-    @ApiProperty({ example: true, required: false })
-    @IsBoolean()
-    @IsOptional()
-    requestProfileView?: boolean;
+    // @ApiProperty({ example: true, required: false })
+    // @IsBoolean()
+    // @IsOptional()
+    // requestProfileView?: boolean;
 }

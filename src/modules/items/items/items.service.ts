@@ -14,6 +14,7 @@ import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ItemType, ItemStatus } from 'src/common/types/enums/items.enum';
 import { CreateFreeItemDto } from '../dto/create-free-item.dto';
 import { UserRole } from 'src/common/types/enums/users.enum';
+import { isAdminRole } from 'src/common/utils/role.util';
 
 type WhereType = {
     type?: string;
@@ -295,7 +296,7 @@ export class ItemsService {
             try {
                 const where: { id: string; user_id?: string } = { id };
 
-                if (user.role !== UserRole.ADMIN) {
+                if (!isAdminRole(user.role_name)) {
                     where.user_id = user.id;
                 }
 
@@ -330,11 +331,11 @@ export class ItemsService {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
 
-                if (user.role !== UserRole.ADMIN && (item.getDataValue('user_id') !== user.id)) {
+                if (!isAdminRole(user.role_name) && (item.getDataValue('user_id') !== user.id)) {
                     throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
                 }
 
-                // if (updateItemDto.status === ItemStatus.REJECTED && user.role !== UserRole.ADMIN) {
+                // if (updateItemDto.status === ItemStatus.REJECTED && !isAdminRole(user.role_name)) {
                 //     return reject({ error: 'only admin can rehect item', statusCode: 403 });
                 // }
 
@@ -381,9 +382,9 @@ export class ItemsService {
         return new Promise(async (resolve, reject) => {
             try {
 
-                if (user.role !== UserRole.ADMIN) {
-                    return reject({ error: ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, statusCode: 403 });
-                }
+                // if (!isAdminRole(user.role_name)) {
+                //     return reject({ error: ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, statusCode: 403 });
+                // }
 
                 const item = await this.itemsModel.findOne({ where: { id: itemId }, raw: true });
 
@@ -447,7 +448,7 @@ export class ItemsService {
     validateItemOwnership(user: AuthUser, item: Item): void {
         try {
 
-            if (user.role !== UserRole.ADMIN && (item.user_id !== user.id)) {
+            if (!isAdminRole(user.role_name) && (item.user_id !== user.id)) {
                 throw new GlobalHttpException(ERROR_MESSAGES.FORBIDDEN_OWNERSHIP, 403);
             }
         } catch (error) {
