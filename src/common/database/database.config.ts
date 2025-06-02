@@ -35,12 +35,12 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     database: process.env.DB_NAME,
     models: [User, Item, UserProfile, ItemInterests, UserPreference, Chat, ProfileViewRequests, Role, AuthChild, AuthItem],
     logging: (msg) => console.log(msg),
-    ssl: false,
-    // dialectOptions: {
-    //     ssl: {
-    //         require: true,
-    //         rejectUnauthorized: true,
-    //         ca: caCert,
-    //     },
-    // },
+    ssl: true,
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: true,
+            ca: caCert,
+        },
+    },
 };
