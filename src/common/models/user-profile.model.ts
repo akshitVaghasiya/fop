@@ -65,7 +65,6 @@ export class UserProfile extends Model {
 
             if (buffer && metadata?.mimeType) {
                 const base64String = buffer.toString('base64');
-                console.log("base64-->", base64String);
 
                 return `data:${metadata.mimeType};base64,${base64String}`;
             }

@@ -200,8 +200,6 @@ export class AuthService {
           nest: true,
         });
 
-        console.log('userInfo user:', user);
-
         if (!user) {
           return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
         }

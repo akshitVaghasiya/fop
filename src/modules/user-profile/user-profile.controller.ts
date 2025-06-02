@@ -62,7 +62,6 @@ export class UserProfileController {
         @UploadedFile() file?: Express.Multer.File,
     ): Promise<UserProfile> {
         try {
-            console.log("file-->", file);
             return await this.userProfilesService.create(createDto, req.user, file);
         } catch (err) {
             console.log("err->", err);
@@ -135,8 +134,6 @@ export class UserProfileController {
         @UploadedFile() file?: Express.Multer.File,
     ): Promise<UserProfile> {
         try {
-            console.log("file-->", file);
-
             return await this.userProfilesService.update(id, updateDto, req.user, file);
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);

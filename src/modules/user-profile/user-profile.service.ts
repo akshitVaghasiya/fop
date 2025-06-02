@@ -114,8 +114,6 @@ export class UserProfileService {
                     // nest: true,
                 });
 
-                console.log('profile-->', profile);
-
                 if (!profile) {
                     return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
@@ -132,7 +130,7 @@ export class UserProfileService {
                     attributes: ['id', 'status'],
                     raw: true,
                 });
-                console.log('item-->', item);
+
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
@@ -156,7 +154,7 @@ export class UserProfileService {
 
                 resolve(profile);
             } catch (error) {
-                console.log('Error fetching user profile:', error);
+                console.log('error->', error);
                 reject({ error: error.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: error.statusCode || 500 });
             }
         });
@@ -165,8 +163,6 @@ export class UserProfileService {
     update(id: string, dto: UpdateUserProfileDto, user: AuthUser, file?: Express.Multer.File): Promise<UserProfile> {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log("dto-->", dto);
-
                 const profile = await this.userProfileModel.findByPk(id, { raw: true, nest: true });
 
                 if (!profile) {

@@ -207,7 +207,6 @@ export class AppService {
           // nest: true,
           // raw: false
         });
-        console.log("data-->", data);
 
         // return data;
         resolve(data);
@@ -229,7 +228,6 @@ export class AppService {
       raw: true,
       nest: true
     });
-    // console.log("data-->", data);
 
     return data;
   }

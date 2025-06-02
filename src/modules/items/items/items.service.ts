@@ -50,8 +50,6 @@ export class ItemsService {
         file?: Express.Multer.File,
     ): Promise<Item> {
         return new Promise(async (resolve, reject) => {
-            console.log("createItemDto-->", createItemDto);
-            console.log("file-->", file);
 
             let imageUrl: string | undefined;
             let publicId: string | undefined;
@@ -77,7 +75,6 @@ export class ItemsService {
 
                 resolve(item);
             } catch (error) {
-                console.log("error-->", error);
 
                 if (publicId) {
                     await this.cloudinaryService.deleteImage(publicId);
@@ -235,7 +232,6 @@ export class ItemsService {
             }
 
             try {
-                console.log("filters-->", filters);
 
                 const { rows, count } = await this.itemsModel.findAndCountAll({
                     where,
@@ -255,8 +251,6 @@ export class ItemsService {
                     offset: (page - 1) * limit,
                     limit,
                 });
-                console.log("rows-->", rows);
-
 
                 const page_context: PageContext = {
                     page,

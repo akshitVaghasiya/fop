@@ -117,9 +117,6 @@ export class UsersService {
           return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
         }
 
-        console.log("req.user-->", user);
-        console.log("dto before-->", dto);
-
         if (!isAdminRole(user.role_name)) {
           if ('role' in dto) {
             delete dto.role;
@@ -128,7 +125,6 @@ export class UsersService {
             delete dto.role_id;
           }
         }
-        console.log("dto after-->", dto);
 
         const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
           where: { id },

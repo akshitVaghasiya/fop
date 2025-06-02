@@ -35,7 +35,7 @@ export class RolesService {
                 if (error instanceof UniqueConstraintError) {
                     return reject({ error: ERROR_MESSAGES.UNIQUE_ROLE, statusCode: 400 });
                 }
-                console.log("error--->", error);
+
                 reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
         });

@@ -41,8 +41,6 @@ export class ProfilePermissionService {
       try {
 
         const item = await this.itemsModel.findByPk(dto.item_id, { raw: true, nest: true, transaction });
-        console.log("item-->", item);
-
         if (!item) {
           await transaction.rollback();
           return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
@@ -68,7 +66,6 @@ export class ProfilePermissionService {
             nest: true,
             transaction
           });
-          console.log("interest-->", interest);
 
           if (!interest) {
             await transaction.rollback();
@@ -76,7 +73,6 @@ export class ProfilePermissionService {
             return reject({ error: ERROR_MESSAGES.INVALID_INTERACTION, statusCode: 403 });
           }
         } else if (item.type === ItemType.LOST) {
-          console.log("requester_id-->", requester_id);
 
           const chat = await this.chatModel.findOne({
             where: {
@@ -89,7 +85,6 @@ export class ProfilePermissionService {
             nest: true,
             transaction
           });
-          console.log("chat-->", chat);
 
           if (!chat) {
             await transaction.rollback();
@@ -113,7 +108,6 @@ export class ProfilePermissionService {
           },
           transaction,
         });
-        console.log("existingRequest-->", existingRequest);
 
         if (existingRequest) {
           await transaction.rollback();
@@ -130,7 +124,6 @@ export class ProfilePermissionService {
           },
           { transaction },
         );
-        console.log("request-->", request);
 
         await transaction.commit();
         resolve(request);
@@ -153,7 +146,6 @@ export class ProfilePermissionService {
           ...(status && { status }),
           ...(item_id && { item_id }),
         };
-        console.log("where-->", where);
 
         const { rows, count } = await this.permissionRequestsModel.findAndCountAll({
           where,
@@ -169,7 +161,6 @@ export class ProfilePermissionService {
           raw: true,
           nest: true,
         });
-        console.log("row-->", rows);
 
         const page_context: PageContext = {
           page,

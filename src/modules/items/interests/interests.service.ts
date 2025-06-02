@@ -41,7 +41,6 @@ export class ItemInterestsService {
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ACTIVE_ITEM_NOT_FOUND, statusCode: 404 });
                 }
-                console.log("item-->", item);
 
                 if (item.user_id === user_id) {
                     return reject({ error: ERROR_MESSAGES.OWNER_CANNOT_EXPRESS_INTEREST, statusCode: 403 });
@@ -72,7 +71,7 @@ export class ItemInterestsService {
             try {
                 const { page = 1, limit = 10, search } = filters;
                 const item = await this.itemsModel.findByPk(item_id, { raw: true, nest: true });
-                console.log("item-->", item);
+
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }

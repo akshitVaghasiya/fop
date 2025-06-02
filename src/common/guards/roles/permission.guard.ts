@@ -16,16 +16,14 @@ export class PermissionGuard implements CanActivate {
             context.getClass(),
         ]);
 
-        // console.log("requiredPermissions-->", requiredPermissions);
 
         if (!requiredPermissions || requiredPermissions.length === 0) {
-            // return true;
+            return true;
         }
 
         const request = context.switchToHttp().getRequest();
         const userId: string = request.user.id;
 
-        // console.log("userId-->", userId);
 
         if (!userId) {
             return false;
@@ -44,11 +42,6 @@ export class PermissionGuard implements CanActivate {
             nest: true,
         });
 
-        console.log("user-->", user);
-
-
-        // console.log("user-->", user);
-
         if (!user || !user.auth_items.auth_items) {
             return false;
         }
@@ -56,15 +49,12 @@ export class PermissionGuard implements CanActivate {
         request.user.role_name = user.auth_items.name;
 
         const userPermissions = user.auth_items.auth_items;
-        // const userPermissions = user.role;
-        // console.log("userPermissions-->", userPermissions);
+
         const parentPermissions = await AuthChild.findAll({
             where: { child: requiredPermissions },
             attributes: ['parent'],
             raw: true,
         }).then(results => results.map(r => r.parent));
-
-        // console.log("parentPermissions-->", parentPermissions);
 
         return requiredPermissions.some(permission =>
             userPermissions.includes(permission) ||

@@ -17,9 +17,7 @@ import { User } from './users.model';
     tableName: 'roles',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    paranoid: true,
-    deletedAt: 'deleted_at',
+    updatedAt: 'updated_at'
 })
 export class Role extends Model {
     @Column({

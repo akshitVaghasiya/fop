@@ -49,15 +49,11 @@ export class ChatsService {
 
                 const { item_interest_id, receiver_id, message } = dto;
 
-                console.log("dto-->", dto);
-
                 const item = await this.itemModel.findByPk(item_id, { raw: true });
                 if (!item) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
-
-                console.log("item-->", item);
 
                 if (item.type === ItemType.FREE) {
                     await transaction.rollback();
@@ -75,16 +71,10 @@ export class ChatsService {
                     return reject({ error: ERROR_MESSAGES.RECEIVER_USER_NOT_FOUND, statusCode: 404 });
                 }
 
-                console.log("receiver-->", receiver);
-
-
                 if (receiver_id === user.id) {
                     await transaction.rollback();
                     return reject({ error: ERROR_MESSAGES.CANNOT_MESSAGE_SELF, statusCode: 400 });
                 }
-
-                // console.log("user-->", user);
-
 
                 let validatedClaimId: string | null = null;
                 if (item.type === ItemType.FOUND) {
@@ -98,7 +88,7 @@ export class ChatsService {
                         raw: true,
                         transaction,
                     });
-                    console.log('claim-->', claim);
+
                     if (!claim) {
                         await transaction.rollback();
                         return reject({ error: ERROR_MESSAGES.NOT_ASSIGNED, statusCode: 400 });
@@ -116,8 +106,6 @@ export class ChatsService {
                     },
                     { transaction },
                 );
-                console.log("chat-->", chat);
-
 
                 // if (requestProfileView && item.type === 'LOST' && receiver_id === item.user_id) {
                 //     await this.profilePermissionService.createPermissionRequest(
@@ -145,7 +133,6 @@ export class ChatsService {
                     transaction,
                 });
 
-                console.log("createdChat-->", createdChat);
                 await transaction.commit();
                 resolve(createdChat!);
                 // });
@@ -170,7 +157,7 @@ export class ChatsService {
                     attributes: ['id', 'type', 'user_id'],
                     raw: true,
                 });
-                console.log('item-->', item);
+
                 if (!item) {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
                 }
@@ -188,7 +175,7 @@ export class ChatsService {
                             attributes: ['id'],
                             raw: true,
                         });
-                        console.log('isAssigned-->', isAssigned);
+
                         if (!isAssigned) {
                             return reject({ error: ERROR_MESSAGES.NOT_ASSIGNED, statusCode: 403 });
                         }

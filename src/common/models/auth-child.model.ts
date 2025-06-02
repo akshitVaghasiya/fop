@@ -1,5 +1,9 @@
-import { Table, Column, Model, DataType, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, DefaultScope } from 'sequelize-typescript';
 import { AuthItem } from './auth-item.model';
+
+@DefaultScope(() => ({
+    attributes: { exclude: ['created_at', 'updated_at'] },
+}))
 
 @Table({
     tableName: 'auth_child',
