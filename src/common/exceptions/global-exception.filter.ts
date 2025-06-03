@@ -41,7 +41,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     } else if (exception instanceof Error) {
       message = exception.message || message;
+    } else if (
+      typeof exception === 'object' &&
+      exception !== null &&
+      'error' in exception
+    ) {
+      error = (exception as any).error.error || error;
+      message = (exception as any).error.message || message;
+    } else if (typeof exception === 'string') {
+      message = exception;
+    } else {
+      message = 'An unexpected error occurred';
     }
+
     console.log("in global exception-->", exception);
 
     const timestamp = new Date().toISOString();

@@ -41,6 +41,8 @@ export class PermissionGuard implements CanActivate {
             nest: true,
         });
 
+        console.log("user-->", user);
+
         if (!user || !user.auth_items.auth_items) {
             return false;
         }
@@ -54,6 +56,8 @@ export class PermissionGuard implements CanActivate {
             attributes: ['parent'],
             raw: true,
         }).then(results => results.map(r => r.parent));
+
+        console.log("parentPermissions-->", parentPermissions);
 
         return requiredPermissions.some(permission =>
             userPermissions.includes(permission) ||

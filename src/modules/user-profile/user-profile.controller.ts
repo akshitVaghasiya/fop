@@ -91,7 +91,7 @@ export class UserProfileController {
     @Roles('user_profile_view')
     @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get a user profile (item_id optional for self/admin)' })
-    @ApiParam({ name: 'id', description: 'UUID of the user profile' })
+    @ApiParam({ name: 'id', description: 'UUID of the user' })
     @ApiQuery({ name: 'item_id', description: 'UUID of the item for permission check', required: false })
     @ApiResponse({ status: 200, description: 'User profile details', type: UserProfile })
     @ApiResponse({ status: 403, description: 'No permission to view profile' })

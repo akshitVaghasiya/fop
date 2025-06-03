@@ -29,144 +29,130 @@ export class UsersService {
     private readonly userModel: typeof User,
   ) { }
 
-  create(createUserDto: SignUpDto): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const user = await this.userModel.create({
-          name: createUserDto.name,
-          email: createUserDto.email,
-          password: createUserDto.password,
-        });
-        resolve(user);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
+  async create(createUserDto: SignUpDto): Promise<User> {
+    try {
+      const user = await this.userModel.create({
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: createUserDto.password,
+      });
+      return user;
+    } catch (error) {
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
   }
 
-  findByEmail(email: string): Promise<User | null> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const data = await this.userModel.findOne({
-          where: { email },
-          raw: true,
-        });
-        resolve(data);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const data = await this.userModel.findOne({
+        where: { email },
+        raw: true,
+      });
+      return data;
+    } catch (error) {
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
   }
 
-  findAll(filters: UserFilterDto): Promise<{ users: User[]; page_context: PageContext }> {
-    return new Promise(async (resolve, reject) => {
-      try {
+  async findAll(filters: UserFilterDto): Promise<{ users: User[]; page_context: PageContext }> {
+    try {
+      const { search, page = 1, limit = 5 } = filters;
+      const where = search
+        ? { name: { [Op.iLike]: `%${search}%` } }
+        : undefined;
 
-        const { search, page = 1, limit = 5 } = filters;
-        const where = search
-          ? { name: { [Op.iLike]: `%${search}%` } }
-          : undefined;
+      const { rows, count } = await this.userModel.findAndCountAll({
+        where,
+        offset: (page - 1) * limit,
+        limit,
+        distinct: true,
+        include: [
+          {
+            model: Item,
+            as: 'items',
+          },
+        ],
+      });
 
-        const { rows, count } = await this.userModel.findAndCountAll({
-          where,
-          offset: (page - 1) * limit,
-          limit,
-          distinct: true,
-          include: [
-            {
-              model: Item,
-              as: 'items',
-            },
-          ],
-        });
+      const page_context: PageContext = {
+        page,
+        limit,
+        total: count,
+        ...(search && { search }),
+      };
 
-        const page_context: PageContext = {
-          page,
-          limit,
-          total: count,
-          ...(search && { search }),
-        };
-
-        resolve({ users: rows, page_context });
-
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
+      return { users: rows, page_context };
+    } catch (error) {
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
   }
 
-  findOneById(id: string): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const user = await this.userModel.findByPk(id, { raw: true });
-        if (!user) {
-          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
+  async findOneById(id: string): Promise<User> {
+    try {
+      const user = await this.userModel.findByPk(id, { raw: true });
+      if (!user) {
+        throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
+      }
+      return user;
+    } catch (error) {
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
+  }
+
+  async updateUser(id: string, dto: UpdateUserDto, user: AuthUser): Promise<User> {
+    try {
+      if (!isAdminRole(user.role_name) && user.id !== id) {
+        throw { error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 };
+      }
+
+      if (!isAdminRole(user.role_name)) {
+        if ('role' in dto) {
+          delete dto.role;
         }
-        resolve(user);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+        if ('role_id' in dto) {
+          delete dto.role_id;
+        }
       }
-    });
+
+      const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
+        where: { id },
+        returning: true,
+      });
+      if (rowsUpdated === 0) {
+        throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
+      }
+      return updatedUsers[0];
+    } catch (error) {
+      throw error;
+    }
   }
 
-  updateUser(id: string, dto: UpdateUserDto, user: AuthUser): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        //  user.role_name.toLowerCase() !== UserRole.ADMIN.toLowerCase()
-        if (!isAdminRole(user.role_name) && user.id !== id) {
-          return reject({ error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 });
-        }
-
-        if (!isAdminRole(user.role_name)) {
-          if ('role' in dto) {
-            delete dto.role;
-          }
-          if ('role_id' in dto) {
-            delete dto.role_id;
-          }
-        }
-
-        const [rowsUpdated, updatedUsers] = await this.userModel.update(dto, {
-          where: { id },
-          returning: true,
-        });
-        if (rowsUpdated === 0) {
-          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
-        }
-        resolve(updatedUsers[0]);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
-      }
-    });
-  }
-
-  updateUserStatus(
+  async updateUserStatus(
     user_id: string,
     is_active: boolean,
     currentUser: AuthUser,
   ): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (user_id === currentUser.id) {
-          return reject({
-            error: ERROR_MESSAGES.FORBIDDEN_SELF_STATUS_CHANGE,
-            statusCode: 403,
-          });
-        }
-        const [rowsUpdated, updatedUsers] = await this.userModel.update(
-          { is_active },
-          {
-            where: { id: user_id },
-            returning: true,
-          },
-        );
-        if (rowsUpdated === 0) {
-          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
-        }
-        resolve(updatedUsers[0]);
-      } catch (error) {
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+    try {
+      if (user_id === currentUser.id) {
+        throw {
+          error: ERROR_MESSAGES.FORBIDDEN_SELF_STATUS_CHANGE,
+          statusCode: 403,
+        };
       }
-    });
+      const [rowsUpdated, updatedUsers] = await this.userModel.update(
+        { is_active },
+        {
+          where: { id: user_id },
+          returning: true,
+        },
+      );
+      if (rowsUpdated === 0) {
+        throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
+      }
+      return updatedUsers[0];
+    } catch (error) {
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
   }
+  
 }

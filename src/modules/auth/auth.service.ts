@@ -10,13 +10,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Role } from 'src/common/models/role.model';
 import { RolesService } from '../roles/roles.service';
-import { Scopes } from 'sequelize-typescript';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UsersService,
     @InjectModel(User)
     private readonly userModel: typeof User,
     @InjectModel(Role)
@@ -43,7 +41,7 @@ export class AuthService {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
 
-        const createdUser = await this.userService.create({
+        const createdUser = await this.userModel.create({
           name: signUpDto.name,
           email: signUpDto.email,
           password: hashedPassword,

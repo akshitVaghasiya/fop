@@ -104,21 +104,16 @@ export class UserProfileService {
     getProfile(id: string, user: AuthUser, item_id?: string): Promise<any> {
         return new Promise(async (resolve, reject) => {
             try {
-                const profile = await this.userProfileModel.findOne({
-                    where: { user_id: id },
-                    // attributes: {
-                    //     exclude: ['profile_picture', 'profile_picture_metadata'],
-                    // },
-                    // include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }],
-                    // raw: true,
-                    // nest: true,
-                });
-
-                if (!profile) {
-                    return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
-                }
 
                 if (user && (user.id === id || isAdminRole(user.role_name))) {
+                    const profile = await this.userProfileModel.findOne({
+                        where: { user_id: id }
+                    });
+
+                    if (!profile) {
+                        return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
+                    }
+
                     return resolve(profile);
                 }
 
@@ -126,36 +121,47 @@ export class UserProfileService {
                     return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
                 }
 
-                const item = await this.itemsModel.findByPk(item_id, {
-                    attributes: ['id', 'status'],
-                    raw: true,
-                });
+                const [permissionWithItem, profile] = await Promise.all([
+                    this.permissionRequestsModel.findOne({
+                        where: {
+                            owner_id: id,
+                            requester_id: user?.id,
+                            item_id,
+                            status: 'APPROVED',
+                        },
+                        include: [{
+                            model: Item,
+                            as: 'item',
+                            attributes: ['id', 'status'],
+                            required: true
+                        }],
+                        attributes: ['id', 'status'],
+                        raw: true,
+                        nest: true,
+                    }),
+                    this.userProfileModel.findOne({
+                        where: { user_id: id }
+                    })
+                ]);
 
-                if (!item) {
-                    return reject({ error: ERROR_MESSAGES.ITEM_NOT_FOUND, statusCode: 404 });
+                if (!permissionWithItem) {
+                    return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
                 }
+
+                const item = permissionWithItem.item;
                 if (item.status === 'COMPLETED' || item.status === 'REJECTED') {
                     return reject({ error: ERROR_MESSAGES.ITEM_NOT_ACTIVE, statusCode: 400 });
                 }
 
-                const permission = await this.permissionRequestsModel.findOne({
-                    where: {
-                        owner_id: id,
-                        requester_id: user?.id,
-                        item_id,
-                        status: 'APPROVED',
-                    },
-                    attributes: ['id', 'status'],
-                    raw: true,
-                });
-                if (!permission) {
-                    return reject({ error: ERROR_MESSAGES.NO_PROFILE_PERMISSION, statusCode: 403 });
+                if (!profile) {
+                    return reject({ error: ERROR_MESSAGES.PROFILE_NOT_FOUND, statusCode: 404 });
                 }
 
                 resolve(profile);
+
             } catch (error) {
                 console.log('error->', error);
-                reject({ error: error.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: error.statusCode || 500 });
+                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
             }
         });
     }

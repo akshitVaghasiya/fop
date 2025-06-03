@@ -26,7 +26,7 @@ export class AuthController {
     try {
       return await this.authService.register(signUpDto);
     } catch (err) {
-      throw new GlobalHttpException(err.error, err.statusCode);
+      throw new GlobalHttpException(err?.error, err?.statusCode);
     }
   }
 
