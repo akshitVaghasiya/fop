@@ -24,40 +24,38 @@ export class AuthService {
   ) { }
 
   async register(signUpDto: SignUpDto): Promise<{ data: Omit<User, 'password'>; message: string }> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const existingUser = await this.userModel.findOne({
-          where: { email: signUpDto.email },
-          raw: true,
-        });
+    try {
+      const existingUser = await this.userModel.findOne({
+        where: { email: signUpDto.email },
+        raw: true,
+      });
 
-        if (existingUser) {
-          return reject({
-            error: ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED,
-            statusCode: 409,
-          });
-        }
-
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
-
-        const createdUser = await this.userModel.create({
-          name: signUpDto.name,
-          email: signUpDto.email,
-          password: hashedPassword,
-        });
-
-        resolve({
-          data: createdUser,
-          message: 'User registered successfully',
-        });
-      } catch (err) {
-        reject({
-          error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-          statusCode: 500,
-        });
+      if (existingUser) {
+        throw {
+          error: ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED,
+          statusCode: 409,
+        };
       }
-    });
+
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+
+      const createdUser = await this.userModel.create({
+        name: signUpDto.name,
+        email: signUpDto.email,
+        password: hashedPassword,
+      });
+
+      return {
+        data: createdUser,
+        message: 'User registered successfully',
+      };
+    } catch (err) {
+      throw {
+        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      };
+    }
   }
 
   async login(signInDto: SignInDto): Promise<{
@@ -67,64 +65,62 @@ export class AuthService {
     refresh_token: string;
     refresh_expires_in: number;
   }> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const user = await this.userModel.scope('withPassword').findOne({
-          where: { email: signInDto.email },
-          raw: true,
-        });
+    try {
+      const user = await this.userModel.scope('withPassword').findOne({
+        where: { email: signInDto.email },
+        raw: true,
+      });
 
-        if (!user) {
-          return reject({
-            error: ERROR_MESSAGES.USER_NOT_FOUND,
-            statusCode: 404,
-          });
-        }
-
-        if (!user.is_active) {
-          return reject({
-            error: ERROR_MESSAGES.ACCOUNT_DEACTIVATED,
-            statusCode: 403,
-          });
-        }
-
-        const isValid = await bcrypt.compare(signInDto.password, user.password);
-        if (!isValid) {
-          return reject({
-            error: ERROR_MESSAGES.INVALID_CREDENTIALS,
-            statusCode: 401,
-          });
-        }
-
-        const payload = {
-          id: user.id,
-          name: user.name,
+      if (!user) {
+        throw {
+          error: ERROR_MESSAGES.USER_NOT_FOUND,
+          statusCode: 404,
         };
-
-        const accessToken = this.jwtService.sign(payload, {
-          secret: process.env.JWT_SECRET,
-          expiresIn: Number(process.env.JWT_EXPIRE),
-        });
-
-        const refreshToken = this.jwtService.sign(payload, {
-          secret: process.env.JWT_REFRESH_SECRET,
-          expiresIn: Number(process.env.JWT_REFRESH_EXPIRE),
-        });
-
-        resolve({
-          access_token: accessToken,
-          token_type: 'Bearer',
-          expires_in: Number(process.env.JWT_EXPIRE),
-          refresh_token: refreshToken,
-          refresh_expires_in: Number(process.env.JWT_REFRESH_EXPIRE),
-        });
-      } catch (err) {
-        reject({
-          error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-          statusCode: 500,
-        });
       }
-    });
+
+      if (!user.is_active) {
+        throw {
+          error: ERROR_MESSAGES.ACCOUNT_DEACTIVATED,
+          statusCode: 403,
+        };
+      }
+
+      const isValid = await bcrypt.compare(signInDto.password, user.password);
+      if (!isValid) {
+        throw {
+          error: ERROR_MESSAGES.INVALID_CREDENTIALS,
+          statusCode: 401,
+        };
+      }
+
+      const payload = {
+        id: user.id,
+        name: user.name,
+      };
+
+      const accessToken = this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: Number(process.env.JWT_EXPIRE),
+      });
+
+      const refreshToken = this.jwtService.sign(payload, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: Number(process.env.JWT_REFRESH_EXPIRE),
+      });
+
+      return {
+        access_token: accessToken,
+        token_type: 'Bearer',
+        expires_in: Number(process.env.JWT_EXPIRE),
+        refresh_token: refreshToken,
+        refresh_expires_in: Number(process.env.JWT_REFRESH_EXPIRE),
+      };
+    } catch (err) {
+      throw {
+        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      };
+    }
   }
 
   async refreshToken(refreshToken: string): Promise<{
@@ -132,126 +128,116 @@ export class AuthService {
     token_type: string;
     expires_in: number;
   }> {
-    return new Promise(async (resolve, reject) => {
-      try {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
 
-        const payload = await this.jwtService.verifyAsync(refreshToken, {
-          secret: process.env.JWT_REFRESH_SECRET,
-        });
+      const user = await this.userModel.findOne({
+        where: { id: payload.id },
+        raw: true,
+      });
 
-        const user = await this.userModel.findOne({
-          where: { id: payload.id },
-          raw: true,
-        });
-
-        if (!user) {
-          return reject({
-            error: ERROR_MESSAGES.USER_NOT_FOUND,
-            statusCode: 404,
-          });
-        }
-
-        if (!user.is_active) {
-          return reject({
-            error: ERROR_MESSAGES.ACCOUNT_DEACTIVATED,
-            statusCode: 403,
-          });
-        }
-
-        const newPayload = {
-          id: user.id,
-          name: user.name,
+      if (!user) {
+        throw {
+          error: ERROR_MESSAGES.USER_NOT_FOUND,
+          statusCode: 404,
         };
-
-        const newAccessToken = this.jwtService.sign(newPayload, {
-          secret: process.env.JWT_SECRET,
-          expiresIn: Number(process.env.JWT_EXPIRE),
-        });
-
-        resolve({
-          access_token: newAccessToken,
-          token_type: 'Bearer',
-          expires_in: Number(process.env.JWT_EXPIRE),
-        });
-      } catch (err) {
-        reject({
-          error: ERROR_MESSAGES.INVALID_TOKEN,
-          statusCode: 401,
-        });
       }
-    });
+
+      if (!user.is_active) {
+        throw {
+          error: ERROR_MESSAGES.ACCOUNT_DEACTIVATED,
+          statusCode: 403,
+        };
+      }
+
+      const newPayload = {
+        id: user.id,
+        name: user.name,
+      };
+
+      const newAccessToken = this.jwtService.sign(newPayload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: Number(process.env.JWT_EXPIRE),
+      });
+
+      return {
+        access_token: newAccessToken,
+        token_type: 'Bearer',
+        expires_in: Number(process.env.JWT_EXPIRE),
+      };
+    } catch (err) {
+      throw {
+        error: ERROR_MESSAGES.INVALID_TOKEN,
+        statusCode: 401,
+      };
+    }
   }
 
   async userInfo(id: string): Promise<User> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // const user = await this.userModel.findByPk(id, {
-        // const user = await this.userModel.unscoped().findByPk(id, {
-        const user = await this.userModel.scope('withAuthItem').findByPk(id, {
-          include: [
-            {
-              model: this.roleModel.scope('withDetail'),
-              as: 'auth_items'
-            },
-          ],
-          raw: true,
-          nest: true,
-        });
+    try {
+      const user = await this.userModel.scope('withAuthItem').findByPk(id, {
+        include: [
+          {
+            model: this.roleModel.scope('withDetail'),
+            as: 'auth_items'
+          },
+        ],
+        raw: true,
+        nest: true,
+      });
 
-        if (!user) {
-          return reject({ error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 });
-        }
-        if (user.auth_items) {
-          const [formattedRole] = await this.rolesService.formatRoles([user.auth_items]);
-
-          user.auth_items.auth_items = formattedRole.auth_items;
-        }
-
-        resolve(user);
-      } catch (error) {
-        console.log('Error-->', error);
-
-        reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+      if (!user) {
+        throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
       }
-    });
+      if (user.auth_items) {
+        const [formattedRole] = await this.rolesService.formatRoles([user.auth_items]);
+
+        user.auth_items.auth_items = formattedRole.auth_items;
+      }
+
+      return user;
+    } catch (error) {
+      console.log('Error-->', error);
+      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    }
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const user = await this.userModel.findByPk(userId, { raw: true });
-        if (!user) {
-          return reject({
-            error: ERROR_MESSAGES.USER_NOT_FOUND,
-            statusCode: 404,
-          });
-        }
-
-        const isMatch = await bcrypt.compare(changePasswordDto.oldPassword, user.password);
-
-        if (!isMatch) {
-          return reject({
-            error: ERROR_MESSAGES.OLD_PASSWORD_INCORRECT,
-            statusCode: 400,
-          });
-        }
-
-        const salt = await bcrypt.genSalt();
-        const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, salt);
-
-        await this.userModel.update(
-          { password: hashedNewPassword },
-          { where: { id: userId } }
-        );
-
-        resolve({ message: 'Password changed successfully' });
-      } catch (err) {
-        reject({
-          error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-          statusCode: 500,
-        });
+    try {
+      const user = await this.userModel.findByPk(userId, { raw: true });
+      if (!user) {
+        throw {
+          error: ERROR_MESSAGES.USER_NOT_FOUND,
+          statusCode: 404,
+        };
       }
-    });
+
+      const isMatch = await bcrypt.compare(changePasswordDto.oldPassword, user.password);
+
+      if (!isMatch) {
+        throw {
+          error: ERROR_MESSAGES.OLD_PASSWORD_INCORRECT,
+          statusCode: 400,
+        };
+      }
+
+      const salt = await bcrypt.genSalt();
+      const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, salt);
+
+      await this.userModel.update(
+        { password: hashedNewPassword },
+        { where: { id: userId } }
+      );
+
+      return { message: 'Password changed successfully' };
+    } catch (err) {
+      throw {
+        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      };
+    }
   }
 
 }

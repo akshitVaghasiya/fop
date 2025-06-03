@@ -23,40 +23,35 @@ export class RolesService {
         private readonly authChildModel: typeof AuthChild,
     ) { }
 
-    create(dto: CreateRoleDto): Promise<Role> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const role = await this.roleModel.create({
-                    name: dto.name,
-                    auth_items: [],
-                });
-                resolve(role);
-            } catch (error) {
-                if (error instanceof UniqueConstraintError) {
-                    return reject({ error: ERROR_MESSAGES.UNIQUE_ROLE, statusCode: 400 });
-                }
-
-                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+    async create(dto: CreateRoleDto): Promise<Role> {
+        try {
+            const role = await this.roleModel.create({
+                name: dto.name,
+                auth_items: [],
+            });
+            return role;
+        } catch (error) {
+            if (error instanceof UniqueConstraintError) {
+                throw { error: ERROR_MESSAGES.UNIQUE_ROLE, statusCode: 400 };
             }
-        });
+            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+        }
     }
 
-    findAll(): Promise<any[]> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const roles = await this.roleModel.findAll({
-                    raw: true,
-                    attributes: ['id', 'name', 'auth_items']
-                });
-                const formatted = await this.formatRoles(roles);
-                resolve(formatted);
-            } catch (error) {
-                reject({
-                    error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-                    statusCode: 500
-                });
-            }
-        });
+    async findAll(): Promise<any[]> {
+        try {
+            const roles = await this.roleModel.findAll({
+                raw: true,
+                attributes: ['id', 'name', 'auth_items']
+            });
+            const formatted = await this.formatRoles(roles);
+            return formatted;
+        } catch (error) {
+            throw {
+                error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: 500
+            };
+        }
     }
 
     public async formatRoles(roles: Role[]): Promise<any[]> {
@@ -115,59 +110,55 @@ export class RolesService {
         };
     }
 
-    update(id: string, dto: UpdateRoleDto): Promise<Role> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const role = await this.roleModel.findByPk(id, { raw: true });
-                if (!role) {
-                    return reject({ error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 });
-                }
-
-                if (isProtectedRole(role.name)) {
-                    return reject({ error: ERROR_MESSAGES.UPDATE_ADMIN_ROLE, statusCode: 400 });
-                }
-
-                const [rowsUpdated, [updatedRole]] = await this.roleModel.update(dto, {
-                    where: { id },
-                    returning: true,
-                });
-
-                if (rowsUpdated === 0) {
-                    return reject({ error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 });
-                }
-
-                resolve(updatedRole);
-            } catch (error) {
-                console.log("error--->", error);
-                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+    async update(id: string, dto: UpdateRoleDto): Promise<Role> {
+        try {
+            const role = await this.roleModel.findByPk(id, { raw: true });
+            if (!role) {
+                throw { error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 };
             }
-        });
+
+            if (isProtectedRole(role.name)) {
+                throw { error: ERROR_MESSAGES.UPDATE_ADMIN_ROLE, statusCode: 400 };
+            }
+
+            const [rowsUpdated, [updatedRole]] = await this.roleModel.update(dto, {
+                where: { id },
+                returning: true,
+            });
+
+            if (rowsUpdated === 0) {
+                throw { error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 };
+            }
+
+            return updatedRole;
+        } catch (error) {
+            console.log("error--->", error);
+            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+        }
     }
 
-    delete(id: string): Promise<{ message: string }> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const role = await this.roleModel.findByPk(id, { raw: true });
-                if (!role) {
-                    return reject({ error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 });
-                }
-
-                if (isProtectedRole(role.name)) {
-                    return reject({ error: ERROR_MESSAGES.DELETE_ADMIN_ROLE, statusCode: 400 });
-                }
-
-                const userCount = await this.userModel.count({ where: { role_id: id } });
-                if (userCount > 0) {
-                    return reject({ error: ERROR_MESSAGES.ROLE_IN_USE, statusCode: 400 });
-                }
-
-                await this.roleModel.destroy({ where: { id } });
-                resolve({ message: 'Role deleted successfully' });
-            } catch (error) {
-                if (error.statusCode) return reject(error);
-                reject({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 });
+    async delete(id: string): Promise<{ message: string }> {
+        try {
+            const role = await this.roleModel.findByPk(id, { raw: true });
+            if (!role) {
+                throw { error: ERROR_MESSAGES.ROLE_NOT_FOUND, statusCode: 404 };
             }
-        });
+
+            if (isProtectedRole(role.name)) {
+                throw { error: ERROR_MESSAGES.DELETE_ADMIN_ROLE, statusCode: 400 };
+            }
+
+            const userCount = await this.userModel.count({ where: { role_id: id } });
+            if (userCount > 0) {
+                throw { error: ERROR_MESSAGES.ROLE_IN_USE, statusCode: 400 };
+            }
+
+            await this.roleModel.destroy({ where: { id } });
+            return { message: 'Role deleted successfully' };
+        } catch (error) {
+            if (error.statusCode) throw error;
+            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+        }
     }
 
 }
