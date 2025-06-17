@@ -32,7 +32,6 @@ export class RolesController {
 
     @Post()
     @Roles('role_create')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Create a new role' })
     @ApiResponse({ status: 201, description: 'Role created', type: Role })
     async create(@Body() createDto: CreateRoleDto): Promise<Role> {
@@ -45,7 +44,6 @@ export class RolesController {
 
     @Get()
     @Roles('role_view')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get all roles' })
     @ApiResponse({ status: 200, description: 'List of all roles' })
     async findAll(): Promise<any[]> {
@@ -58,7 +56,6 @@ export class RolesController {
 
     @Patch(':id')
     @Roles('role_update')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Update a role' })
     @ApiParam({ name: 'id', description: 'UUID of the role' })
     @ApiResponse({ status: 200, description: 'Updated role', type: Role })
@@ -76,7 +73,6 @@ export class RolesController {
 
     @Delete(':id')
     @Roles('role_delete')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Delete a role' })
     @ApiParam({ name: 'id', description: 'UUID of the role' })
     @ApiResponse({ status: 200, description: 'Role deleted' })

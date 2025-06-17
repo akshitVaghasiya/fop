@@ -34,7 +34,10 @@ export class RolesService {
             if (error instanceof UniqueConstraintError) {
                 throw { error: ERROR_MESSAGES.UNIQUE_ROLE, statusCode: 400 };
             }
-            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+            throw {
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
+            };
         }
     }
 
@@ -48,8 +51,8 @@ export class RolesService {
             return formatted;
         } catch (error) {
             throw {
-                error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-                statusCode: 500
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
             };
         }
     }
@@ -133,7 +136,10 @@ export class RolesService {
             return updatedRole;
         } catch (error) {
             console.log("error--->", error);
-            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+            throw {
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
+            };
         }
     }
 
@@ -156,8 +162,11 @@ export class RolesService {
             await this.roleModel.destroy({ where: { id } });
             return { message: 'Role deleted successfully' };
         } catch (error) {
-            if (error.statusCode) throw error;
-            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+            // if (error.statusCode) throw error;
+            throw {
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
+            };
         }
     }
 

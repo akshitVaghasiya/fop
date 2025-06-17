@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Item } from 'src/common/models/item.model';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
-import { UserRole } from 'src/common/types/enums/users.enum';
 import { isAdminRole } from 'src/common/utils/role.util';
 
 type PageContext = {
@@ -37,8 +36,11 @@ export class UsersService {
         password: createUserDto.password,
       });
       return user;
-    } catch (error) {
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
 
@@ -49,8 +51,11 @@ export class UsersService {
         raw: true,
       });
       return data;
-    } catch (error) {
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
 
@@ -82,8 +87,11 @@ export class UsersService {
       };
 
       return { users: rows, page_context };
-    } catch (error) {
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
 
@@ -94,8 +102,11 @@ export class UsersService {
         throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
       }
       return user;
-    } catch (error) {
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
 
@@ -122,8 +133,11 @@ export class UsersService {
         throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
       }
       return updatedUsers[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
 
@@ -150,9 +164,12 @@ export class UsersService {
         throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
       }
       return updatedUsers[0];
-    } catch (error) {
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+    } catch (err) {
+      throw {
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
+      };
     }
   }
-  
+
 }

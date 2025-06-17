@@ -9,27 +9,31 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { ItemsService } from './items.service';
-import { CreateItemDto } from '../dto/create-item.dto';
-import { ItemFilterDto } from '../dto/item-filter.dto';
-import { UpdateItemDto } from '../dto/update-item.dto';
+import { CreateItemDto } from './dto/create-item.dto';
+import { ItemFilterDto } from './dto/item-filter.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 import { AuthenticatedRequest } from 'src/common/types/authenticated-request.type';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Item } from 'src/common/models/item.model';
 import { GlobalHttpException } from 'src/common/exceptions/global-exception';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
-import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 import { Public } from 'src/common/decorators/public/public.decorator';
-import { CreateFreeItemDto } from '../dto/create-free-item.dto';
+import { CreateFreeItemDto } from './dto/create-free-item.dto';
+import { AssignReceiverDto } from './dto/assign-receiver.dto';
+import { ItemInterests } from 'src/common/models/item-interest.model';
+import { ItemInterestFilterDto } from './dto/item-interest-filter.dto';
 
 @ApiTags('Items')
-// @Roles(UserRole.ADMIN, UserRole.USER)
-@Controller('items')
+@Controller()
 export class ItemsController {
-  constructor(private readonly itemsService: ItemsService) { }
+  constructor(
+    protected readonly itemsService: ItemsService
+    // private readonly itemInterestsService: ItemInterestsService
+  ) { }
 
   @Public()
-  @Post('free')
+  @Post('/items/free')
   @ApiOperation({ summary: 'Create a new free item' })
   @ApiResponse({
     status: 201,
@@ -60,10 +64,9 @@ export class ItemsController {
       throw new GlobalHttpException(err.error, err.statusCode);
     }
   }
-  
-  @Post()
+
+  @Post('/items')
   @Roles('item_create')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new item' })
   @ApiResponse({
@@ -98,9 +101,8 @@ export class ItemsController {
   }
 
   @Public()
-  @Get()
+  @Get('/items')
   // @Roles('item_list')
-  // @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get all items' })
   @ApiResponse({ status: 200, description: 'List of items', type: [Item] })
   @ApiQuery({
@@ -118,9 +120,8 @@ export class ItemsController {
     }
   }
 
-  @Get('shared')
+  @Get('/items/shared')
   @Roles('item_shared_list')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get shared items for the authenticated user' })
   @ApiResponse({
@@ -142,9 +143,8 @@ export class ItemsController {
     }
   }
 
-  @Get('my')
+  @Get('/items/my')
   @Roles('item_my_list')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get items created by the authenticated user' })
   @ApiResponse({ status: 200, description: 'List of user-created items', type: [Item] })
@@ -164,9 +164,8 @@ export class ItemsController {
     }
   }
 
-  @Get(':id')
+  @Get('/items/:id')
   @Roles('item_view')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get an item by ID' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
@@ -183,9 +182,8 @@ export class ItemsController {
     }
   }
 
-  @Patch(':id')
+  @Patch('/items/:id')
   @Roles('item_update')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an item' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
@@ -214,9 +212,8 @@ export class ItemsController {
     }
   }
 
-  @Patch(':id/reject')
+  @Patch('/items/:id/reject')
   @Roles('item_reject')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reject an item' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
@@ -233,9 +230,8 @@ export class ItemsController {
     }
   }
 
-  @Delete(':id')
+  @Delete('/items/:id')
   @Roles('item_delete')
-  @UseGuards(PermissionGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an item' })
   @ApiParam({ name: 'id', description: 'UUID of the item' })
@@ -247,6 +243,73 @@ export class ItemsController {
   ): Promise<{ message: string }> {
     try {
       return await this.itemsService.delete(id, req.user);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+}
+
+// @ApiTags('Items')
+// @Controller('items')
+export class ItemInterestsController extends ItemsController {
+  constructor(
+    itemsService: ItemsService
+  ) {
+    super(itemsService);
+  }
+
+  @ApiBearerAuth()
+  @Get('items/:item_id/interests')
+  @Roles('interest_list')
+  @ApiOperation({ summary: 'Get claims/interests for an item' })
+  @ApiResponse({ status: 200, description: 'List of claims/interests', type: [ItemInterests] })
+  @ApiParam({ name: 'item_id', description: 'UUID of the item', required: true })
+  @ApiQuery({ name: 'filters', description: 'Filters for claims/interests', type: ItemInterestFilterDto })
+  async getInterests(
+    @Param('item_id', ParseUUIDPipe) item_id: string,
+    @Query() filters: ItemInterestFilterDto,
+    @Req() req: AuthenticatedRequest,
+  ): Promise<{ interests: ItemInterests[]; page_context: any }> {
+    try {
+      return await this.itemsService.getInterests(item_id, filters, req.user);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+  @ApiBearerAuth()
+  @Post('items/:item_id/interests')
+  @Roles('interest_create')
+  @ApiOperation({ summary: 'Create a claim (FOUND) or interest (FREE)' })
+  @ApiResponse({ status: 201, description: 'Claim/interest created', type: ItemInterests })
+  @ApiResponse({ status: 403, description: 'Forbidden (e.g., owner, already claimed)' })
+  @ApiParam({ name: 'item_id', description: 'UUID of the item', required: true })
+  async createInterest(
+    @Req() req: AuthenticatedRequest,
+    @Param('item_id', ParseUUIDPipe) item_id: string,
+  ): Promise<ItemInterests> {
+    try {
+      return await this.itemsService.createInterest(item_id, req.user.id);
+    } catch (err) {
+      throw new GlobalHttpException(err.error, err.statusCode);
+    }
+  }
+
+  @ApiBearerAuth()
+  @Post('items/:interest_id/assign')
+  @Roles('interest_assign')
+  @ApiOperation({ summary: 'Assign receiver for claim (FOUND) or interest (FREE)' })
+  @ApiResponse({ status: 201, description: 'Receiver assigned', type: ItemInterests })
+  @ApiResponse({ status: 403, description: 'Not authorized or invalid assignment' })
+  @ApiParam({ name: 'interest_id', description: 'UUID of the claim/interest' })
+  async assignReceiver(
+    @Param('interest_id', ParseUUIDPipe) interest_id: string,
+    @Body() dto: AssignReceiverDto,
+    @Req() req: AuthenticatedRequest,
+  ): Promise<{ message: string }> {
+    try {
+      return await this.itemsService.assignReceiver(interest_id, req.user);
     } catch (err) {
       throw new GlobalHttpException(err.error, err.statusCode);
     }

@@ -41,8 +41,6 @@ export class PermissionGuard implements CanActivate {
             nest: true,
         });
 
-        console.log("user-->", user);
-
         if (!user || !user.auth_items.auth_items) {
             return false;
         }
@@ -51,16 +49,18 @@ export class PermissionGuard implements CanActivate {
 
         const userPermissions = user.auth_items.auth_items;
 
+        console.log("reqper->", requiredPermissions);
+        console.log("userPermissions->", userPermissions);
         const parentPermissions = await AuthChild.findAll({
             where: { child: requiredPermissions },
             attributes: ['parent'],
             raw: true,
         }).then(results => results.map(r => r.parent));
-
         console.log("parentPermissions-->", parentPermissions);
 
-        return requiredPermissions.some(permission =>
+        return requiredPermissions.every(permission =>
             userPermissions.includes(permission) ||
+            //  parentPermissions.includes(permission)
             parentPermissions.some(parent => userPermissions.includes(parent))
         );
     }

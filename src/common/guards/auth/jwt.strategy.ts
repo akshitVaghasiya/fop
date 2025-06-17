@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../../modules/users/users.service';
-import { UserDeactivatedException } from '../../exceptions/user-deactivated.exception';
 import { AuthUser } from '../../types/auth-user.type';
+import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -19,13 +19,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         const user = await this.usersService.findOneById(payload.id);
 
         if (!user) {
-            throw new UnauthorizedException('User not found');
+            throw { error: ERROR_MESSAGES.USER_NOT_FOUND, statusCode: 404 };
         }
         if (!user.is_active) {
-            throw new UserDeactivatedException({
-                message: 'Account deactivated',
-                code: 'USER_DEACTIVATED',
-            });
+            throw { error: ERROR_MESSAGES.USER_DEACTIVATED, statusCode: 403 };
         }
         return user;
     }

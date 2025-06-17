@@ -10,7 +10,6 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
 import { ChatFilterDto } from './dto/chat-filter.dto';
 import { Op } from 'sequelize';
-import { UserRole } from 'src/common/types/enums/users.enum';
 import { ItemStatus, ItemType } from 'src/common/types/enums/items.enum';
 import { isAdminRole } from 'src/common/utils/role.util';
 
@@ -135,7 +134,10 @@ export class ChatsService {
             return createdChat!;
         } catch (error) {
             await transaction.rollback();
-            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+            throw {
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
+            };
         }
     }
 
@@ -209,7 +211,10 @@ export class ChatsService {
 
             return { messages: rows, page_context };
         } catch (error) {
-            throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+            throw {
+                error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+                statusCode: error?.statusCode || 500,
+            };
         }
     }
 }

@@ -1,4 +1,8 @@
 export const ERROR_MESSAGES = {
+  USER_DEACTIVATED: {
+    error: 'USER_DEACTIVATED',
+    message: 'User deactivated.',
+  },
   EMAIL_ALREADY_REGISTERED: {
     error: 'EMAIL_ALREADY_REGISTERED',
     message: 'Email already registered',

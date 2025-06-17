@@ -50,9 +50,7 @@ export class AuthController {
 
   @Get('user_info')
   @ApiBearerAuth()
-  // @Roles(UserRole.ADMIN, UserRole.USER)
   @Roles('auth_user_info')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get current user details' })
   @ApiResponse({ status: 200, description: 'Current user details', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -81,9 +79,7 @@ export class AuthController {
 
   @Post('change_password')
   @ApiBearerAuth()
-  // @Roles(UserRole.ADMIN, UserRole.USER)
   @Roles('auth_change_password')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid old password' })

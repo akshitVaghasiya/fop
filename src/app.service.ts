@@ -25,16 +25,6 @@ export class AppService {
     private authItemModel: typeof AuthItem,
   ) { }
 
-  async authChild(): Promise<any> {
-    const parentPermissions = await this.authChildModel.findAll()
-    return parentPermissions;
-  }
-
-  async authItem(): Promise<any> {
-    const parentPermissions = await this.authItemModel.findAll()
-    return parentPermissions;
-  }
-
   async getHello(
     filters: UserFilterDto,
   ): Promise<any> {

@@ -8,8 +8,6 @@ import { User } from 'src/common/models/users.model';
 import { ItemInterestFilterDto } from '../dto/item-interest-filter.dto';
 import { AuthUser } from 'src/common/types/auth-user.type';
 import { CreateItemInterestDto } from '../dto/create-item-interest.dto';
-import { ProfilePermissionService } from 'src/modules/user-profile-permission/profile-permission.service';
-import { UserRole } from 'src/common/types/enums/users.enum';
 import { ItemType, ItemStatus } from 'src/common/types/enums/items.enum';
 import { isAdminRole } from 'src/common/utils/role.util';
 
@@ -27,7 +25,6 @@ export class ItemInterestsService {
         @InjectModel(ItemInterests) private readonly itemInterestsModel: typeof ItemInterests,
         @InjectModel(User) private readonly usersModel: typeof User,
         @Inject('SEQUELIZE') private readonly sequelize: Sequelize,
-        private readonly profilePermissionService: ProfilePermissionService,
     ) { }
 
     async createInterest(dto: CreateItemInterestDto, user_id: string): Promise<ItemInterests> {

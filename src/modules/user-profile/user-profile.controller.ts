@@ -20,6 +20,7 @@ import {
     ApiBearerAuth,
     ApiQuery,
     ApiConsumes,
+    ApiBody,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
@@ -32,6 +33,10 @@ import { UserProfileService } from './user-profile.service';
 import { PermissionGuard } from 'src/common/guards/roles/permission.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ERROR_MESSAGES } from 'src/common/constants/error-response.constant';
+import { ProfileViewRequests } from 'src/common/models/profile-view-request.model';
+import { PermissionRequestFilterDto } from './dto/permission-request-filter.dto';
+import { UpdateStatusProfileDto } from './dto/update-status.dto';
+import { ApprovePermissionRequestFilterDto } from './dto/approve-permission-request-filter.dto';
 
 @ApiTags('User Profiles')
 @ApiBearerAuth()
@@ -40,9 +45,7 @@ export class UserProfileController {
     constructor(private readonly userProfilesService: UserProfileService) { }
 
     @Post()
-    // @Roles(UserRole.USER)
     @Roles('user_profile_create')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Create a user profile' })
     @ApiResponse({ status: 201, description: 'Created user profile', type: UserProfile })
     @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -71,9 +74,7 @@ export class UserProfileController {
     }
 
     @Get()
-    // @Roles(UserRole.ADMIN)
     @Roles('user_profile_list')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get all user profiles' })
     @ApiResponse({ status: 200, description: 'List of all user profiles', type: [UserProfile] })
     async findAll(
@@ -87,9 +88,7 @@ export class UserProfileController {
     }
 
     @Get(':id')
-    // @Roles(UserRole.ADMIN, UserRole.USER)
     @Roles('user_profile_view')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Get a user profile (item_id optional for self/admin)' })
     @ApiParam({ name: 'id', description: 'UUID of the user' })
     @ApiQuery({ name: 'item_id', description: 'UUID of the item for permission check', required: false })
@@ -109,9 +108,7 @@ export class UserProfileController {
     }
 
     @Patch(':id')
-    // @Roles(UserRole.ADMIN, UserRole.USER)
     @Roles('user_profile_update')
-    @UseGuards(PermissionGuard)
     @ApiOperation({ summary: 'Update user profile details' })
     @ApiParam({ name: 'id', description: 'UUID of the user profile' })
     @ApiResponse({ status: 200, description: 'Updated user profile', type: UserProfile })
@@ -135,6 +132,85 @@ export class UserProfileController {
     ): Promise<UserProfile> {
         try {
             return await this.userProfilesService.update(id, updateDto, req.user, file);
+        } catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+
+    @Post(':item_id/permission')
+    @Roles('profile_permission_create')
+    @ApiOperation({ summary: 'Request permission to view a profile for an item' })
+    @ApiParam({ name: 'item_id', description: 'UUID of the item' })
+    @ApiResponse({ status: 201, description: 'Permission request created', type: ProfileViewRequests })
+    @ApiResponse({ status: 403, description: 'Invalid request or interaction' })
+    async createPermissionRequest(
+        @Req() req: AuthenticatedRequest,
+        @Param('item_id', ParseUUIDPipe) item_id: string,
+        // @Body() createDto: CreatePermissionRequestDto,
+    ): Promise<ProfileViewRequests> {
+        try {
+            return await this.userProfilesService.createPermissionRequest(item_id, req.user.id);
+        } catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+
+    @Get(':item_id/permission')
+    @Roles('profile_permission_list')
+    @ApiOperation({ summary: 'List permission requests (incoming or outgoing)' })
+    @ApiParam({ name: 'item_id', description: 'UUID of the item' })
+    @ApiResponse({ status: 200, description: 'List of permission requests', type: [ProfileViewRequests] })
+    @ApiQuery({ name: 'filters', description: 'Filters for requests', type: PermissionRequestFilterDto })
+    async getPermissionRequests(
+        @Query() filters: PermissionRequestFilterDto,
+        @Param('item_id', ParseUUIDPipe) item_id: string,
+        @Req() req: AuthenticatedRequest,
+    ): Promise<{ requests: ProfileViewRequests[]; page_context: any }> {
+        try {
+            return await this.userProfilesService.getPermissionRequests(item_id, filters, req.user);
+        } catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+
+    @Get(':item_id/viewers')
+    @Roles('profile_permission_viewers')
+    @ApiOperation({ summary: 'List users with approved permission to view user profile' })
+    @ApiResponse({ status: 200, type: [ProfileViewRequests] })
+    @ApiParam({ name: 'item_id', description: 'UUID of the item' })
+    @ApiQuery({ name: 'filters', type: ApprovePermissionRequestFilterDto })
+    async getProfileViewers(
+        @Query() filters: ApprovePermissionRequestFilterDto,
+        @Param('item_id', ParseUUIDPipe) item_id: string,
+        @Req() req: AuthenticatedRequest,
+    ): Promise<{ viewers: ProfileViewRequests[]; page_context: any }> {
+        try {
+            return await this.userProfilesService.getProfileViewers(item_id, filters, req.user);
+        }
+        catch (err) {
+            throw new GlobalHttpException(err.error, err.statusCode);
+        }
+    }
+
+    @Patch(':permission_id/permission_status')
+    @Roles('profile_permission_status_update')
+    @ApiOperation({ summary: 'Update the status of a profile view permission request' })
+    @ApiResponse({ status: 200, description: 'Request status updated', type: ProfileViewRequests })
+    @ApiResponse({ status: 403, description: 'Not authorized to update status' })
+    @ApiResponse({ status: 400, description: 'Invalid status transition' })
+    @ApiParam({ name: 'permission_id', description: 'UUID of the permission request' })
+    @ApiBody({ type: UpdateStatusProfileDto, description: 'New status for the permission request' })
+    async updatePermissionRequestStatus(
+        @Param('permission_id', ParseUUIDPipe) id: string,
+        @Body() updateStatusDto: UpdateStatusProfileDto,
+        @Req() req: AuthenticatedRequest,
+    ): Promise<ProfileViewRequests> {
+        try {
+            return await this.userProfilesService.updatePermissionRequestStatus(
+                id,
+                req.user.id,
+                updateStatusDto.status,
+            );
         } catch (err) {
             throw new GlobalHttpException(err.error, err.statusCode);
         }

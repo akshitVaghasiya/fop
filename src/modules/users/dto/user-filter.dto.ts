@@ -22,8 +22,8 @@ export class UserFilterDto {
   limit?: number = 5;
 
   @ApiPropertyOptional({
-    description: 'Search term for items',
-    example: 'wallet',
+    description: 'Search by user name',
+    example: 'john',
   })
   @IsString()
   @IsOptional()

@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
-import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../common/models/users.model';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +9,12 @@ import { InjectModel } from '@nestjs/sequelize';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Role } from 'src/common/models/role.model';
 import { RolesService } from '../roles/roles.service';
+
+interface JwtPayload {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
 
 @Injectable()
 export class AuthService {
@@ -50,10 +55,10 @@ export class AuthService {
         data: createdUser,
         message: 'User registered successfully',
       };
-    } catch (err) {
+    } catch (error) {
       throw {
-        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        statusCode: 500,
+        error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: error?.statusCode || 500,
       };
     }
   }
@@ -115,10 +120,10 @@ export class AuthService {
         refresh_token: refreshToken,
         refresh_expires_in: Number(process.env.JWT_REFRESH_EXPIRE),
       };
-    } catch (err) {
+    } catch (error) {
       throw {
-        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        statusCode: 500,
+        error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: error?.statusCode || 500,
       };
     }
   }
@@ -129,9 +134,17 @@ export class AuthService {
     expires_in: number;
   }> {
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
-      });
+      let payload: JwtPayload;
+      try {
+        payload = await this.jwtService.verifyAsync(refreshToken, {
+          secret: process.env.JWT_REFRESH_SECRET,
+        });
+      } catch (error) {
+        throw {
+          error: ERROR_MESSAGES.INVALID_TOKEN,
+          statusCode: 400
+        }
+      }
 
       const user = await this.userModel.findOne({
         where: { id: payload.id },
@@ -167,10 +180,12 @@ export class AuthService {
         token_type: 'Bearer',
         expires_in: Number(process.env.JWT_EXPIRE),
       };
-    } catch (err) {
+    } catch (error) {
+      console.log("error-->", error);
+
       throw {
-        error: ERROR_MESSAGES.INVALID_TOKEN,
-        statusCode: 401,
+        error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: error?.statusCode || 500,
       };
     }
   }
@@ -200,13 +215,16 @@ export class AuthService {
       return user;
     } catch (error) {
       console.log('Error-->', error);
-      throw { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR, statusCode: 500 };
+      throw {
+        error: error?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: error?.statusCode || 500,
+      };
     }
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
     try {
-      const user = await this.userModel.findByPk(userId, { raw: true });
+      const user = await this.userModel.scope("withPassword").findByPk(userId, { raw: true });
       if (!user) {
         throw {
           error: ERROR_MESSAGES.USER_NOT_FOUND,
@@ -234,8 +252,8 @@ export class AuthService {
       return { message: 'Password changed successfully' };
     } catch (err) {
       throw {
-        error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        statusCode: 500,
+        error: err?.error || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        statusCode: err?.statusCode || 500,
       };
     }
   }

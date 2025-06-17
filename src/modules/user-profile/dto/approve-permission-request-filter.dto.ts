@@ -22,13 +22,13 @@ export class ApprovePermissionRequestFilterDto {
     // @IsOptional()
     // status?: ProfileViewStatus;
 
-    @ApiProperty({ required: false })
-    @IsString()
-    @IsOptional()
-    item_id?: string;
+    // @ApiProperty({ required: false })
+    // @IsString()
+    // @IsOptional()
+    // item_id?: string;
 
     @ApiProperty({ description: 'Filter by owner UUID (for viewers)', required: false })
     @IsUUID()
     @IsOptional()
-    owner_id?: string;
+    owner_id: string;
 }

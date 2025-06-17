@@ -21,18 +21,6 @@ export class AppController {
     return "server is running";
   }
 
-  @Public()
-  @Get('auth_child')
-  async authChild() {
-    return await this.appService.authChild();
-  }
-
-  @Public()
-  @Get('auth_Item')
-  async authItem() {
-    return await this.appService.authItem();
-  }
-
   // @Public()
   // @Get('user-preference')
   // userPreference() {

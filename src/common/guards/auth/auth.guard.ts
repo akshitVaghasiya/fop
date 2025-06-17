@@ -21,14 +21,20 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     try {
       const result = await super.canActivate(context);
-      if (!result) throw new GlobalHttpException(ERROR_MESSAGES.INVALID_TOKEN, 401);
+      if (!result) throw {
+        error: ERROR_MESSAGES.INVALID_TOKEN,
+        statusCode: 401
+      };
 
       if (request.user) {
         request.user = request.user
       }
+
       return true;
     } catch (error) {
-      throw new GlobalHttpException(ERROR_MESSAGES.INVALID_TOKEN, 401);
+      throw new GlobalHttpException(
+        error?.error || ERROR_MESSAGES.INVALID_TOKEN,
+        error?.statusCode || 401);
     }
   }
 }

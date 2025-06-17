@@ -18,10 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:create": "ts-node src/common/database/create-migration.ts",
-    "migration:up": "ts-node src/common/database/umzug.config.ts up",
-    "migration:down": "ts-node src/common/database/umzug.config.ts down",
-    "migration:list": "ts-node src/common/database/umzug.config.ts list"
+    "migration:create": "ts-node src/common/config/database/create-migration.ts",
+    "migration:up": "ts-node src/common/config/database/umzug.config.ts up",
+    "migration:down": "ts-node src/common/config/database/umzug.config.ts down",
+    "migration:list": "ts-node src/common/config/database/umzug.config.ts list"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

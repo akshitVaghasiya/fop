@@ -22,8 +22,8 @@ export class PermissionRequestFilterDto {
     @IsOptional()
     status?: ProfileViewStatus;
 
-    @ApiProperty({ example: 'UUID of the item', required: false })
-    @IsString()
-    @IsOptional()
-    item_id?: string;
+    // @ApiProperty({ example: 'UUID of the item', required: false })
+    // @IsString()
+    // @IsOptional()
+    // item_id?: string;
 }

@@ -18,7 +18,6 @@ export class UsersController {
 
   @Get()
   @Roles('user_list')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   async findAll(
@@ -33,7 +32,6 @@ export class UsersController {
 
   @Get(':id')
   @Roles('user_view')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Get details of a specific user' })
   @ApiParam({
     name: 'id',
@@ -51,7 +49,6 @@ export class UsersController {
 
   @Patch(':id')
   @Roles('user_update')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Update user details' })
   @ApiParam({ name: 'id', description: 'UUID of the user' })
   @ApiResponse({ status: 200, description: 'Updated user details', type: User })
@@ -70,7 +67,6 @@ export class UsersController {
 
   @Patch(':id/status')
   @Roles('user_status_update')
-  @UseGuards(PermissionGuard)
   @ApiOperation({ summary: 'Update user active status' })
   @ApiParam({
     name: 'id',
