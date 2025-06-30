@@ -26,6 +26,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = ERROR_MESSAGES.INTERNAL_SERVER_ERROR.message;
 
     if (exception instanceof HttpException) {
+      console.log("exception->", exception);
+      console.log("exception->", exception.getResponse());
+      console.log("exception->", exception.getStatus());
       statusCode = exception.getStatus();
       const exceptionResponse = exception.getResponse();
       if (
@@ -34,20 +37,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         'error' in exceptionResponse &&
         'message' in exceptionResponse
       ) {
-        error = (exceptionResponse as any).error || error;
-        message = (exceptionResponse as any).message || message;
+        error = typeof exceptionResponse.error === 'string' ? exceptionResponse.error : error;
+        message = typeof exceptionResponse.message === 'string' ? exceptionResponse.message : message;
       } else if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
       }
     } else if (exception instanceof Error) {
       message = exception.message || message;
-    } else if (
-      typeof exception === 'object' &&
-      exception !== null &&
-      'error' in exception
-    ) {
-      error = (exception as any).error.error || error;
-      message = (exception as any).error.message || message;
     } else if (typeof exception === 'string') {
       message = exception;
     } else {

@@ -28,7 +28,7 @@ import { ItemInterestFilterDto } from './dto/item-interest-filter.dto';
 @Controller()
 export class ItemsController {
   constructor(
-    protected readonly itemsService: ItemsService
+    private readonly itemsService: ItemsService
     // private readonly itemInterestsService: ItemInterestsService
   ) { }
 
@@ -47,7 +47,7 @@ export class ItemsController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('itemImage', {
     fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+      if (!file.mimetype.match(/image\/(jpg|jpeg|png)/)) {
         return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
       }
       cb(null, true);
@@ -81,7 +81,7 @@ export class ItemsController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('itemImage', {
     fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+      if (!file.mimetype.match(/image\/(jpg|jpeg|png)/)) {
         return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
       }
       cb(null, true);
@@ -192,7 +192,7 @@ export class ItemsController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('itemImage', {
     fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/image\/(jpg|jpeg|png|gif)/)) {
+      if (!file.mimetype.match(/image\/(jpg|jpeg|png)/)) {
         return cb(new GlobalHttpException(ERROR_MESSAGES.INVALID_FILE_TYPE, 400), false);
       }
       cb(null, true);
@@ -250,14 +250,12 @@ export class ItemsController {
 
 }
 
-// @ApiTags('Items')
-// @Controller('items')
-export class ItemInterestsController extends ItemsController {
+@ApiTags('Items')
+@Controller()
+export class ItemInterestsController {
   constructor(
-    itemsService: ItemsService
-  ) {
-    super(itemsService);
-  }
+    private readonly itemsService: ItemsService
+  ) { }
 
   @ApiBearerAuth()
   @Get('items/:item_id/interests')

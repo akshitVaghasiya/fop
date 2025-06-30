@@ -19,7 +19,7 @@ import { ItemInterestFilterDto } from './dto/item-interest-filter.dto';
 
 type WhereType = {
     type?: string;
-    status?: string;
+    status?: ItemStatus | { [key: symbol]: any };
     [Op.or]?: [
         { title: { [Op.iLike]: string } },
         { description: { [Op.iLike]: string } }
@@ -125,28 +125,29 @@ export class ItemsService {
     async findAll(
         filters: ItemFilterDto,
     ): Promise<{ items: Item[]; page_context: PageContext }> {
-        const {
-            page = 1,
-            limit = 5,
-            type,
-            status,
-            search,
-            sort_by = 'created_at',
-            sort_type = 'DESC',
-        } = filters;
-
-        const where: WhereType = {
-            ...(type && { type }),
-            ...(status && { status }),
-            ...(search && {
-                [Op.or]: [
-                    { title: { [Op.iLike]: `%${search}%` } },
-                    { description: { [Op.iLike]: `%${search}%` } },
-                ],
-            }),
-        };
-
         try {
+            const {
+                page = 1,
+                limit = 5,
+                type,
+                status,
+                search,
+                sort_by = 'created_at',
+                sort_type = 'DESC',
+            } = filters;
+
+            const where: WhereType = {
+                // ...(status && { status }),
+                status: status ? status : { [Op.in]: [ItemStatus.ACTIVE, ItemStatus.COMPLETED] },
+                ...(type && { type }),
+                ...(search && {
+                    [Op.or]: [
+                        { title: { [Op.iLike]: `%${search}%` } },
+                        { description: { [Op.iLike]: `%${search}%` } },
+                    ],
+                }),
+            };
+
             const { rows, count } = await this.itemsModel.findAndCountAll({
                 where,
                 order: [[sort_by, sort_type]],

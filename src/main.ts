@@ -18,12 +18,12 @@ async function bootstrap() {
     .setTitle('Find Out Portal')
     .setDescription('The API description')
     .setVersion('1.0')
-    .addTag('API')
+    // .addTag('API')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document);
 
   app.useGlobalPipes(
     new ValidationPipe({

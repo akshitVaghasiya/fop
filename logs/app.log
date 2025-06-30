@@ -1725,3 +1725,33 @@
 {"level":50,"time":1750154070586,"pid":13260,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-17T09:54:30.583Z] [ERROR] POST /auth/refresh 400 - Invalid or expired token"}
 {"level":30,"time":1750154880761,"pid":13068,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-17T10:08:00.760Z] [INFO] POST /auth/login 201 - 456ms"}
 {"level":50,"time":1750154882872,"pid":13068,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-17T10:08:02.872Z] [ERROR] POST /auth/refresh 400 - Invalid or expired token"}
+{"level":50,"time":1750224699523,"pid":10484,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T05:31:39.522Z] [ERROR] POST /auth/login 500 - Internal server error"}
+{"level":50,"time":1750224734199,"pid":17316,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T05:32:14.198Z] [ERROR] POST /auth/login 500 - Internal server error"}
+{"level":30,"time":1750224766213,"pid":15152,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T05:32:46.212Z] [INFO] POST /auth/login 201 - 916ms"}
+{"level":30,"time":1750226674528,"pid":8100,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:04:34.527Z] [INFO] POST /items/free 201 - 3584ms"}
+{"level":50,"time":1750227333522,"pid":8100,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:15:33.522Z] [ERROR] GET /api-docs 404 - Cannot GET /api-docs"}
+{"level":50,"time":1750227333679,"pid":8100,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:15:33.679Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":50,"time":1750229634505,"pid":11096,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:53:54.503Z] [ERROR] GET /json 404 - Cannot GET /json"}
+{"level":50,"time":1750229635422,"pid":11096,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:53:55.422Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":50,"time":1750229643475,"pid":11096,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-18T06:54:03.475Z] [ERROR] GET /api/json 404 - Cannot GET /api/json"}
+{"level":30,"time":1750857547188,"pid":6220,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:19:07.187Z] [INFO] POST /auth/login 201 - 971ms"}
+{"level":50,"time":1750857565811,"pid":6220,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:19:25.811Z] [ERROR] GET /users?page=1&limit=10&search=john 403 - Forbidden resource"}
+{"level":50,"time":1750857575286,"pid":6220,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:19:35.286Z] [ERROR] GET /auth/user_info 403 - Forbidden resource"}
+{"level":30,"time":1750857586701,"pid":6220,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:19:46.701Z] [INFO] POST /auth/login 201 - 227ms"}
+{"level":30,"time":1750857603713,"pid":6220,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:20:03.713Z] [INFO] GET /auth/user_info 200 - 221ms"}
+{"level":30,"time":1750858024023,"pid":2736,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:27:04.022Z] [INFO] GET /auth/user_info 304 - 325ms"}
+{"level":50,"time":1750858032142,"pid":2736,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-25T13:27:12.142Z] [ERROR] GET /auth/user_info 401 - Invalid or expired token"}
+{"level":50,"time":1750939053237,"pid":1952,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-26T11:57:33.236Z] [ERROR] GET /users?page=1&limit=10&search=john 401 - Invalid or expired token"}
+{"level":50,"time":1750939067115,"pid":14760,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-26T11:57:47.114Z] [ERROR] GET /users?page=1&limit=10&search=john 401 - Invalid or expired token"}
+{"level":50,"time":1750939116997,"pid":5876,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-26T11:58:36.996Z] [ERROR] GET /users?page=1&limit=10&search=john 401 - Invalid or expired token"}
+{"level":50,"time":1750939162948,"pid":9484,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-26T11:59:22.947Z] [ERROR] GET /users?page=1&limit=10&search=john 401 - Invalid or expired token"}
+{"level":50,"time":1751277327261,"pid":13872,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T09:55:27.260Z] [ERROR] GET /api 404 - Cannot GET /api"}
+{"level":50,"time":1751277329087,"pid":13872,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T09:55:29.087Z] [ERROR] GET /api 404 - Cannot GET /api"}
+{"level":50,"time":1751277329661,"pid":13872,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T09:55:29.661Z] [ERROR] GET /favicon.ico 404 - Cannot GET /favicon.ico"}
+{"level":30,"time":1751277341613,"pid":13872,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T09:55:41.613Z] [INFO] GET / 200 - 3ms"}
+{"level":30,"time":1751280292353,"pid":14272,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:44:52.352Z] [INFO] GET /items?page=1&limit=10 200 - 447ms"}
+{"level":30,"time":1751280307458,"pid":14272,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:45:07.458Z] [INFO] GET /items?status=REJECTED&page=1&limit=10 200 - 315ms"}
+{"level":30,"time":1751280319662,"pid":14272,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:45:19.662Z] [INFO] GET /items?page=1&limit=10 304 - 121ms"}
+{"level":30,"time":1751280342672,"pid":14272,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:45:42.672Z] [INFO] GET /items?page=1&limit=20 200 - 121ms"}
+{"level":30,"time":1751280575466,"pid":19720,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:49:35.465Z] [INFO] GET /items?page=1&limit=20 200 - 291ms"}
+{"level":30,"time":1751280587691,"pid":19720,"hostname":"DESKTOP-030UCRK","msg":"[2025-06-30T10:49:47.691Z] [INFO] GET /items?status=REJECTED&page=1&limit=20 200 - 126ms"}

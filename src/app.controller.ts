@@ -15,11 +15,11 @@ export class AppController {
     return 'pong';
   }
 
-  @Public()
-  @Get()
-  getHello() {
-    return "server is running";
-  }
+  // @Public()
+  // @Get()
+  // getHello() {
+  //   return "server is running";
+  // }
 
   // @Public()
   // @Get('user-preference')

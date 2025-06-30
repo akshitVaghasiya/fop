@@ -26,9 +26,9 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
         statusCode: 401
       };
 
-      if (request.user) {
-        request.user = request.user
-      }
+      // if (request.user) {
+      //   request.user = request.user
+      // }
 
       return true;
     } catch (error) {

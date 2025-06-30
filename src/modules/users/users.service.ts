@@ -112,6 +112,8 @@ export class UsersService {
 
   async updateUser(id: string, dto: UpdateUserDto, user: AuthUser): Promise<User> {
     try {
+      console.log("update user dto-->", dto);
+
       if (!isAdminRole(user.role_name) && user.id !== id) {
         throw { error: ERROR_MESSAGES.FORBIDDEN_ACCESS, statusCode: 403 };
       }
