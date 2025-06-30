@@ -47,11 +47,11 @@ export const sequelizeConfig: SequelizeModuleOptions = {
     ],
     logging: (msg) => console.log(msg),
     ssl: false,
-    // dialectOptions: {
-    //     ssl: {
-    //         require: true,
-    //         rejectUnauthorized: true,
-    //         ca: caCert,
-    //     },
-    // },
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: true,
+            ca: caCert,
+        },
+    },
 };
